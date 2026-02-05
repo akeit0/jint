@@ -221,7 +221,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -239,7 +239,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -256,7 +256,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -281,7 +281,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -306,7 +306,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -351,7 +351,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -392,7 +392,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -435,7 +435,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -463,25 +463,27 @@ internal abstract class JintBinaryExpression : JintExpression
             _invert = invert;
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
                 return JsValue.Undefined;
             }
 
-            if (context.OperatorOverloadingAllowed
-                && TryOperatorOverloading(context, left, right, _invert ? "op_Inequality" : "op_Equality", out var opResult))
-            {
-                return JsValue.FromObject(context.Engine, opResult);
-            }
+            // if (context.OperatorOverloadingAllowed
+            //     && TryOperatorOverloading(context, left, right, _invert ? "op_Inequality" : "op_Equality", out var opResult))
+            // {
+            //     return JsValue.FromObject(context.Engine, opResult);
+            // }
 
             // if types match, we can take faster strict equality
-            var equality = left.Type == right.Type
+            var tagLeft = (int)left.Tag;
+            var tagRight = (int)right.Tag;
+            var equality = tagLeft==tagRight||Math.Min(tagLeft, tagRight)>=8
                 ? left.Equals(right)
                 : left.IsLooselyEqual(right);
 
-            return equality == !_invert ? JsBoolean.True : JsBoolean.False;
+            return new JsValue(equality == !_invert);
         }
     }
 
@@ -494,7 +496,7 @@ internal abstract class JintBinaryExpression : JintExpression
             _leftFirst = leftFirst;
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var leftValue, out var rightValue))
             {
@@ -521,7 +523,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var leftValue, out var rightValue))
             {
@@ -538,7 +540,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var leftReference, out var rightReference))
             {
@@ -665,7 +667,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -695,7 +697,7 @@ internal abstract class JintBinaryExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var left, out var right))
             {
@@ -738,7 +740,7 @@ internal abstract class JintBinaryExpression : JintExpression
             _operator = expression.Operator;
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!TryEvaluateOperands(context, out var lval, out var rval))
             {

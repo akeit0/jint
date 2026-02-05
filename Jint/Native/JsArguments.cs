@@ -157,7 +157,7 @@ public sealed class JsArguments : ObjectInstance
 
         if (desc.IsAccessorDescriptor())
         {
-            if (desc.Set is not ICallable setter)
+            if (desc.Set.Obj is not ICallable setter)
             {
                 return false;
             }
@@ -201,7 +201,7 @@ public sealed class JsArguments : ObjectInstance
                 else
                 {
                     var descValue = desc.Value;
-                    if (descValue is not null && !descValue.IsUndefined())
+                    if (!descValue.IsUndefined())
                     {
                         map.Set(property, descValue, false);
                     }

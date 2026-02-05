@@ -1,3 +1,4 @@
+using Jint.Native;
 using Jint.Native.Function;
 
 namespace Jint.Runtime.Interpreter.Expressions;
@@ -11,7 +12,7 @@ internal sealed class JintArrowFunctionExpression : JintExpression
         _function = new JintFunctionDefinition(function);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         return Build(context.Engine, _function);
     }

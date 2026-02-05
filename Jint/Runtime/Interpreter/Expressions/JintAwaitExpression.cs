@@ -16,7 +16,7 @@ internal sealed class JintAwaitExpression : JintExpression
         _initialized = false;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

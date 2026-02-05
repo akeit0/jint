@@ -24,7 +24,7 @@ internal sealed class JintSequenceExpression : JintExpression
         _expressions = temp;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

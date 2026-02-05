@@ -83,12 +83,12 @@ internal sealed class NumberFormatPrototype : Prototype
             // Handle BigInt values separately to preserve precision
             if (value is JsBigInt bigInt)
             {
-                return numberFormat.Format(bigInt._value);
+                return numberFormat.Format(bigInt.value);
             }
 
             if (value is BigIntInstance bigIntInstance)
             {
-                return numberFormat.Format(bigIntInstance.BigIntData._value);
+                return numberFormat.Format(bigIntInstance.BigIntData.value);
             }
 
             return numberFormat.Format(TypeConverter.ToNumber(value));
@@ -318,12 +318,12 @@ internal sealed class NumberFormatPrototype : Prototype
         // Handle BigInt values - convert to double
         if (value is JsBigInt bigInt)
         {
-            return (double) bigInt._value;
+            return (double) bigInt.value;
         }
 
         if (value is BigIntInstance bigIntInstance)
         {
-            return (double) bigIntInstance.BigIntData._value;
+            return (double) bigIntInstance.BigIntData.value;
         }
 
         var number = TypeConverter.ToNumber(value);

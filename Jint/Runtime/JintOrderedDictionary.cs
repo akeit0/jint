@@ -26,7 +26,7 @@ namespace Jint.Runtime;
 /// </remarks>
 [DebuggerDisplay("Count = {Count}")]
 internal sealed class JintOrderedDictionary<TKey, TValue>
-    : IDictionary<TKey, TValue>, IList<KeyValuePair<TKey, TValue>> where TKey : class where TValue : class
+    : IDictionary<TKey, TValue>, IList<KeyValuePair<TKey, TValue>> //where TKey : class where TValue : class
 {
     private readonly Dictionary<TKey, TValue> dictionary;
     private readonly List<TKey> keys;

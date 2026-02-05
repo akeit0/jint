@@ -1,3 +1,4 @@
+using Jint.Native;
 using Jint.Runtime.Environments;
 
 namespace Jint.Runtime.Interpreter.Expressions;
@@ -8,7 +9,7 @@ internal sealed class JintSuperExpression : JintExpression
     {
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var envRec = (FunctionEnvironment) context.Engine.ExecutionContext.GetThisEnvironment();
         var activeFunction = envRec._functionObject;

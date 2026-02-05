@@ -39,7 +39,7 @@ public static class TypeConverter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static JsValue ToPrimitive(JsValue input, Types preferredType = Types.Empty)
     {
-        return input is not ObjectInstance oi
+        return input.Obj is not ObjectInstance oi
             ? input
             : ToPrimitiveObjectInstance(oi, preferredType);
     }
@@ -76,26 +76,26 @@ public static class TypeConverter
     /// </summary>
     internal static JsValue OrdinaryToPrimitive(ObjectInstance input, Types hint = Types.Empty)
     {
-        JsString property1;
-        JsString property2;
+        JsValue property1;
+        JsValue property2;
 
         if (hint == Types.String)
         {
-            property1 = (JsString) "toString";
-            property2 = (JsString) "valueOf";
+            property1 = "toString";
+            property2 = "valueOf";
         }
         else if (hint == Types.Number)
         {
-            property1 = (JsString) "valueOf";
-            property2 = (JsString) "toString";
+            property1 = "valueOf";
+            property2 = "toString";
         }
         else
         {
             Throw.TypeError(input.Engine.Realm);
-            return null;
+            return JsValue.Null;
         }
 
-        if (input.Get(property1) is ICallable method1)
+        if (input.Get(property1).Obj is ICallable method1)
         {
             var val = method1.Call(input, Arguments.Empty);
             if (val.IsPrimitive())
@@ -104,7 +104,7 @@ public static class TypeConverter
             }
         }
 
-        if (input.Get(property2) is ICallable method2)
+        if (input.Get(property2).Obj is ICallable method2)
         {
             var val = method2.Call(input, Arguments.Empty);
             if (val.IsPrimitive())
@@ -114,7 +114,7 @@ public static class TypeConverter
         }
 
         Throw.TypeError(input.Engine.Realm);
-        return null;
+        return default;
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public static class TypeConverter
             return primValue;
         }
 
-        return ToNumber(primValue);
+        return (primValue);
     }
 
     /// <summary>
@@ -147,28 +147,58 @@ public static class TypeConverter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double ToNumber(JsValue o)
     {
-        return o.IsNumber()
-            ? ((JsNumber) o)._value
+        return (int) o.Tag >= (int) Tag.JS_TAG_FLOAT64
+            ? o.GetFloat64Value()
             : ToNumberUnlikely(o);
     }
 
+
     private static double ToNumberUnlikely(JsValue o)
     {
-        var type = o._type & ~InternalTypes.InternalFlags;
+        var type = o.Tag;
 
         switch (type)
         {
-            case InternalTypes.Undefined:
+            case Tag.JS_TAG_UNDEFINED:
                 return double.NaN;
-            case InternalTypes.Null:
+            case Tag.JS_TAG_NULL:
                 return 0;
-            case InternalTypes.Boolean:
-                return ((JsBoolean) o)._value ? 1 : 0;
-            case InternalTypes.String:
-                return ToNumber(o.ToString());
-            case InternalTypes.Symbol:
-            case InternalTypes.BigInt:
-            case InternalTypes.Empty:
+            case Tag.JS_TAG_BOOL:
+                return (int) o.U != 0 ? 1 : 0;
+            case Tag.JS_TAG_STRING:
+                return ToNumber((string) o.Obj!);
+            case Tag.JS_TAG_SYMBOL:
+            case Tag.JS_TAG_BIG_INT:
+                // TODO proper TypeError would require Engine instance and a lot of API changes
+                Throw.TypeErrorNoEngine("Cannot convert a " + type + " value to a number");
+                return 0;
+            default:
+                return ToNumber(ToPrimitive(o, Types.Number));
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double ToNumberForComp(JsValue o)
+    {
+        return (int) o.Tag >= (int) Tag.JS_TAG_FLOAT64
+            ? o.GetFloat64Value()
+            : ToNumberUnlikely(o);
+    }
+
+    private static double ToNumberUnlikelyForComp(JsValue o)
+    {
+        var type = o.Tag;
+        switch (type)
+        {
+            case Tag.JS_TAG_UNDEFINED:
+            case Tag.JS_TAG_NULL:
+                return double.NaN;
+            case Tag.JS_TAG_BOOL:
+                return (int) o.U != 0 ? 1 : 0;
+            case Tag.JS_TAG_STRING:
+                return ToNumber((string) o.Obj!);
+            case Tag.JS_TAG_SYMBOL:
+            case Tag.JS_TAG_BIG_INT:
                 // TODO proper TypeError would require Engine instance and a lot of API changes
                 Throw.TypeErrorNoEngine("Cannot convert a " + type + " value to a number");
                 return 0;
@@ -280,7 +310,8 @@ public static class TypeConverter
         try
         {
             var targetString = firstChar == '-' ? input.Substring(1) : input;
-            var n = double.Parse(targetString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
+            var n =
+ double.Parse(targetString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
 
             if (n == 0 && firstChar == '-')
             {
@@ -566,7 +597,7 @@ public static class TypeConverter
     public static BigInteger ToBigInt(JsValue value)
     {
         return value is JsBigInt bigInt
-            ? bigInt._value
+            ? bigInt.value
             : ToBigIntUnlikely(value);
     }
 
@@ -576,7 +607,7 @@ public static class TypeConverter
         switch (prim.Type)
         {
             case Types.BigInt:
-                return ((JsBigInt) prim)._value;
+                return ((JsBigInt) prim).value;
             case Types.Boolean:
                 return ((JsBoolean) prim)._value ? BigInteger.One : BigInteger.Zero;
             case Types.String:
@@ -942,7 +973,7 @@ public static class TypeConverter
             case InternalTypes.Number:
                 return ToString(((JsNumber) o)._value);
             case InternalTypes.BigInt:
-                return ToString(((JsBigInt) o)._value);
+                return ToString(((JsBigInt) o).value);
             case InternalTypes.Symbol:
                 Throw.TypeErrorNoEngine("Cannot convert a Symbol value to a string");
                 return null;
@@ -962,7 +993,7 @@ public static class TypeConverter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ObjectInstance ToObject(Realm realm, JsValue value)
     {
-        if (value is ObjectInstance oi)
+        if (value.Obj is ObjectInstance oi)
         {
             return oi;
         }

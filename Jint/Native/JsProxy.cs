@@ -10,22 +10,22 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
     internal ObjectInstance _target;
     internal ObjectInstance? _handler;
 
-    private static readonly JsString TrapApply = new JsString("apply");
-    private static readonly JsString TrapGet = new JsString("get");
-    private static readonly JsString TrapSet = new JsString("set");
-    private static readonly JsString TrapPreventExtensions = new JsString("preventExtensions");
-    private static readonly JsString TrapIsExtensible = new JsString("isExtensible");
-    private static readonly JsString TrapDefineProperty = new JsString("defineProperty");
-    private static readonly JsString TrapDeleteProperty = new JsString("deleteProperty");
-    private static readonly JsString TrapGetOwnPropertyDescriptor = new JsString("getOwnPropertyDescriptor");
-    private static readonly JsString TrapHas = new JsString("has");
-    private static readonly JsString TrapGetProtoTypeOf = new JsString("getPrototypeOf");
-    private static readonly JsString TrapSetProtoTypeOf = new JsString("setPrototypeOf");
-    private static readonly JsString TrapOwnKeys = new JsString("ownKeys");
-    private static readonly JsString TrapConstruct = new JsString("construct");
+    private const string TrapApply = ("apply");
+    private const string TrapGet = ("get");
+    private const string TrapSet = ("set");
+    private const string TrapPreventExtensions = ("preventExtensions");
+    private const string TrapIsExtensible = ("isExtensible");
+    private const string TrapDefineProperty = ("defineProperty");
+    private const string TrapDeleteProperty = ("deleteProperty");
+    private const string TrapGetOwnPropertyDescriptor = ("getOwnPropertyDescriptor");
+    private const string TrapHas = ("has");
+    private const string TrapGetProtoTypeOf = ("getPrototypeOf");
+    private const string TrapSetProtoTypeOf = ("setPrototypeOf");
+    private const string TrapOwnKeys = ("ownKeys");
+    private const string TrapConstruct = ("construct");
 
-    private static readonly JsString KeyFunctionRevoke = new JsString("revoke");
-    private static readonly JsString KeyIsArray = new JsString("isArray");
+    private const string KeyFunctionRevoke = ("revoke");
+    private const string KeyIsArray = ("isArray");
 
     public JsProxy(
         Engine engine,
@@ -85,7 +85,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
             return constructor.Construct(arguments, newTarget);
         }
 
-        var oi = result as ObjectInstance;
+        var oi = result.Obj as ObjectInstance;
         if (oi is null)
         {
             Throw.TypeError(_engine.Realm);
@@ -111,7 +111,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
                 return true;
             }
 
-            if (_handler is not null && _handler.TryGetValue(TrapConstruct, out var handlerFunction) && handlerFunction is IConstructor)
+            if (_handler is not null && _handler.TryGetValue(TrapConstruct, out var handlerFunction) && handlerFunction.Obj is IConstructor)
             {
                 return true;
             }
@@ -147,7 +147,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
 
             if (targetDesc.IsAccessorDescriptor())
             {
-                if (!targetDesc.Configurable && (targetDesc.Get ?? Undefined).IsUndefined() && !result.IsUndefined())
+                if (!targetDesc.Configurable && (targetDesc.Get).IsUndefined() && !result.IsUndefined())
                 {
                     Throw.TypeError(_engine.Realm, $"'get' on proxy: property '{property}' is a non-configurable accessor property on the proxy target and does not have a getter function, but the trap did not return 'undefined' (got '{result}')");
                 }
@@ -292,7 +292,6 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
     {
         if (desc.IsGenericDescriptor() || desc.IsDataDescriptor())
         {
-            desc.Value ??= Undefined;
             if (!desc.WritableSet)
             {
                 desc.Writable = false;
@@ -301,8 +300,8 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
         else
         {
             var getSet = (GetSetPropertyDescriptor) desc;
-            getSet.SetGet(getSet.Get ?? Undefined);
-            getSet.SetSet(getSet.Set ?? Undefined);
+            getSet.SetGet(getSet.Get);
+            getSet.SetSet(getSet.Set);
         }
 
         if (!desc.EnumerableSet)
@@ -345,7 +344,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
 
             if (targetDesc.IsAccessorDescriptor() && !targetDesc.Configurable)
             {
-                if ((targetDesc.Set ?? Undefined).IsUndefined())
+                if ((targetDesc.Set).IsUndefined())
                 {
                     Throw.TypeError(_engine.Realm, $"'set' on proxy: trap returned truish for property '{property}' which exists in the proxy target as a non-configurable and non-writable accessor property without a setter");
                 }
@@ -408,7 +407,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
 
     private static bool IsCompatiblePropertyDescriptor(bool extensible, PropertyDescriptor desc, PropertyDescriptor current)
     {
-        return ValidateAndApplyPropertyDescriptor(null, JsString.Empty, extensible, desc, current);
+        return ValidateAndApplyPropertyDescriptor(null, "", extensible, desc, current);
     }
 
     /// <summary>
@@ -539,15 +538,15 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
 
         if (_target.Extensible)
         {
-            return (ObjectInstance) handlerProto;
+            return (ObjectInstance) handlerProto.Obj!;
         }
 
-        if (!ReferenceEquals(handlerProto, _target.Prototype))
+        if (!ReferenceEquals(handlerProto.Obj!, _target.Prototype))
         {
             Throw.TypeError(_engine.Realm);
         }
 
-        return (ObjectInstance) handlerProto;
+        return (ObjectInstance) handlerProto.Obj!;
     }
 
     /// <summary>
@@ -572,7 +571,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
             return true;
         }
 
-        if (!ReferenceEquals(value, _target.Prototype))
+        if (!ReferenceEquals(value.Obj, _target.Prototype))
         {
             Throw.TypeError(_engine.Realm);
         }
@@ -590,7 +589,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
         var handlerFunction = _handler!.Get(propertyName);
         if (!handlerFunction.IsNullOrUndefined())
         {
-            var callable = handlerFunction as ICallable;
+            var callable = handlerFunction.Obj as ICallable;
             if (callable is null)
             {
                 Throw.TypeError(_engine.Realm, $"{_handler} returned for property '{propertyName}' of object '{_target}' is not a function");

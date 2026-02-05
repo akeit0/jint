@@ -16,7 +16,7 @@ public abstract class Constructor : Function.Function, IConstructor
     protected internal override JsValue Call(JsValue thisObject, JsCallArguments arguments)
     {
         Throw.TypeError(_realm, $"Constructor {_nameDescriptor?.Value} requires 'new'");
-        return null;
+        return default;
     }
 
     public abstract ObjectInstance Construct(JsCallArguments arguments, JsValue newTarget);

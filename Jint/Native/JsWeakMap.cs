@@ -6,16 +6,16 @@ namespace Jint.Native;
 
 internal sealed class JsWeakMap : ObjectInstance
 {
-    private readonly ConditionalWeakTable<JsValue, JsValue> _table;
+    private readonly ConditionalWeakTable<object, object> _table;
 
     public JsWeakMap(Engine engine) : base(engine)
     {
-        _table = new ConditionalWeakTable<JsValue, JsValue>();
+        _table = new ConditionalWeakTable<object, object>();
     }
 
     internal bool WeakMapHas(JsValue key)
     {
-        return _table.TryGetValue(key, out _);
+        return _table.TryGetValue(key.Obj!, out _);
     }
 
     internal bool WeakMapDelete(JsValue key)
@@ -31,7 +31,7 @@ internal sealed class JsWeakMap : ObjectInstance
         }
 
 #if SUPPORTS_WEAK_TABLE_ADD_OR_UPDATE
-        _table.AddOrUpdate(key, value);
+        _table.AddOrUpdate(key, value.Obj!);
 #else
         _table.Remove(key);
         _table.Add(key, value);
@@ -45,14 +45,14 @@ internal sealed class JsWeakMap : ObjectInstance
             return Undefined;
         }
 
-        return value;
+        return JsValue.FromObject(value);
     }
 
     internal JsValue GetOrInsert(JsValue key, JsValue value)
     {
         if (_table.TryGetValue(key, out var temp))
         {
-            return temp;
+            return JsValue.FromObject(temp);
         }
 
         _table.Add(key, value);
@@ -63,7 +63,7 @@ internal sealed class JsWeakMap : ObjectInstance
     {
         if (_table.TryGetValue(key, out var temp))
         {
-            return temp;
+            return JsValue.FromObject(temp);
         }
 
         var value = callbackfn.Call(Undefined, key);

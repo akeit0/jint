@@ -23,9 +23,9 @@ public sealed class GlobalSymbolRegistry
     // engine-specific created by scripts
     private Dictionary<JsValue, JsSymbol>? _customSymbolLookup;
 
-    internal bool TryGetSymbol(JsValue key, [NotNullWhen(true)] out JsSymbol? symbol)
+    internal bool TryGetSymbol(JsValue key, [NotNullWhen(true)] out JsSymbol symbol)
     {
-        symbol = null;
+        symbol = new JsSymbol(null);
         return _customSymbolLookup != null
                && _customSymbolLookup.TryGetValue(key, out symbol);
     }
@@ -33,10 +33,10 @@ public sealed class GlobalSymbolRegistry
     internal void Add(JsSymbol symbol)
     {
         _customSymbolLookup ??= new Dictionary<JsValue, JsSymbol>();
-        _customSymbolLookup[symbol._value] = symbol;
+        _customSymbolLookup[symbol._value!] = symbol;
     }
 
-    internal static JsSymbol CreateSymbol(JsValue description)
+    internal static JsSymbol CreateSymbol(string? description)
     {
         return new JsSymbol(description);
     }
@@ -46,9 +46,9 @@ public sealed class GlobalSymbolRegistry
     /// </summary>
     internal JsValue KeyForSymbol(JsValue value)
     {
-        if (value is JsSymbol symbol && _customSymbolLookup?.TryGetValue(symbol._value, out var s) == true)
+        if (value.IsSymbol() && _customSymbolLookup?.TryGetValue((string) value.Obj!, out var s) == true)
         {
-            return s._value;
+            return s!;
         }
 
         return JsValue.Undefined;

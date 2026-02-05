@@ -18,5 +18,5 @@ internal sealed class JintConstantExpression : JintExpression
 
     public override JsValue GetValue(EvaluationContext context) => _value;
 
-    protected override object EvaluateInternal(EvaluationContext context) => _value;
+    protected override JsValue EvaluateInternal(EvaluationContext context) => _value;
 }

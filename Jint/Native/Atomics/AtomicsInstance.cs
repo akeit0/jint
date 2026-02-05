@@ -553,7 +553,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         var currentValue = DoAtomicLoad(ta, byteIndexInBuffer);
         if (ta._arrayElementType == TypedArrayElementType.BigInt64)
         {
-            var currentBigInt = ((JsBigInt) currentValue)._value;
+            var currentBigInt = ((JsBigInt) currentValue).value;
             if (currentBigInt != v.BigInteger)
             {
                 return new JsString("not-equal");
@@ -671,7 +671,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         bool valueMatches;
         if (ta._arrayElementType == TypedArrayElementType.BigInt64)
         {
-            var currentBigInt = ((JsBigInt) currentValue)._value;
+            var currentBigInt = ((JsBigInt) currentValue).value;
             valueMatches = currentBigInt == v.BigInteger;
         }
         else

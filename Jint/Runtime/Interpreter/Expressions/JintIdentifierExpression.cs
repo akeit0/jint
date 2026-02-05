@@ -31,7 +31,7 @@ internal sealed class JintIdentifierExpression : JintExpression
         }
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var engine = context.Engine;
         var env = engine.ExecutionContext.LexicalEnvironment;

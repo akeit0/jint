@@ -20,7 +20,7 @@ using TypeConverter = Jint.Runtime.TypeConverter;
 namespace Jint.Native.Object;
 
 [DebuggerTypeProxy(typeof(ObjectInstanceDebugView))]
-public partial class ObjectInstance : JsValue, IEquatable<ObjectInstance>
+public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
 {
     private bool _initialized;
     private readonly ObjectClass _class;
@@ -1097,7 +1097,7 @@ public partial class ObjectInstance : JsValue, IEquatable<ObjectInstance>
 
                 if (this is BigIntInstance bigIntInstance)
                 {
-                    converted = bigIntInstance.BigIntData._value;
+                    converted = bigIntInstance.BigIntData.value;
                     break;
                 }
 

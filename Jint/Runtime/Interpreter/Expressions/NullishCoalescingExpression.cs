@@ -31,7 +31,7 @@ internal sealed class NullishCoalescingExpression : JintExpression
         return EvaluateConstantOrExpression(context);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         return EvaluateConstantOrExpression(context);
     }

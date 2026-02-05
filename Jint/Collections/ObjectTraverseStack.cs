@@ -9,7 +9,7 @@ namespace Jint.Collections;
 internal sealed class ObjectTraverseStack
 {
     private readonly Engine _engine;
-    private readonly Stack<object> _stack = new();
+    private readonly Stack<JsValue> _stack = new();
 
     public ObjectTraverseStack(Engine engine)
     {
@@ -18,11 +18,6 @@ internal sealed class ObjectTraverseStack
 
     public bool TryEnter(JsValue value)
     {
-        if (value is null)
-        {
-            Throw.ArgumentNullException(nameof(value));
-        }
-
         if (_stack.Contains(value))
         {
             return false;

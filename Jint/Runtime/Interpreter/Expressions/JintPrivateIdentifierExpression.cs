@@ -1,3 +1,5 @@
+using Jint.Native;
+
 namespace Jint.Runtime.Interpreter.Expressions;
 
 internal sealed class JintPrivateIdentifierExpression : JintExpression
@@ -9,7 +11,7 @@ internal sealed class JintPrivateIdentifierExpression : JintExpression
         _privateIdentifierString = expression.Name;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var engine = context.Engine;
         var env = engine.ExecutionContext.PrivateEnvironment;

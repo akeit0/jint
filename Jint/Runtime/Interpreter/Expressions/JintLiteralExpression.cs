@@ -58,7 +58,7 @@ internal sealed class JintLiteralExpression : JintExpression
         return ResolveValue(context);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context) => ResolveValue(context);
+    protected override JsValue EvaluateInternal(EvaluationContext context) => ResolveValue(context);
 
     private JsValue ResolveValue(EvaluationContext context)
     {

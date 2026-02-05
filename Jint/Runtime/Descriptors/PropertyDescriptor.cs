@@ -11,7 +11,7 @@ public class PropertyDescriptor
     public static readonly PropertyDescriptor Undefined = new UndefinedPropertyDescriptor();
 
     internal PropertyFlag _flags;
-    internal JsValue? _value;
+    internal JsValue _value;
 
     public PropertyDescriptor() : this(PropertyFlag.None)
     {
@@ -24,7 +24,7 @@ public class PropertyDescriptor
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected internal PropertyDescriptor(JsValue? value, PropertyFlag flags) : this(flags)
+    protected internal PropertyDescriptor(JsValue value, PropertyFlag flags) : this(flags)
     {
         if ((_flags & PropertyFlag.CustomJsValue) != PropertyFlag.None)
         {
@@ -36,7 +36,7 @@ public class PropertyDescriptor
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public PropertyDescriptor(JsValue? value, bool? writable, bool? enumerable, bool? configurable)
+    public PropertyDescriptor(JsValue value, bool? writable, bool? enumerable, bool? configurable)
     {
         if ((_flags & PropertyFlag.CustomJsValue) != PropertyFlag.None)
         {
@@ -79,8 +79,8 @@ public class PropertyDescriptor
         WritableSet = descriptor.WritableSet;
     }
 
-    public virtual JsValue? Get => null;
-    public virtual JsValue? Set => null;
+    public virtual JsValue Get => JsValue.Undefined;
+    public virtual JsValue Set => JsValue.Undefined;
 
     public bool Enumerable
     {
@@ -200,7 +200,7 @@ public class PropertyDescriptor
         {
             if ((_flags & PropertyFlag.CustomJsValue) != PropertyFlag.None)
             {
-                return CustomValue!;
+                return CustomValue;
             }
 
             return _value!;
@@ -216,9 +216,9 @@ public class PropertyDescriptor
         }
     }
 
-    protected internal virtual JsValue? CustomValue
+    protected internal virtual JsValue CustomValue
     {
-        get => null;
+        get => JsValue.Undefined;
         set => Throw.NotImplementedException();
     }
 
@@ -233,7 +233,7 @@ public class PropertyDescriptor
     /// </summary>
     public static PropertyDescriptor ToPropertyDescriptor(Realm realm, JsValue o)
     {
-        if (o is not ObjectInstance obj)
+        if (o.Obj is not ObjectInstance obj)
         {
             Throw.TypeError(realm);
             return null;

@@ -24,7 +24,7 @@ internal sealed class JintTaggedTemplateExpression : JintExpression
         _quasi.DoInitialize();
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

@@ -19,7 +19,7 @@ internal sealed class JintImportExpression : JintExpression
     /// <summary>
     /// https://tc39.es/proposal-import-attributes/#sec-evaluate-import-call
     /// </summary>
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

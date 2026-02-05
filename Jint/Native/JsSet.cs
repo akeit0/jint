@@ -22,16 +22,16 @@ public sealed class JsSet : ObjectInstance, IEnumerable<JsValue>
 
     public int Size => _set.Count;
 
-    internal JsValue? this[int index]
+    internal JsValue this[int index]
     {
-        get { return index < _set._list.Count ? _set._list[index] : null; }
+        get { return index < _set._list.Count ? _set._list[index] : JsValue.Undefined; }
     }
 
     public override PropertyDescriptor GetOwnProperty(JsValue property)
     {
-        if (CommonProperties.Size.Equals(property))
+        if (JsString.Equals(CommonProperties.Size, (property)))
         {
-            return new PropertyDescriptor(_set.Count, PropertyFlag.AllForbidden);
+            return new PropertyDescriptor((double) _set.Count, PropertyFlag.AllForbidden);
         }
 
         return base.GetOwnProperty(property);
@@ -39,7 +39,7 @@ public sealed class JsSet : ObjectInstance, IEnumerable<JsValue>
 
     protected override bool TryGetProperty(JsValue property, [NotNullWhen(true)] out PropertyDescriptor? descriptor)
     {
-        if (CommonProperties.Size.Equals(property))
+        if (JsString.Equals(CommonProperties.Size, (property)))
         {
             descriptor = new PropertyDescriptor(_set.Count, PropertyFlag.AllForbidden);
             return true;

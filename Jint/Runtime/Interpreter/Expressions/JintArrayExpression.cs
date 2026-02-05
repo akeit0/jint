@@ -26,7 +26,7 @@ internal sealed class JintArrayExpression : JintExpression
         _initialized = true;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {
@@ -72,7 +72,7 @@ internal sealed class JintArrayExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             return new JsArray(context.Engine, []);
         }

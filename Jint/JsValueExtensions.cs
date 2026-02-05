@@ -25,14 +25,14 @@ public static class JsValueExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsUndefined(this JsValue value)
     {
-        return value._type == InternalTypes.Undefined;
+        return value.U == (ulong)Tag.JS_TAG_UNDEFINED<<32;
     }
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsArray(this JsValue value)
     {
-        return value is JsArray;
+        return value.Obj is JsArray;
     }
 
     [Pure]
@@ -46,14 +46,14 @@ public static class JsValueExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsDate(this JsValue value)
     {
-        return value is JsDate;
+        return value.Obj is JsDate;
     }
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsPromise(this JsValue value)
     {
-        return value is JsPromise;
+        return value.Obj is JsPromise;
     }
 
     [Pure]
@@ -64,7 +64,7 @@ public static class JsValueExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsRegExp(this JsValue value)
     {
-        if (value is not ObjectInstance oi)
+        if (value.Obj is not ObjectInstance oi)
         {
             return false;
         }
@@ -206,12 +206,12 @@ public static class JsValueExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool AsBoolean(this JsValue value)
     {
-        if (value._type != InternalTypes.Boolean)
+        if (value.Tag != Tag.JS_TAG_BOOL)
         {
             ThrowWrongTypeException(value, "boolean");
         }
 
-        return ((JsBoolean) value)._value;
+        return (int)value.U != 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -234,7 +234,7 @@ public static class JsValueExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static BigInteger AsBigInt(this JsValue value)
     {
-        return ((JsBigInt) value)._value;
+        return ((JsBigInt) value).value;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

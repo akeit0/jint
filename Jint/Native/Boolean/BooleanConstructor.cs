@@ -28,7 +28,7 @@ internal sealed class BooleanConstructor : Constructor
     {
         if (arguments.Length == 0)
         {
-            return false;
+            return JsValue.False;
         }
 
         return TypeConverter.ToBoolean(arguments[0]);
@@ -55,7 +55,7 @@ internal sealed class BooleanConstructor : Constructor
         return o;
     }
 
-    public BooleanInstance Construct(JsBoolean value)
+    public BooleanInstance Construct(bool value)
     {
         var instance = new BooleanInstance(Engine, value)
         {

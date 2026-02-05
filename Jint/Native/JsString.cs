@@ -9,126 +9,62 @@ using Jint.Runtime;
 namespace Jint.Native;
 
 [DebuggerDisplay("{ToString()}")]
-public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
+public readonly struct JsString : IEquatable<JsString>, IEquatable<string>
 {
+    internal readonly object? _union = null;
+    internal readonly bool _isString = true;
     private const int AsciiMax = 126;
-    private static readonly JsString[] _charToJsValue;
-    private static readonly JsString[] _charToStringJsValue;
-    private static readonly JsString[] _intToStringJsValue;
+    private static readonly string[] _charToStringValue;
+    private static readonly string[] _intToStringJsValue;
 
     public static readonly JsString Empty;
-    internal static readonly JsString NullString;
-    internal static readonly JsString UndefinedString;
-    internal static readonly JsString ObjectString;
-    internal static readonly JsString FunctionString;
-    internal static readonly JsString BooleanString;
-    internal static readonly JsString StringString;
-    internal static readonly JsString NumberString;
-    internal static readonly JsString BigIntString;
-    internal static readonly JsString SymbolString;
-    internal static readonly JsString DefaultString;
-    internal static readonly JsString NumberZeroString;
-    internal static readonly JsString NumberOneString;
-    internal static readonly JsString TrueString;
-    internal static readonly JsString FalseString;
-    internal static readonly JsString LengthString;
-    internal static readonly JsValue CommaString;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal string _value;
-
-    private static readonly ConcurrentDictionary<string, JsString> _stringCache;
 
     static JsString()
     {
-        _charToJsValue = new JsString[AsciiMax + 1];
-        _charToStringJsValue = new JsString[AsciiMax + 1];
+        _charToStringValue = new string[AsciiMax + 1];
 
         for (var i = 0; i <= AsciiMax; i++)
         {
-            _charToJsValue[i] = new JsString((char) i);
-            _charToStringJsValue[i] = new JsString(((char) i).ToString());
+            _charToStringValue[i] = (((char) i).ToString());
         }
 
-        _intToStringJsValue = new JsString[1024];
+        _intToStringJsValue = new string[1024];
         for (var i = 0; i < _intToStringJsValue.Length; ++i)
         {
-            _intToStringJsValue[i] = new JsString(TypeConverter.ToString(i));
+            _intToStringJsValue[i] =(TypeConverter.ToString(i));
         }
-
-
-        _stringCache = new ConcurrentDictionary<string, JsString>(StringComparer.Ordinal);
-        Empty = new JsString("", InternalTypes.String);
-        NullString = CachedCreate("null");
-        UndefinedString = CachedCreate("undefined");
-        ObjectString = CachedCreate("object");
-        FunctionString = CachedCreate("function");
-        BooleanString = CachedCreate("boolean");
-        StringString = CachedCreate("string");
-        NumberString = CachedCreate("number");
-        BigIntString = CachedCreate("bigint");
-        SymbolString = CachedCreate("symbol");
-        DefaultString = CachedCreate("default");
-        NumberZeroString = CachedCreate("0");
-        NumberOneString = CachedCreate("1");
-        TrueString = CachedCreate("true");
-        FalseString = CachedCreate("false");
-        LengthString = CachedCreate("length");
-        CommaString = CachedCreate(",");
     }
 
-    public JsString(string value) : this(value, InternalTypes.String)
+    public JsString(string value) : this(value, true)
     {
     }
 
-    private JsString(string value, InternalTypes type) : base(type)
+    private JsString(object value, bool type)
     {
-        _value = value;
+        _union = value;
+        _isString = type;
     }
 
-    public JsString(char value) : base(Types.String)
+    public JsString(char value)
     {
-        _value = value.ToString();
+        _union = value.ToString();
+        _isString = true;
     }
 
-    public static bool operator ==(JsString? a, JsString? b)
+    public static bool operator ==(JsString a, JsString b)
     {
-        if (a is not null)
-        {
-            return a.Equals(b);
-        }
-
-        if (a is null)
-        {
-            return b is null;
-        }
-
-        return b is not null && a.Equals(b);
+        return a.Equals(b);
     }
 
-    public static bool operator ==(JsValue? a, JsString? b)
+    public static bool operator ==(JsValue a, JsString b)
     {
-        if (a is JsString s && b is not null)
-        {
-            return s.Equals(b);
-        }
 
-        if (a is null)
-        {
-            return b is null;
-        }
-
-        return b is not null && a.Equals(b);
+        return a.Equals(b);
     }
 
-    public static bool operator ==(JsString? a, JsValue? b)
+    public static bool operator ==(JsString a, JsValue b)
     {
-        if (a is not null)
-        {
-            return a.Equals(b);
-        }
-
-        return b is null;
+        return a.Equals(b);
     }
 
     public static bool operator !=(JsString a, JsValue b)
@@ -136,17 +72,12 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
         return !(a == b);
     }
 
-    public static bool operator ==(JsString? a, string? b)
+    public static bool operator ==(JsString a, string? b)
     {
-        if (a is not null)
-        {
-            return a.Equals(b);
-        }
-
-        return b is null;
+        return a.Equals(b);
     }
 
-    public static bool operator !=(JsString? a, string? b)
+    public static bool operator !=(JsString a, string? b)
     {
         return !(a == b);
     }
@@ -163,22 +94,6 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
 
     internal static JsString Create(string value)
     {
-        if (value.Length > 1)
-        {
-            return new JsString(value);
-        }
-
-        if (value.Length == 0)
-        {
-            return Empty;
-        }
-
-        var i = (uint) value[0];
-        var temp = _charToStringJsValue;
-        if (i < (uint) temp.Length)
-        {
-            return temp[i];
-        }
         return new JsString(value);
     }
 
@@ -194,10 +109,10 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
 
     internal static JsString Create(char value)
     {
-        var temp = _charToJsValue;
+        var temp = _charToStringValue;
         if (value < (uint) temp.Length)
         {
-            return temp[value];
+            return new JsString(temp[value]);
         }
 
         return new JsString(value);
@@ -208,7 +123,7 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
         var temp = _intToStringJsValue;
         if (value < (uint) temp.Length)
         {
-            return temp[value];
+            return new JsString(temp[value]);
         }
 
         return new JsString(TypeConverter.ToString(value));
@@ -222,7 +137,7 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
             return temp[value];
         }
 
-        return new JsString(TypeConverter.ToString(value));
+        return (TypeConverter.ToString(value));
     }
 
     internal static JsValue Create(ulong value)
@@ -233,20 +148,20 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
             return temp[value];
         }
 
-        return new JsString(TypeConverter.ToString(value));
+        return (TypeConverter.ToString(value));
     }
 
 
-    public virtual char this[int index] => _value[index];
+    public char this[int index] => _value[index];
 
-    public virtual int Length => _value.Length;
+    public int Length => _value.Length;
 
-    internal virtual JsString Append(JsValue jsValue)
+    internal JsString Append(JsValue jsValue)
     {
         return new ConcatenatedString(string.Concat(ToString(), TypeConverter.ToString(jsValue)));
     }
 
-    internal virtual JsString EnsureCapacity(int capacity)
+    internal JsString EnsureCapacity(int capacity)
     {
         return new ConcatenatedString(_value, capacity);
     }
@@ -299,7 +214,7 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
         return ToString().Substring(startIndex);
     }
 
-    internal override bool TryGetIterator(
+    internal bool TryGetIterator(
         Realm realm,
         [NotNullWhen(true)] out IteratorInstance? iterator,
         GeneratorKind hint = GeneratorKind.Sync,
@@ -335,7 +250,7 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
         return string.Equals(_value, other.ToString(), StringComparison.Ordinal);
     }
 
-    protected internal override bool IsLooselyEqual(JsValue value)
+    internal static bool IsLooselyEqual(object o,JsValue value)
     {
         if (value is JsString jsString)
         {
@@ -344,21 +259,30 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
 
         if (value.IsBigInt())
         {
-            return value.IsBigInt() && TypeConverter.TryStringToBigInt(ToString(), out var temp) && temp == value.AsBigInt();
+            return TypeConverter.TryStringToBigInt(ToString(), out var temp) && temp == value.AsBigInt();
         }
-
-        return base.IsLooselyEqual(value);
+        return false;
     }
 
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(_value);
+    
+    public static bool Equals(string s, JsValue value)
+    {
+        if (value.Tag is Tag.JS_TAG_STRING or Tag.JS_TAG_STRING_CONCAT)
+        {
+            return string.Equals(s, value.Obj!.ToString(), StringComparison.Ordinal);
+        }
 
-    internal sealed class ConcatenatedString : JsString
+        return false;
+    }
+
+    internal sealed class ConcatenatedString
     {
         private StringBuilder? _stringBuilder;
+        string _value="";
         private bool _dirty;
 
         internal ConcatenatedString(string value, int capacity = 0)
-            : base(value, InternalTypes.String | InternalTypes.RequiresCloning)
         {
             if (capacity > 0)
             {
@@ -378,12 +302,12 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
                 _dirty = false;
             }
 
-            return _value;
+            return _value!;
         }
 
-        public override char this[int index] => _stringBuilder?[index] ?? _value[index];
+        public char this[int index] => _stringBuilder?[index] ?? _value[index];
 
-        internal override JsString Append(JsValue jsValue)
+        internal void Append(JsValue jsValue)
         {
             var value = TypeConverter.ToString(jsValue);
             if (_stringBuilder == null)
@@ -393,19 +317,16 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
 
             _stringBuilder.Append(value);
             _dirty = true;
-
-            return this;
         }
 
-        internal override JsString EnsureCapacity(int capacity)
+        internal void EnsureCapacity(int capacity)
         {
             _stringBuilder!.EnsureCapacity(capacity);
-            return this;
         }
 
-        public override int Length => _stringBuilder?.Length ?? _value?.Length ?? 0;
+        public int Length => _stringBuilder?.Length ?? _value?.Length ?? 0;
 
-        public override bool Equals(string? s)
+        public bool Equals(string? s)
         {
             if (s is null || Length != s.Length)
             {
@@ -429,9 +350,9 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
             return string.Equals(_value, s, StringComparison.Ordinal);
         }
 
-        public override bool Equals(JsString? other)
+        public bool Equals(JsString other)
         {
-            if (other is ConcatenatedString cs)
+            if (other._union is ConcatenatedString cs)
             {
                 var stringBuilder = _stringBuilder;
                 var csStringBuilder = cs._stringBuilder;
@@ -453,7 +374,7 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
                 return string.Equals(ToString(), cs.ToString(), StringComparison.Ordinal);
             }
 
-            if (other is null || other.Length != Length)
+            if (other.Length != Length)
             {
                 return false;
             }
@@ -463,9 +384,9 @@ public class JsString : JsValue, IEquatable<JsString>, IEquatable<string>
 
         public override int GetHashCode() => _stringBuilder?.GetHashCode() ?? StringComparer.Ordinal.GetHashCode(_value);
 
-        internal override JsValue DoClone()
+        internal JsValue DoClone()
         {
-            return new JsString(ToString());
+            return ToString();
         }
     }
 }

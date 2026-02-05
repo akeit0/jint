@@ -9,7 +9,7 @@ namespace Jint.Native;
 public sealed class JsRegExp : ObjectInstance
 {
     internal const string regExpForMatchingAllCharacters = "(?:)";
-    internal static readonly JsString PropertyLastIndex = new("lastIndex");
+    internal const string PropertyLastIndex = "lastIndex";
 
     private string _flags = null!;
 
@@ -78,7 +78,7 @@ public sealed class JsRegExp : ObjectInstance
 
     public override PropertyDescriptor GetOwnProperty(JsValue property)
     {
-        if (PropertyLastIndex.Equals(property))
+        if (JsString.Equals(PropertyLastIndex, property))
         {
             return _prototypeDescriptor ?? PropertyDescriptor.Undefined;
         }
@@ -88,7 +88,7 @@ public sealed class JsRegExp : ObjectInstance
 
     protected internal override void SetOwnProperty(JsValue property, PropertyDescriptor desc)
     {
-        if (PropertyLastIndex.Equals(property))
+        if (JsString.Equals(PropertyLastIndex, (property)))
         {
             _prototypeDescriptor = desc;
             return;

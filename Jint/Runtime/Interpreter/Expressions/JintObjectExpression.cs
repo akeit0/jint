@@ -117,7 +117,7 @@ internal sealed class JintObjectExpression : JintExpression
         _valueExpressions.Initialize(context, valueExpressions.AsSpan());
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {
@@ -273,7 +273,7 @@ internal sealed class JintObjectExpression : JintExpression
         {
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             return new JsObject(context.Engine);
         }

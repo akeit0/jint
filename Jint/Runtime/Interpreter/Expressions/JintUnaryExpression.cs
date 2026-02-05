@@ -66,7 +66,7 @@ internal sealed class JintUnaryExpression : JintExpression
             return (JsValue) EvaluateInternal(context);
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             var engine = context.Engine;
             var result = _argument.Evaluate(context);
@@ -127,7 +127,7 @@ internal sealed class JintUnaryExpression : JintExpression
         return EvaluateJsValue(context);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         return EvaluateJsValue(context);
     }

@@ -31,7 +31,7 @@ internal sealed class JintTemplateLiteralExpression : JintExpression
         _initialized = true;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

@@ -34,7 +34,7 @@ internal abstract class JintExpression
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | (MethodImplOptions) 512)]
-    public object Evaluate(EvaluationContext context)
+    public JsValue Evaluate(EvaluationContext context)
     {
         var oldSyntaxElement = context.LastSyntaxElement;
         context.PrepareFor(_expression);
@@ -47,12 +47,12 @@ internal abstract class JintExpression
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal object EvaluateWithoutNodeTracking(EvaluationContext context)
+    internal JsValue EvaluateWithoutNodeTracking(EvaluationContext context)
     {
         return EvaluateInternal(context);
     }
 
-    protected abstract object EvaluateInternal(EvaluationContext context);
+    protected abstract JsValue EvaluateInternal(EvaluationContext context);
 
     /// <summary>
     /// If we'd get Esprima source, we would just refer to it, but this makes error messages easier to decipher.

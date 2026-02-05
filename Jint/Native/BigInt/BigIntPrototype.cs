@@ -59,7 +59,7 @@ internal sealed class BigIntPrototype : Prototype
         var numberFormat = (JsNumberFormat) Engine.Realm.Intrinsics.NumberFormat.Construct([locales, options], Engine.Realm.Intrinsics.NumberFormat);
 
         // Use BigInteger overload to avoid precision loss
-        return numberFormat.Format(x._value);
+        return numberFormat.Format(x.value);
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ internal sealed class BigIntPrototype : Prototype
             Throw.RangeError(_realm, "radix must be between 2 and 36");
         }
 
-        var value = x._value;
+        var value = x.value;
         if (value == BigInteger.Zero)
         {
             return JsString.NumberZeroString;

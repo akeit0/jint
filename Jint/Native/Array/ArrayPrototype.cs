@@ -130,15 +130,15 @@ public sealed class ArrayPrototype : ArrayInstance
         return null;
     }
 
-    internal ObjectInstance Values(JsValue thisObject, JsCallArguments arguments)
+    internal JsValue Values(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is ObjectInstance oi && oi.IsArrayLike)
+        if (thisObject.Obj is ObjectInstance oi && oi.IsArrayLike)
         {
             return _realm.Intrinsics.ArrayIteratorPrototype.Construct(oi, ArrayIteratorType.Value);
         }
 
         Throw.TypeError(_realm, "cannot construct iterator");
-        return null;
+        return default;
     }
 
     private ObjectInstance With(JsValue thisObject, JsCallArguments arguments)

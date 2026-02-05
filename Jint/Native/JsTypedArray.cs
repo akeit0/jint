@@ -171,7 +171,7 @@ public sealed class JsTypedArray : ObjectInstance
         var numericIndex = TypeConverter.CanonicalNumericIndexString(property);
         if (numericIndex is not null)
         {
-            if (ReferenceEquals(this, receiver))
+            if (ReferenceEquals(this, receiver.Obj))
             {
                 IntegerIndexedElementSet(numericIndex.Value, value);
                 return true;
@@ -310,12 +310,14 @@ public sealed class JsTypedArray : ObjectInstance
         var value = _viewedArrayBuffer.GetValueFromBuffer(indexedPosition, elementType, isTypedArray: true, ArrayBufferOrder.Unordered);
         if (value.Type == Types.Number)
         {
-            return _arrayElementType.FitsInt32()
-                ? JsNumber.Create((int) value.DoubleValue)
-                : JsNumber.Create(value.DoubleValue);
+            return (value.DoubleValue);
+            // _arrayElementType.FitsInt32()
+            // ? JsNumber.Create((int) value.DoubleValue)
+            // :
+            //(value.DoubleValue);
         }
 
-        return JsBigInt.Create(value.BigInteger);
+        return new JsValue(value.BigInteger);
     }
 
     // helper tot prevent floating point

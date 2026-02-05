@@ -14,7 +14,7 @@ internal sealed class JintSpreadExpression : JintExpression
         _argumentName = (expression.Argument as Identifier)?.Name;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         GetValueAndCheckIterator(context, out var objectInstance, out var iterator);
         return objectInstance;

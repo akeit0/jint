@@ -1,3 +1,5 @@
+using Jint.Native;
+
 namespace Jint.Runtime.Interpreter.Expressions;
 
 internal sealed class JintNewExpression : JintExpression
@@ -17,7 +19,7 @@ internal sealed class JintNewExpression : JintExpression
         _calleeExpression = Build(expression.Callee);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

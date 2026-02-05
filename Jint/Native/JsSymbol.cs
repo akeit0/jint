@@ -3,35 +3,52 @@ using Jint.Runtime;
 
 namespace Jint.Native;
 
-public sealed class JsSymbol : JsValue, IEquatable<JsSymbol>
+public readonly struct JsSymbol : IEquatable<JsSymbol>
 {
-    internal readonly JsValue _value;
+    internal readonly string? _value;
 
-    internal JsSymbol(string value) : this(new JsString(value))
-    {
-    }
-
-    internal JsSymbol(JsValue value) : base(Types.Symbol)
+    internal JsSymbol(string? value)
     {
         _value = value;
     }
-
-    public override object ToObject() => _value;
 
     /// <summary>
     /// https://tc39.es/ecma262/#sec-symboldescriptivestring
     /// </summary>
     public override string ToString()
     {
-        var value = _value.IsUndefined() ? "" : _value.AsString();
-        return "Symbol(" + value + ")";
+        if (_value == null) return "Symbol()";
+        return "Symbol(" + _value + ")";
     }
 
-    public override bool Equals(object? obj) => Equals(obj as JsSymbol);
+    internal JsValue ToJsValue()
+    {
+        if (_value == null) return JsValue.Undefined;
+        return _value;
+    }
 
-    public override bool Equals(JsValue? other) => Equals(other as JsSymbol);
+    public bool Equals(JsSymbol other)
+    {
+        return string.Equals(_value, other._value, StringComparison.Ordinal);
+    }
 
-    public bool Equals(JsSymbol? other) => ReferenceEquals(this, other);
+    public override bool Equals(object? obj)
+    {
+        return obj is JsSymbol other && Equals(other);
+    }
 
-    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
+    public override int GetHashCode()
+    {
+        return (_value != null ? StringComparer.Ordinal.GetHashCode(_value) : 0);
+    }
+
+    public static bool operator ==(JsSymbol left, JsSymbol right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(JsSymbol left, JsSymbol right)
+    {
+        return !(left == right);
+    }
 }

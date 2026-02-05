@@ -15,7 +15,7 @@ internal sealed class JintFunctionExpression : JintExpression
         _function = new JintFunctionDefinition(function);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         return Build(context.Engine, _function);
     }

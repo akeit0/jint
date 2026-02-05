@@ -13,7 +13,7 @@ internal sealed class JintLogicalOrExpression : JintExpression
         _right = Build(expression.Right);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var left = _left.GetValue(context);
 

@@ -15,7 +15,7 @@ public class ErrorInstance : ObjectInstance
     /// </summary>
     internal void InstallErrorCause(JsValue options)
     {
-        if (options is ObjectInstance oi && oi.HasProperty("cause"))
+        if (options.Obj is ObjectInstance oi && oi.HasProperty("cause"))
         {
             var cause = oi.Get("cause");
             CreateNonEnumerableDataPropertyOrThrow("cause", cause);

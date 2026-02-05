@@ -1,3 +1,4 @@
+using Jint.Native;
 using Jint.Runtime.Modules;
 
 namespace Jint.Runtime.Interpreter.Expressions;
@@ -11,7 +12,7 @@ internal sealed class JintMetaPropertyExpression : JintExpression
     /// <summary>
     /// https://tc39.es/ecma262/#sec-meta-properties
     /// </summary>
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var expression = (MetaProperty) _expression;
         if (string.Equals(expression.Meta.Name, "new", StringComparison.Ordinal) && string.Equals(expression.Property.Name, "target", StringComparison.Ordinal))

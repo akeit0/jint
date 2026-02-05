@@ -83,14 +83,14 @@ internal sealed class ClassDefinition
                 protoParent = null;
                 constructorParent = engine.Realm.Intrinsics.Function.PrototypeObject;
             }
-            else if (!superclass.IsConstructor)
+            else if (superclass.Obj is not Constructor superclassConstructor)
             {
                 Throw.TypeError(engine.Realm, "super class is not a constructor");
             }
             else
             {
                 var temp = superclass.Get(CommonProperties.Prototype);
-                if (temp is ObjectInstance protoParentObject)
+                if (temp.Obj is ObjectInstance protoParentObject)
                 {
                     protoParent = protoParentObject;
                 }
@@ -104,7 +104,7 @@ internal sealed class ClassDefinition
                     return default;
                 }
 
-                constructorParent = (ObjectInstance) superclass;
+                constructorParent = superclassConstructor;
             }
         }
 
@@ -420,8 +420,8 @@ internal sealed class ClassDefinition
                 {
                     Key = privateEnv!.Names[privateIdentifier],
                     Kind = PrivateElementKind.Accessor,
-                    Get = getter ? closure : null,
-                    Set = !getter ? closure : null
+                    Get = getter ? closure : JsValue.Undefined,
+                    Set = !getter ? closure : JsValue.Undefined
                 };
             }
 

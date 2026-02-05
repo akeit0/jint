@@ -39,7 +39,7 @@ internal sealed class JintMemberExpression : JintExpression
         return property ?? _nullMarker;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

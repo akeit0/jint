@@ -8,7 +8,7 @@ internal sealed class JintThisExpression : JintExpression
     {
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         return context.Engine.ResolveThisBinding();
     }

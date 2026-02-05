@@ -39,7 +39,7 @@ internal sealed class JintAssignmentExpression : JintExpression
         return new JintAssignmentExpression(expression);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var engine = context.Engine;
         var strict = StrictModeScope.IsStrictModeCode;
@@ -472,7 +472,7 @@ internal sealed class JintAssignmentExpression : JintExpression
             _right = Build(assignmentExpression.Right);
         }
 
-        protected override object EvaluateInternal(EvaluationContext context)
+        protected override JsValue EvaluateInternal(EvaluationContext context)
         {
             if (!_initialized)
             {

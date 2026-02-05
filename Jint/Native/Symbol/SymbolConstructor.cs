@@ -25,7 +25,7 @@ internal sealed class SymbolConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new SymbolPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(+0, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 
@@ -38,8 +38,12 @@ internal sealed class SymbolConstructor : Constructor
 
         var properties = new PropertyDictionary(17, checkExistingKeys: false)
         {
-            ["for"] = new PropertyDescriptor(new ClrFunction(Engine, "for", For, 1, lengthFlags), PropertyFlag.Writable | PropertyFlag.Configurable),
-            ["keyFor"] = new PropertyDescriptor(new ClrFunction(Engine, "keyFor", KeyFor, 1, lengthFlags), PropertyFlag.Writable | PropertyFlag.Configurable),
+            ["for"] =
+                new PropertyDescriptor(new ClrFunction(Engine, "for", For, 1, lengthFlags),
+                    PropertyFlag.Writable | PropertyFlag.Configurable),
+            ["keyFor"] =
+                new PropertyDescriptor(new ClrFunction(Engine, "keyFor", KeyFor, 1, lengthFlags),
+                    PropertyFlag.Writable | PropertyFlag.Configurable),
             ["hasInstance"] = new PropertyDescriptor(GlobalSymbolRegistry.HasInstance, propertyFlags),
             ["isConcatSpreadable"] = new PropertyDescriptor(GlobalSymbolRegistry.IsConcatSpreadable, propertyFlags),
             ["iterator"] = new PropertyDescriptor(GlobalSymbolRegistry.Iterator, propertyFlags),
@@ -66,8 +70,8 @@ internal sealed class SymbolConstructor : Constructor
     {
         var description = arguments.At(0);
         var descString = description.IsUndefined()
-            ? Undefined
-            : TypeConverter.ToJsString(description);
+            ? null
+            : TypeConverter.ToString(description);
 
         var value = GlobalSymbolRegistry.CreateSymbol(descString);
         return value;
@@ -78,17 +82,11 @@ internal sealed class SymbolConstructor : Constructor
     /// </summary>
     private JsValue For(JsValue thisObject, JsCallArguments arguments)
     {
-        var stringKey = TypeConverter.ToJsString(arguments.At(0));
+        var stringKey = TypeConverter.ToString(arguments.At(0));
 
         // 2. ReturnIfAbrupt(stringKey).
 
-        if (!_engine.GlobalSymbolRegistry.TryGetSymbol(stringKey, out var symbol))
-        {
-            symbol = GlobalSymbolRegistry.CreateSymbol(stringKey);
-            _engine.GlobalSymbolRegistry.Add(symbol);
-        }
-
-        return symbol;
+        return new JsSymbol(stringKey);
     }
 
     /// <summary>
@@ -96,15 +94,15 @@ internal sealed class SymbolConstructor : Constructor
     /// </summary>
     private JsValue KeyFor(JsValue thisObject, JsCallArguments arguments)
     {
-        var symbol = arguments.At(0) as JsSymbol;
-        if (symbol is null)
+        var symbol = arguments.At(0);
+        if (!symbol.IsSymbol())
         {
             Throw.TypeError(_realm);
         }
 
-        if (_engine.GlobalSymbolRegistry.TryGetSymbol(symbol._value, out var e))
+        if (_engine.GlobalSymbolRegistry.TryGetSymbol((string) symbol.Obj!, out var e))
         {
-            return e._value;
+            return e.ToJsValue();
         }
 
         return Undefined;

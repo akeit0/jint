@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using Jint.Native.Number;
 using Jint.Native.Object;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors;
@@ -82,9 +83,9 @@ public sealed class JsMap : ObjectInstance, IEnumerable<KeyValuePair<JsValue, Js
 
     public new void Set(JsValue key, JsValue value)
     {
-        if (key is JsNumber number && number.IsNegativeZero())
+        if (key.IsFloat64 && NumberInstance.IsNegativeZero(key.GetFloat64Value()))
         {
-            key = JsNumber.PositiveZero;
+            key = +0;
         }
         _map[key] = value;
     }

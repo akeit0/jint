@@ -161,9 +161,9 @@ internal sealed class PrivateElement
 {
     public required PrivateName Key { get; set; }
     public PrivateElementKind Kind { get; set; }
-    public JsValue? Value { get; set; }
-    public JsValue? Get { get; set; }
-    public JsValue? Set { get; set; }
+    public JsValue Value { get; set; }
+    public JsValue Get { get; set; }
+    public JsValue Set { get; set; }
 }
 
 internal enum PrivateElementKind

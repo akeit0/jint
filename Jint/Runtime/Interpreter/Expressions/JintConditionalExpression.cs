@@ -1,3 +1,5 @@
+using Jint.Native;
+
 namespace Jint.Runtime.Interpreter.Expressions;
 
 internal sealed class JintConditionalExpression : JintExpression
@@ -13,7 +15,7 @@ internal sealed class JintConditionalExpression : JintExpression
         _alternate = Build(expression.Alternate);
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var testValue = _test.GetValue(context);
 

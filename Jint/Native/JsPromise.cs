@@ -12,7 +12,7 @@ internal sealed class JsPromise : ObjectInstance
     internal PromiseState State { get; private set; }
 
     // valid only in settled state (Fulfilled or Rejected)
-    internal JsValue Value { get; private set; } = null!;
+    internal JsValue Value { get; private set; } = JsValue.Undefined;
     internal ManualResetEventSlim CompletedEvent { get; } = new();
 
     internal List<PromiseReaction> PromiseRejectReactions = new();
@@ -64,12 +64,12 @@ internal sealed class JsPromise : ObjectInstance
     {
         // Note that alreadyResolved logic lives in CreateResolvingFunctions method
 
-        if (ReferenceEquals(result, this))
+        if (ReferenceEquals(result.Obj, this))
         {
             return RejectPromise(_engine.Realm.Intrinsics.TypeError.Construct("Cannot resolve Promise with itself"));
         }
 
-        if (result is not ObjectInstance resultObj)
+        if (result.Obj is not ObjectInstance resultObj)
         {
             return FulfillPromise(result);
         }
@@ -84,7 +84,7 @@ internal sealed class JsPromise : ObjectInstance
             return RejectPromise(e.Error);
         }
 
-        if (thenProp is not ICallable thenMethod)
+        if (thenProp.Obj is not ICallable thenMethod)
         {
             return FulfillPromise(result);
         }

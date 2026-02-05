@@ -14,7 +14,7 @@ internal sealed class JintYieldExpression : JintExpression
     {
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         var expression = (YieldExpression) _expression;
         var generator = context.Engine.ExecutionContext.Generator;

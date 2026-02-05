@@ -6,11 +6,11 @@ namespace Jint.Native;
 /// Private names are a bit like symbols, they follow reference equality so that each one is globally to object,
 /// only exception to the rule is get/set pair which should share same private name.
 /// </summary>
-internal sealed class PrivateName : JsValue, IEquatable<PrivateName>
+internal sealed class PrivateName : IEquatable<PrivateName>
 {
     private readonly PrivateIdentifier _identifier;
 
-    public PrivateName(PrivateIdentifier identifier) : base(InternalTypes.PrivateName)
+    public PrivateName(PrivateIdentifier identifier)
     {
         _identifier = identifier;
         Description = identifier.Name;
@@ -20,17 +20,11 @@ internal sealed class PrivateName : JsValue, IEquatable<PrivateName>
 
     public override string ToString() => _identifier.Name;
 
-    public override object ToObject() => throw new NotImplementedException();
-
     public override bool Equals(object? obj)
     {
         return Equals(obj as PrivateName);
     }
 
-    public override bool Equals(JsValue? other)
-    {
-        return Equals(other as PrivateName);
-    }
 
     public bool Equals(PrivateName? other)
     {

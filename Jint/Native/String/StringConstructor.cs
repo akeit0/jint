@@ -80,12 +80,12 @@ internal sealed class StringConstructor : Constructor
     /// </summary>
     private JsValue FromCodePoint(JsValue thisObject, JsCallArguments arguments)
     {
-        JsNumber codePoint;
+        double codePoint;
         using var result = new ValueStringBuilder(stackalloc char[128]);
         foreach (var a in arguments)
         {
             int point;
-            codePoint = TypeConverter.ToJsNumber(a);
+            codePoint = TypeConverter.ToNumber(a);
             if (codePoint.IsInteger())
             {
                 point = (int) codePoint._value;
@@ -96,7 +96,7 @@ internal sealed class StringConstructor : Constructor
             }
             else
             {
-                var pointTemp = codePoint._value;
+                var pointTemp = codePoint;
                 if (pointTemp < 0 || pointTemp > 0x10FFFF || double.IsInfinity(pointTemp) || double.IsNaN(pointTemp) || TypeConverter.ToInt32(pointTemp) != pointTemp)
                 {
                     goto rangeError;
@@ -120,7 +120,7 @@ internal sealed class StringConstructor : Constructor
             }
         }
 
-        return JsString.Create(result.ToString());
+        return (result.ToString());
 
 rangeError:
         _engine.SignalError(Throw.CreateRangeError(_realm, "Invalid code point " + codePoint));

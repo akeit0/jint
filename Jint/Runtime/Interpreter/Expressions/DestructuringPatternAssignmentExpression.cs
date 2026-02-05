@@ -17,7 +17,7 @@ internal sealed class DestructuringPatternAssignmentExpression : JintExpression
         _pattern = (DestructuringPattern) expression.Left;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {
@@ -388,7 +388,7 @@ internal sealed class DestructuringPatternAssignmentExpression : JintExpression
                     {
                         if (assignmentPattern.Right.IsFunctionDefinition())
                         {
-                            ((Function) value).SetFunctionName(new JsString(leftIdentifier.Name));
+                            ((Function) value.Obj!).SetFunctionName((leftIdentifier.Name));
                         }
 
                         AssignToIdentifier(engine, leftIdentifier.Name, value, environment, checkReference);
@@ -528,7 +528,7 @@ internal sealed class DestructuringPatternAssignmentExpression : JintExpression
 
                         if (assignmentPattern.Right.IsFunctionDefinition())
                         {
-                            ((Function) value).SetFunctionName(target!.Name);
+                            ((Function) value.Obj!).SetFunctionName(target!.Name);
                         }
 
                         AssignToIdentifier(context.Engine, target!.Name, value, environment, checkReference);
@@ -604,7 +604,7 @@ internal sealed class DestructuringPatternAssignmentExpression : JintExpression
     private static Reference GetReferenceFromMember(EvaluationContext context, MemberExpression memberExpression)
     {
         var expression = new JintMemberExpression(memberExpression);
-        var reference = expression.Evaluate(context) as Reference;
+        var reference = expression.Evaluate(context).Obj as Reference;
         if (reference is null)
         {
             Throw.ReferenceError(context.Engine.Realm, "invalid reference");

@@ -39,7 +39,7 @@ internal sealed class JintUpdateExpression : JintExpression
         _evalOrArguments = _leftIdentifier?.HasEvalOrArguments == true;
     }
 
-    protected override object EvaluateInternal(EvaluationContext context)
+    protected override JsValue EvaluateInternal(EvaluationContext context)
     {
         if (!_initialized)
         {

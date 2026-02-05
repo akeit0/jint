@@ -1,56 +1,48 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Jint.Runtime;
 
 namespace Jint.Native;
 
-public sealed class JsBigInt : JsValue, IEquatable<JsBigInt>
+public readonly struct JsBigInt : IEquatable<JsBigInt>
 {
-    internal readonly BigInteger _value;
+    internal readonly BigInteger value => Unsafe.As<JsBigInt, BigInteger>(ref Unsafe.AsRef(this));
 
+#pragma warning disable CS0169 // Field is never used
+    private readonly int sign;
+    private readonly uint[]? bits;
+#pragma warning restore CS0169 // Field is never used
     public static readonly JsBigInt Zero = new(0);
     public static readonly JsBigInt One = new(1);
 
-    private static readonly JsBigInt[] _bigIntegerToJsValue;
-
-    static JsBigInt()
+    public JsBigInt(BigInteger value)
     {
-        var bigIntegers = new JsBigInt[1024];
-        for (uint i = 0; i < bigIntegers.Length; i++)
-        {
-            bigIntegers[i] = new JsBigInt(i);
-        }
-
-        _bigIntegerToJsValue = bigIntegers;
+        this = Unsafe.As<BigInteger, JsBigInt>(ref value);
     }
 
-    public JsBigInt(BigInteger value) : base(Types.BigInt)
+    internal JsBigInt(int sign, uint[]? bits)
     {
-        _value = value;
+        this.sign = sign;
+        this.bits = bits;
     }
 
     internal static JsBigInt Create(BigInteger bigInt)
     {
-        var temp = _bigIntegerToJsValue;
-        if (bigInt >= 0 && bigInt < (uint) temp.Length)
-        {
-            return temp[(int) bigInt];
-        }
-
-        return new JsBigInt(bigInt);
+        return Unsafe.As<BigInteger, JsBigInt>(ref bigInt);
     }
 
-    internal static JsBigInt Create(JsValue value)
+    public JsValue ToJsValue()
     {
-        return value as JsBigInt ?? Create(TypeConverter.ToBigInt(value));
+        return new JsValue(unchecked((((ulong)(uint)Tag.JS_TAG_BIG_INT)<< 32 | (uint)sign)), bits);
     }
 
-    public override object ToObject() => _value;
+    public object ToObject() => value;
 
-    internal override bool ToBoolean() => _value != 0;
+    internal bool ToBoolean() => value != 0;
 
     public static bool operator ==(JsBigInt a, double b)
     {
-        return TypeConverter.IsIntegralNumber(b) && a._value == (long) b;
+        return TypeConverter.IsIntegralNumber(b) && a.value == (long) b;
     }
 
     public static bool operator !=(JsBigInt a, double b)
@@ -60,27 +52,28 @@ public sealed class JsBigInt : JsValue, IEquatable<JsBigInt>
 
     public override string ToString()
     {
-        return TypeConverter.ToString(_value);
+        return TypeConverter.ToString(value);
     }
 
-    protected internal override bool IsLooselyEqual(JsValue value)
+    internal bool IsLooselyEqual(JsValue value)
     {
-        if (value is JsBigInt bigInt)
+        if (value.IsBigInt())
         {
-            return Equals(bigInt);
+            return Equals(value.AsBigInt());
         }
 
-        if (value is JsNumber number && TypeConverter.IsIntegralNumber(number._value) && _value == new BigInteger(number._value))
+        if (value.IsFloat64 && TypeConverter.IsIntegralNumber(value.GetFloat64Value()) &&
+            this.value == new BigInteger(value.GetFloat64Value()))
         {
             return true;
         }
 
-        if (value is JsBoolean b)
+        if (value.IsBoolean())
         {
-            return b._value && _value == BigInteger.One || !b._value && _value == BigInteger.Zero;
+            return value.GetBoolValue() && this.value == BigInteger.One || !value.GetBoolValue() && this.value == BigInteger.Zero;
         }
 
-        if (value is JsString s && TypeConverter.TryStringToBigInt(s.ToString(), out var temp) && temp == _value)
+        if (value.IsString() && TypeConverter.TryStringToBigInt(value.ToString(), out var temp) && temp == this.value)
         {
             return true;
         }
@@ -93,19 +86,16 @@ public sealed class JsBigInt : JsValue, IEquatable<JsBigInt>
         return false;
     }
 
-    public override bool Equals(object? obj) => Equals(obj as JsBigInt);
 
-    public override bool Equals(JsValue? other) => Equals(other as JsBigInt);
-
-    public bool Equals(JsBigInt? other)
+    public bool Equals(JsBigInt other)
     {
-        if (ReferenceEquals(null, other))
-        {
-            return false;
-        }
-
-        return ReferenceEquals(this, other) || _value == other._value;
+        return value == other.value;
     }
 
-    public override int GetHashCode() => _value.GetHashCode();
+    public override int GetHashCode() => value.GetHashCode();
+
+    public override bool Equals(object obj)
+    {
+        return obj is JsBigInt && Equals((JsBigInt) obj);
+    }
 }
