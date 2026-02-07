@@ -51,7 +51,7 @@ public class ObjectWrapper : ObjectInstance, IObjectWrapper, IEquatable<ObjectWr
         {
             SetProperty(GlobalSymbolRegistry.Dispose, new PropertyDescriptor(new ClrFunction(engine, "dispose", static (thisObject, _) =>
             {
-                ((thisObject as ObjectWrapper)?.Target as IDisposable)?.Dispose();
+                ((thisObject .Obj as ObjectWrapper)?.Target as IDisposable)?.Dispose();
                 return Undefined;
             }), PropertyFlag.NonEnumerable));
         }
@@ -61,7 +61,7 @@ public class ObjectWrapper : ObjectInstance, IObjectWrapper, IEquatable<ObjectWr
         {
             SetProperty(GlobalSymbolRegistry.AsyncDispose, new PropertyDescriptor(new ClrFunction(engine, "asyncDispose", (thisObject, _) =>
             {
-                var target = ((thisObject as ObjectWrapper)?.Target as IAsyncDisposable)?.DisposeAsync();
+                var target = ((thisObject .Obj as ObjectWrapper)?.Target as IAsyncDisposable)?.DisposeAsync();
                 if (target is not null)
                 {
                     return ConvertAwaitableToPromise(engine, target);
@@ -270,7 +270,7 @@ public class ObjectWrapper : ObjectInstance, IObjectWrapper, IEquatable<ObjectWr
             {
                 if (Target is ICollection c && CommonProperties.Length.Equals(property))
                 {
-                    return JsNumber.Create(c.Count);
+                    return (c.Count);
                 }
             }
             else
@@ -513,7 +513,7 @@ public class ObjectWrapper : ObjectInstance, IObjectWrapper, IEquatable<ObjectWr
 
     private static JsValue Iterator(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is JsProxy proxy)
+        if (thisObject.Obj is  JsProxy proxy)
             return Iterator(proxy._target, arguments);
 
         var wrapper = (ObjectWrapper) thisObject;
@@ -525,11 +525,11 @@ public class ObjectWrapper : ObjectInstance, IObjectWrapper, IEquatable<ObjectWr
 
     private static JsNumber GetLength(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is JsProxy proxy)
+        if (thisObject.Obj is  JsProxy proxy)
             return GetLength(proxy._target, arguments);
 
         var wrapper = (ObjectWrapper) thisObject;
-        return JsNumber.Create((int) (wrapper._typeDescriptor.LengthProperty?.GetValue(wrapper.Target) ?? 0));
+        return ((int) (wrapper._typeDescriptor.LengthProperty?.GetValue(wrapper.Target) ?? 0));
     }
 
     internal override ulong GetSmallestIndex(ulong length)

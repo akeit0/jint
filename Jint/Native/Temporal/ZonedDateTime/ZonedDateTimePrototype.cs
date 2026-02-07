@@ -67,33 +67,33 @@ internal sealed class ZonedDateTimePrototype : Prototype
 
     private JsZonedDateTime ValidateZonedDateTime(JsValue thisObject)
     {
-        if (thisObject is JsZonedDateTime zonedDateTime)
+        if (thisObject.Obj is JsZonedDateTime zonedDateTime)
             return zonedDateTime;
         Throw.TypeError(_realm, "Value is not a Temporal.ZonedDateTime");
         return null!;
     }
 
-    private JsString GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidateZonedDateTime(thisObject).Calendar);
-    private JsString GetTimeZoneId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidateZonedDateTime(thisObject).TimeZone);
-    private JsNumber GetYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Year);
-    private JsNumber GetMonth(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Month);
-    private JsString GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidateZonedDateTime(thisObject).GetIsoDateTime().Month:D2}");
-    private JsNumber GetDay(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Day);
-    private JsNumber GetHour(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Hour);
-    private JsNumber GetMinute(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Minute);
-    private JsNumber GetSecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Second);
-    private JsNumber GetMillisecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Millisecond);
-    private JsNumber GetMicrosecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Microsecond);
-    private JsNumber GetNanosecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Nanosecond);
-    private JsNumber GetEpochMilliseconds(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create((double) (ValidateZonedDateTime(thisObject).EpochNanoseconds / 1_000_000));
-    private JsBigInt GetEpochNanoseconds(JsValue thisObject, JsCallArguments arguments) => JsBigInt.Create(ValidateZonedDateTime(thisObject).EpochNanoseconds);
-    private JsNumber GetDayOfWeek(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Date.DayOfWeek());
-    private JsNumber GetDayOfYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).GetIsoDateTime().Date.DayOfYear());
-    private JsString GetOffset(JsValue thisObject, JsCallArguments arguments)
+    private JsValue GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidateZonedDateTime(thisObject).Calendar);
+    private JsValue GetTimeZoneId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidateZonedDateTime(thisObject).TimeZone);
+    private JsValue GetYear(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Year);
+    private JsValue GetMonth(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Month);
+    private JsValue GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidateZonedDateTime(thisObject).GetIsoDateTime().Month:D2}");
+    private JsValue GetDay(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Day);
+    private JsValue GetHour(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Hour);
+    private JsValue GetMinute(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Minute);
+    private JsValue GetSecond(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Second);
+    private JsValue GetMillisecond(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Millisecond);
+    private JsValue GetMicrosecond(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Microsecond);
+    private JsValue GetNanosecond(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Nanosecond);
+    private JsValue GetEpochMilliseconds(JsValue thisObject, JsCallArguments arguments) => ((double) (ValidateZonedDateTime(thisObject).EpochNanoseconds / 1_000_000));
+    private JsValue GetEpochNanoseconds(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).EpochNanoseconds);
+    private JsValue GetDayOfWeek(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Date.DayOfWeek());
+    private JsValue GetDayOfYear(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).GetIsoDateTime().Date.DayOfYear());
+    private JsValue GetOffset(JsValue thisObject, JsCallArguments arguments)
     {
         var zdt = ValidateZonedDateTime(thisObject);
         var offsetNs = zdt.OffsetNanoseconds;
-        return new JsString(TemporalHelpers.FormatOffsetString(offsetNs));
+        return (TemporalHelpers.FormatOffsetString(offsetNs));
     }
-    private JsNumber GetOffsetNanoseconds(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateZonedDateTime(thisObject).OffsetNanoseconds);
+    private JsValue GetOffsetNanoseconds(JsValue thisObject, JsCallArguments arguments) => (ValidateZonedDateTime(thisObject).OffsetNanoseconds);
 }

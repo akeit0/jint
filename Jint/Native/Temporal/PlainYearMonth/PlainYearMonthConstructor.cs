@@ -21,7 +21,7 @@ internal sealed class PlainYearMonthConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new PlainYearMonthPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.Create(2), PropertyFlag.Configurable);
+        _length = new PropertyDescriptor((2), PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

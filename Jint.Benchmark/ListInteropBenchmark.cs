@@ -51,7 +51,7 @@ public class ListInteropBenchmark
         for (var i = 0; i < Count; ++i)
         {
             input.Add(new Data { Category = new Category { Name = i % 2 == 0 ? "Pugal" : "Beagle" } });
-            _properties[i] = JsNumber.Create(i);
+            _properties[i] = (i);
         }
 
         _engine.SetValue("input", input);

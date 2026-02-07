@@ -9,7 +9,7 @@ namespace Jint.Runtime.Interpreter;
 
 internal sealed class JintStatementList
 {
-    private readonly record struct Pair(JintStatement Statement, JsValue? Value);
+    private readonly record struct Pair(JintStatement Statement, JsValue Value);
 
     private readonly Statement? _statement;
     private readonly NodeList<Statement> _statements;
@@ -46,7 +46,9 @@ internal sealed class JintStatementList
             var esprimaStatement = _statements[i];
             var statement = JintStatement.Build(esprimaStatement);
             // When in debug mode, don't do FastResolve: Stepping requires each statement to be actually executed.
-            var value = context.DebugMode ? null : JintStatement.FastResolve(esprimaStatement);
+            var value = context.DebugMode
+                ? default(JsValue)
+                : JintStatement.FastResolve(esprimaStatement) ?? JsValue.Empty;
             jintStatements[i] = new Pair(statement, value);
         }
 
@@ -73,7 +75,7 @@ internal sealed class JintStatementList
         Completion sl = c;
 
         // The value of a StatementList is the value of the last value-producing item in the StatementList
-        var lastValue = JsEmpty.Instance;
+        var lastValue = JsValue.Empty;
         var i = _index;
         var temp = _jintStatements!;
         try
@@ -82,7 +84,7 @@ internal sealed class JintStatementList
             {
                 ref readonly var pair = ref temp[i];
 
-                if (pair.Value is null)
+                if (pair.Value.IsEmpty)
                 {
                     c = pair.Statement.Execute(context);
                     if (context.Engine._error is not null)
@@ -162,6 +164,7 @@ internal sealed class JintStatementList
         {
             result = result.UpdateEmpty(JsValue.Undefined);
         }
+
         return result;
     }
 
@@ -170,8 +173,10 @@ internal sealed class JintStatementList
         return exception switch
         {
             JavaScriptException javaScriptException => CreateThrowCompletion(s, javaScriptException),
-            TypeErrorException typeErrorException => CreateThrowCompletion(context.Engine.Realm.Intrinsics.TypeError, typeErrorException, typeErrorException.Node ?? s!._statement),
-            RangeErrorException rangeErrorException => CreateThrowCompletion(context.Engine.Realm.Intrinsics.RangeError, rangeErrorException, s!._statement),
+            TypeErrorException typeErrorException => CreateThrowCompletion(context.Engine.Realm.Intrinsics.TypeError,
+                typeErrorException, typeErrorException.Node ?? s!._statement),
+            RangeErrorException rangeErrorException => CreateThrowCompletion(context.Engine.Realm.Intrinsics.RangeError,
+                rangeErrorException, s!._statement),
             _ => throw exception
         };
     }
@@ -214,7 +219,8 @@ internal sealed class JintStatementList
         var privateEnv = env._engine.ExecutionContext.PrivateEnvironment;
 
         var list = declarations.Declarations;
-        var dictionary = env._dictionary ??= new HybridDictionary<Binding>(list.Count, checkExistingKeys: !declarations.AllLexicalScoped);
+        var dictionary = env._dictionary ??=
+            new HybridDictionary<Binding>(list.Count, checkExistingKeys: !declarations.AllLexicalScoped);
         dictionary.EnsureCapacity(list.Count);
 
         for (var i = 0; i < list.Count; i++)

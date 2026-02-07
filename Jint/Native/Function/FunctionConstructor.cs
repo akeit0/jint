@@ -23,7 +23,7 @@ public sealed class FunctionConstructor : Constructor
         PrototypeObject = new FunctionPrototype(engine, realm, objectPrototype);
         _prototype = PrototypeObject;
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
     }
 
     internal FunctionPrototype PrototypeObject { get; }

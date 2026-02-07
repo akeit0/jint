@@ -279,7 +279,7 @@ public sealed class JsonParser
         JsNumber value;
         if (canBeInteger && long.TryParse(number, NumberStyles.Integer, CultureInfo.InvariantCulture, out var longResult) && longResult != -0)
         {
-            value = JsNumber.Create(longResult);
+            value = (longResult);
         }
         else
         {
@@ -294,12 +294,12 @@ public sealed class JsonParser
         var start = _index;
         if (ConsumeMatch("true"))
         {
-            return CreateToken(Tokens.BooleanLiteral, "true", '\t', JsBoolean.True, new TextRange(start, _index));
+            return CreateToken(Tokens.BooleanLiteral, "true", '\t', JsValue.True, new TextRange(start, _index));
         }
 
         if (ConsumeMatch("false"))
         {
-            return CreateToken(Tokens.BooleanLiteral, "false", '\f', JsBoolean.False, new TextRange(start, _index));
+            return CreateToken(Tokens.BooleanLiteral, "false", '\f', JsValue.False, new TextRange(start, _index));
         }
 
         ThrowError(start, Messages.UnexpectedTokenIllegal);

@@ -97,7 +97,7 @@ internal class IteratorPrototype : Prototype
     {
         // 1. Let O be the this value.
         // 2. If O is not an Object, throw a TypeError exception.
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "Iterator.prototype.map called on non-object");
             return Undefined;
@@ -153,7 +153,7 @@ internal class IteratorPrototype : Prototype
     {
         // 1. Let O be the this value.
         // 2. If O is not an Object, throw a TypeError exception.
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "Iterator.prototype.filter called on non-object");
             return Undefined;
@@ -185,7 +185,7 @@ internal class IteratorPrototype : Prototype
     {
         // 1. Let O be the this value.
         // 2. If O is not an Object, throw a TypeError exception.
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "Iterator.prototype.take called on non-object");
             return Undefined;
@@ -237,7 +237,7 @@ internal class IteratorPrototype : Prototype
     {
         // 1. Let O be the this value.
         // 2. If O is not an Object, throw a TypeError exception.
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "Iterator.prototype.drop called on non-object");
             return Undefined;
@@ -289,7 +289,7 @@ internal class IteratorPrototype : Prototype
     {
         // 1. Let O be the this value.
         // 2. If O is not an Object, throw a TypeError exception.
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "Iterator.prototype.flatMap called on non-object");
             return Undefined;
@@ -321,7 +321,7 @@ internal class IteratorPrototype : Prototype
     {
         // 1. Let O be the this value.
         // 2. If O is not an Object, throw a TypeError exception.
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "Iterator.prototype.reduce called on non-object");
             return Undefined;
@@ -393,7 +393,7 @@ internal class IteratorPrototype : Prototype
     /// </summary>
     private JsValue ToArray(JsValue thisObject, JsValue[] arguments)
     {
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "object must be an Object");
             return Undefined;
@@ -423,7 +423,7 @@ internal class IteratorPrototype : Prototype
     /// </summary>
     private JsValue ForEach(JsValue thisObject, JsValue[] arguments)
     {
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "object must be an Object");
             return Undefined;
@@ -468,7 +468,7 @@ internal class IteratorPrototype : Prototype
     /// </summary>
     private JsValue Some(JsValue thisObject, JsValue[] arguments)
     {
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "object must be an Object");
             return Undefined;
@@ -499,7 +499,7 @@ internal class IteratorPrototype : Prototype
                 if (TypeConverter.ToBoolean(result))
                 {
                     iterated.Close(CompletionType.Normal);
-                    return JsBoolean.True;
+                    return JsValue.True;
                 }
 
                 counter++;
@@ -511,7 +511,7 @@ internal class IteratorPrototype : Prototype
             }
         }
 
-        return JsBoolean.False;
+        return JsValue.False;
     }
 
     /// <summary>
@@ -519,7 +519,7 @@ internal class IteratorPrototype : Prototype
     /// </summary>
     private JsValue Every(JsValue thisObject, JsValue[] arguments)
     {
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "object must be an Object");
             return Undefined;
@@ -550,7 +550,7 @@ internal class IteratorPrototype : Prototype
                 if (!TypeConverter.ToBoolean(result))
                 {
                     iterated.Close(CompletionType.Normal);
-                    return JsBoolean.False;
+                    return JsValue.False;
                 }
 
                 counter++;
@@ -562,7 +562,7 @@ internal class IteratorPrototype : Prototype
             }
         }
 
-        return JsBoolean.True;
+        return JsValue.True;
     }
 
     /// <summary>
@@ -570,7 +570,7 @@ internal class IteratorPrototype : Prototype
     /// </summary>
     private JsValue Find(JsValue thisObject, JsValue[] arguments)
     {
-        if (thisObject is not ObjectInstance o)
+        if (thisObject.Obj is  not ObjectInstance o)
         {
             Throw.TypeError(_realm, "object must be an Object");
             return Undefined;
@@ -634,7 +634,7 @@ internal class IteratorPrototype : Prototype
 
     internal JsValue Next(JsValue thisObject, JsCallArguments arguments)
     {
-        var iterator = thisObject as IteratorInstance;
+        var iterator = thisObject .Obj as IteratorInstance;
         if (iterator is null)
         {
             Throw.TypeError(_engine.Realm);

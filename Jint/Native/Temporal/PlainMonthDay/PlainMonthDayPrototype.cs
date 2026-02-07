@@ -52,13 +52,13 @@ internal sealed class PlainMonthDayPrototype : Prototype
 
     private JsPlainMonthDay ValidatePlainMonthDay(JsValue thisObject)
     {
-        if (thisObject is JsPlainMonthDay plainMonthDay)
+        if (thisObject.Obj is JsPlainMonthDay plainMonthDay)
             return plainMonthDay;
         Throw.TypeError(_realm, "Value is not a Temporal.PlainMonthDay");
         return null!;
     }
 
-    private JsString GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidatePlainMonthDay(thisObject).Calendar);
-    private JsString GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidatePlainMonthDay(thisObject).IsoDate.Month:D2}");
-    private JsNumber GetDay(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainMonthDay(thisObject).IsoDate.Day);
+    private JsValue GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidatePlainMonthDay(thisObject).Calendar);
+    private JsValue GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidatePlainMonthDay(thisObject).IsoDate.Month:D2}");
+    private JsValue GetDay(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainMonthDay(thisObject).IsoDate.Day);
 }

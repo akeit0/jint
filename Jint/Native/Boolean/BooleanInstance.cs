@@ -5,7 +5,7 @@ namespace Jint.Native.Boolean;
 
 internal class BooleanInstance : ObjectInstance, IJsPrimitive
 {
-    public BooleanInstance(Engine engine, JsBoolean value)
+    public BooleanInstance(Engine engine, bool value)
         : base(engine, ObjectClass.Boolean)
     {
         BooleanData = value;
@@ -15,5 +15,5 @@ internal class BooleanInstance : ObjectInstance, IJsPrimitive
 
     JsValue IJsPrimitive.PrimitiveValue => BooleanData;
 
-    public JsBoolean BooleanData { get; }
+    public bool BooleanData { get; }
 }

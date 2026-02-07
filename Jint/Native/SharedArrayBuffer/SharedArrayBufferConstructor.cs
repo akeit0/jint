@@ -51,7 +51,7 @@ internal sealed class SharedArrayBufferConstructor : Constructor
     private static JsValue IsView(JsValue thisObject, JsCallArguments arguments)
     {
         var arg = arguments.At(0);
-        return arg is JsDataView or JsTypedArray;
+        return arg.Obj is JsDataView or JsTypedArray;
     }
 
     /// <summary>

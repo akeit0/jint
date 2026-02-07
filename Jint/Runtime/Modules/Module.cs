@@ -14,7 +14,7 @@ internal sealed record ExportResolveSetItem(
 /// <summary>
 /// https://tc39.es/ecma262/#sec-abstract-module-records
 /// </summary>
-public abstract class Module : JsValue, IScriptOrModule
+public abstract class Module : JsObjectBase, IScriptOrModule
 {
     private ObjectInstance _namespace;
     protected readonly Engine _engine;

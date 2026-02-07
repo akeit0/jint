@@ -48,7 +48,7 @@ internal sealed class RelativeTimeFormatPrototype : Prototype
 
     private JsRelativeTimeFormat ValidateRelativeTimeFormat(JsValue thisObject)
     {
-        if (thisObject is JsRelativeTimeFormat relativeTimeFormat)
+        if (thisObject.Obj is  JsRelativeTimeFormat relativeTimeFormat)
         {
             return relativeTimeFormat;
         }

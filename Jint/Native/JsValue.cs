@@ -21,7 +21,7 @@ public readonly struct JsValue : IEquatable<JsValue>
     public static JsValue Null => new JsValue(null!, Tag.JS_TAG_NULL);
     public static JsValue True => new JsValue(true);
     public static JsValue False => new JsValue(false);
-    public static JsValue Empty => new JsValue(unchecked((ulong) ((uint) -4) << 32));
+    public static JsValue Empty => default;
     internal const int JsFloat64TagAddend = (0x7ff80000 - -9 + 1);
     internal const ulong JsFloat64TagAddendShifted = (0x7ff8000A00000000ul);
     internal const ulong JsNan = unchecked((ulong) (long) (0x7ff8000000000000 - 0x7ff8000A00000000));
@@ -29,9 +29,27 @@ public readonly struct JsValue : IEquatable<JsValue>
     internal const ulong NegativeZeroBits = 0x7fff600000000;
     internal bool IsNegativeZero => U == NegativeZeroBits;
     internal bool IsPositiveZero => U == PositiveZeroBits;
+    internal bool IsNaN => U == JsNan;
+    public static JsValue NaN => new JsValue(JsNan);
     public static JsValue PositiveZero => new JsValue(PositiveZeroBits);
     public static JsValue NegativeZero => new JsValue(NegativeZeroBits);
 
+    public string? AsString()
+    {
+        return Obj as string;
+    }
+
+    public JsSymbol AsSymbol()
+    {
+        return new JsSymbol(Obj as string);
+    }
+
+    public JsValue UninitializedToUndefined()
+    {
+        return IsEmpty ? Undefined : this;
+    }
+
+    public bool IsEmptyOrUndefined => U is 0 or ((ulong) Tag.JS_TAG_UNDEFINED) << 32;
     [FieldOffset(0)] public readonly double D;
     [FieldOffset(0)] public readonly ulong U;
     [FieldOffset(8)] public readonly object? Obj;
@@ -43,7 +61,7 @@ public readonly struct JsValue : IEquatable<JsValue>
     public JsValue(double d)
     {
 #if NET8_0_OR_GREATER
-         ulong u64 = Unsafe.BitCast<double, ulong>(d);
+        ulong u64 = Unsafe.BitCast<double, ulong>(d);
 #else
         ulong u64 = Unsafe.As<double, ulong>(ref d);
 #endif
@@ -108,6 +126,9 @@ public readonly struct JsValue : IEquatable<JsValue>
             bool b => new JsValue(b),
             int i => new JsValue(i),
             double d => new JsValue(d),
+            JsValue jv => jv,
+            string s => s,
+            JsSymbol sym => sym,
             _ => new JsValue(o, Tag.JS_TAG_OBJECT)
         };
     }
@@ -123,6 +144,11 @@ public readonly struct JsValue : IEquatable<JsValue>
         };
     }
 
+    public static implicit operator JsValue(bool b)
+    {
+        return new JsValue(b);
+    }
+
     public static implicit operator JsValue(double d)
     {
         return new JsValue(d);
@@ -133,14 +159,24 @@ public readonly struct JsValue : IEquatable<JsValue>
         return new JsValue(obj, Tag.JS_TAG_STRING);
     }
 
+    public static implicit operator JsValue(JsString jsString)
+    {
+        return new JsValue(jsString._value, Tag.JS_TAG_STRING);
+    }
+
     public static implicit operator JsValue(JsSymbol obj)
     {
         return new JsValue(obj._value!, Tag.JS_TAG_SYMBOL);
     }
 
-    public static implicit operator JsValue(ObjectInstance obj)
+    public static implicit operator JsValue(JsObjectBase obj)
     {
         return new JsValue(obj, Tag.JS_TAG_OBJECT);
+    }
+
+    public static implicit operator JsValue(BigInteger bigInteger)
+    {
+        return new JsBigInt(bigInteger).ToJsValue();
     }
 
     internal bool IsLooselyEqual(JsValue value)
@@ -171,15 +207,15 @@ public readonly struct JsValue : IEquatable<JsValue>
             return numX == numY;
         }
 
-        if (y.IsObject() && (x._type & InternalTypes.Primitive) != InternalTypes.Empty)
-        {
-            return x.IsLooselyEqual(TypeConverter.ToPrimitive(y));
-        }
-
-        if (x.IsObject() && (y._type & InternalTypes.Primitive) != InternalTypes.Empty)
-        {
-            return y.IsLooselyEqual(TypeConverter.ToPrimitive(x));
-        }
+        // if (y.IsObject() && (x._type & InternalTypes.Primitive) != InternalTypes.Empty)
+        // {
+        //     return x.IsLooselyEqual(TypeConverter.ToPrimitive(y));
+        // }
+        //
+        // if (x.IsObject() && (y._type & InternalTypes.Primitive) != InternalTypes.Empty)
+        // {
+        //     return y.IsLooselyEqual(TypeConverter.ToPrimitive(x));
+        // }
 
         return false;
     }
@@ -210,6 +246,26 @@ public readonly struct JsValue : IEquatable<JsValue>
         return this;
     }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    public Types Type
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get
+        {
+            return Tag switch
+            {
+                Tag.JS_TAG_UNDEFINED => Types.Undefined,
+                Tag.JS_TAG_NULL => Types.Null,
+                Tag.JS_TAG_BOOL => Types.Boolean,
+                Tag.JS_TAG_STRING or Tag.JS_TAG_STRING_CONCAT => Types.String,
+                Tag.JS_TAG_SYMBOL => Types.Symbol,
+                Tag.JS_TAG_BIG_INT => Types.BigInt,
+                Tag.JS_TAG_OBJECT => Types.Object,
+                _ => Types.Number,
+            };
+        }
+    }
+
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal IteratorInstance GetIterator(Realm realm, GeneratorKind hint = GeneratorKind.Sync,
@@ -235,7 +291,7 @@ public readonly struct JsValue : IEquatable<JsValue>
         if (tag is Tag.JS_TAG_STRING or Tag.JS_TAG_STRING_CONCAT &&
             realm.Intrinsics.String.PrototypeObject.HasOriginalIterator)
         {
-            iterator = new IteratorInstance.StringIterator(realm.GlobalEnv._engine, Obj!.ToString());
+            iterator = new IteratorInstance.StringIterator(realm.GlobalEnv._engine, Obj!.ToString() ?? "");
             return true;
         }
 
@@ -255,7 +311,8 @@ public readonly struct JsValue : IEquatable<JsValue>
                         return false;
                     }
 
-                    var syncIteratorRecord = new JsValue(obj).GetIterator(realm, GeneratorKind.Sync, syncMethod));
+                    JsValue jsObj = obj;
+                    var syncIteratorRecord = jsObj.GetIterator(realm, GeneratorKind.Sync, syncMethod);
                     // CreateAsyncFromSyncIterator - wrap the sync iterator in an async adapter
                     var asyncFromSync = new AsyncFromSyncIterator(obj.Engine, syncIteratorRecord);
                     iterator = new IteratorInstance.ObjectIterator(asyncFromSync);
@@ -292,7 +349,32 @@ public readonly struct JsValue : IEquatable<JsValue>
         return true;
     }
 
-    internal bool IsEmpty => U == unchecked((ulong) ((uint) -4) << 32);
+    internal bool IsEmpty => U == 0;
+    internal bool IsNotEmpty => U != 0;
+
+    public bool TryReadString([NotNullWhen(true)] out string? value)
+    {
+        if (Tag is Tag.JS_TAG_STRING)
+        {
+            value = (string) Obj!;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    public bool TryReadNumber(out double value)
+    {
+        if (Tag is Tag.JS_TAG_STRING)
+        {
+            value = GetFloat64Value();
+            return true;
+        }
+
+        value = 0;
+        return false;
+    }
 
     /// <summary>
     /// https://tc39.es/ecma262/#sec-getv
@@ -317,9 +399,15 @@ public readonly struct JsValue : IEquatable<JsValue>
         return Undefined;
     }
 
+    public bool ValueEquals(JsValue other)
+    {
+        return U == other.U && Equals(Obj, other.Obj);
+    }
+
     public bool Equals(JsValue other)
     {
-        return D.Equals(other.D) && U == other.U && Equals(Obj, other.Obj);
+        if (IsNaN || other.IsNaN) return false;
+        return U == other.U && Equals(Obj, other.Obj);
     }
 
     public override bool Equals(object? obj)
@@ -342,99 +430,12 @@ public readonly struct JsValue : IEquatable<JsValue>
         return !(left == right);
     }
 
-    public override string ToString()
-    {
-        return base.ToString();
-    }
-}
-
-internal enum Tag
-{
-    /* all tags with a reference count are negative */
-    JS_TAG_FIRST = -9, /* first negative tag */
-#pragma warning disable CA1069
-    JS_TAG_BIG_INT = -9,
-#pragma warning restore CA1069
-    JS_TAG_SYMBOL = -8,
-    JS_TAG_STRING = -7,
-    JS_TAG_STRING_CONCAT = -6,
-    JS_TAG_REFERENCE = -5, /* used internally */
-    JS_EMPTY = -4, /* used internally */
-    JS_TAG_MODULE = -3, /* used internally */
-    JS_TAG_FUNCTION_BYTECODE = -2, /* used internally */
-    JS_TAG_OBJECT = -1,
-
-    //JS_TAG_INT = 0,
-    JS_TAG_BOOL = 1,
-    JS_TAG_NULL = 2,
-    JS_TAG_UNDEFINED = 3,
-
-    // JS_TAG_UNINITIALIZED = 4,
-    // JS_TAG_CATCH_OFFSET = 5,
-    // JS_TAG_EXCEPTION = 6,
-    // JS_TAG_SHORT_BIG_INT = 7,
-    JS_TAG_FLOAT64 = 8,
-    /* any larger tag is FLOAT64 if JS_NAN_BOXING */
-};
-
-public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
-{
-    protected static JsValue Undefined => JsValue.Undefined;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal readonly InternalTypes _type;
-
-    protected JsObjectBase(Types type)
-    {
-        _type = (InternalTypes) type;
-    }
-
-    internal JsObjectBase(InternalTypes type)
-    {
-        _type = type;
-    }
-
-    [Pure]
-    internal virtual bool IsArray() => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsIntegerIndexedArray => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsConstructor => false;
-
-    // Temporal type checks
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalDuration => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalInstant => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalPlainDate => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalPlainDateTime => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalPlainMonthDay => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalPlainTime => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalPlainYearMonth => false;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsTemporalZonedDateTime => false;
-
-    internal bool IsEmpty => ReferenceEquals(this, JsEmpty.Instance);
 
     [Pure]
     internal IteratorInstance GetIteratorFromMethod(Realm realm, ICallable method)
     {
         var iterator = method.Call(this);
-        if (iterator is not ObjectInstance objectInstance)
+        if (iterator.Obj is not ObjectInstance objectInstance)
         {
             Throw.TypeError(realm);
             return null!;
@@ -442,7 +443,6 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
 
         return new IteratorInstance.ObjectIterator(objectInstance);
     }
-
 
     internal static JsValue ConvertAwaitableToPromise(Engine engine, object obj)
     {
@@ -465,7 +465,7 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
         }
 #endif
 
-        return FromObject(engine, JsValue.Undefined);
+        return Undefined;
     }
 
     internal static JsValue ConvertTaskToPromise(Engine engine, Task task)
@@ -511,15 +511,6 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
         return promise;
     }
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public Types Type
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => _type == InternalTypes.Integer
-            ? Types.Number
-            : (Types) (_type & ~InternalTypes.InternalFlags);
-    }
-
     /// <summary>
     /// Creates a valid <see cref="JsObjectBase"/> instance from any <see cref="Object"/> instance
     /// </summary>
@@ -540,7 +531,7 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
 
         if (value is JsObjectBase JsObjectBase)
         {
-            return new JsValue(JsObjectBase);
+            return (JsObjectBase);
         }
 
         if (engine._objectConverters != null)
@@ -559,50 +550,7 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
             return defaultConversion;
         }
 
-        return null!;
-    }
-
-    /// <summary>
-    /// Converts a <see cref="JsObjectBase"/> to its underlying CLR value.
-    /// </summary>
-    /// <returns>The underlying CLR value of the <see cref="JsObjectBase"/> instance.</returns>
-    public abstract object? ToObject();
-
-    /// <summary>
-    /// Coerces boolean value from <see cref="JsObjectBase"/> instance.
-    /// </summary>
-    internal virtual bool ToBoolean() => _type > InternalTypes.Null;
-
-    /// <summary>
-    /// https://tc39.es/ecma262/#sec-getv
-    /// </summary>
-    internal JsValue GetV(Realm realm, JsValue property)
-    {
-        var o = TypeConverter.ToObject(realm, this);
-        return o.Get(property, this);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public JsValue Get(JsValue property)
-    {
-        return Get(property, this);
-    }
-
-    /// <summary>
-    /// https://tc39.es/ecma262/#sec-get-o-p
-    /// </summary>
-    public virtual JsValue Get(JsValue property, JsValue receiver)
-    {
-        return Undefined;
-    }
-
-    /// <summary>
-    /// https://tc39.es/ecma262/#sec-set-o-p-v-throw
-    /// </summary>
-    public virtual bool Set(JsValue property, JsValue value, JsValue receiver)
-    {
-        Throw.NotSupportedException();
-        return false;
+        return JsValue.Undefined;
     }
 
     /// <summary>
@@ -610,7 +558,8 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
     /// </summary>
     internal bool InstanceofOperator(JsValue target)
     {
-        if (target is not ObjectInstance oi)
+        var targetObject = target.Obj;
+        if (targetObject is not ObjectInstance oi)
         {
             Throw.TypeErrorNoEngine("Right-hand side of 'instanceof' is not an object");
             return false;
@@ -622,12 +571,12 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
             return TypeConverter.ToBoolean(instOfHandler.Call(target, this));
         }
 
-        if (!target.IsCallable)
+        if (!oi.IsCallable)
         {
             Throw.TypeErrorNoEngine("Right-hand side of 'instanceof' is not callable");
         }
 
-        return target.OrdinaryHasInstance(this);
+        return oi.OrdinaryHasInstance(oi);
     }
 
     /// <summary>
@@ -644,7 +593,7 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
             return null;
         }
 
-        var callable = JsObjectBase as ICallable;
+        var callable = JsObjectBase.Obj as ICallable;
         if (callable is null)
         {
             Throw.TypeError(realm, $"Value returned for property '{p}' of object is not a function");
@@ -653,146 +602,12 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
         return callable;
     }
 
-    public override string ToString()
-    {
-        return "None";
-    }
-
-    public static bool operator ==(JsObjectBase? a, JsObjectBase? b)
-    {
-        if (a is null)
-        {
-            return b is null;
-        }
-
-        return b is not null && a.Equals(b);
-    }
-
-    public static bool operator !=(JsObjectBase? a, JsObjectBase? b)
-    {
-        return !(a == b);
-    }
-
-    public static implicit operator JsObjectBase(char value)
-    {
-        return JsString.Create(value);
-    }
-
-    public static implicit operator JsObjectBase(int value)
-    {
-        return JsNumber.Create(value);
-    }
-
-    public static implicit operator JsObjectBase(uint value)
-    {
-        return JsNumber.Create(value);
-    }
-
-    public static implicit operator JsObjectBase(double value)
-    {
-        return JsNumber.Create(value);
-    }
-
-    public static implicit operator JsObjectBase(long value)
-    {
-        return JsNumber.Create(value);
-    }
-
-    public static implicit operator JsObjectBase(ulong value)
-    {
-        return JsNumber.Create(value);
-    }
-
-    public static implicit operator JsObjectBase(BigInteger value)
-    {
-        return JsBigInt.Create(value);
-    }
-
-    public static implicit operator JsObjectBase(bool value)
-    {
-        return value ? JsBoolean.True : JsBoolean.False;
-    }
-
-    [DebuggerStepThrough]
-    public static implicit operator JsObjectBase(string? value)
-    {
-        return value == null ? Null : JsString.Create(value);
-    }
-
-    /// <summary>
-    /// https://tc39.es/ecma262/#sec-islooselyequal
-    /// </summary>
-    /// <summary>
-    /// Strict equality.
-    /// </summary>
-    public override bool Equals(object? obj) => Equals(obj as JsObjectBase);
-
-    /// <summary>
-    /// Strict equality.
-    /// </summary>
-    public virtual bool Equals(JsObjectBase? other) => ReferenceEquals(this, other);
-
-    public override int GetHashCode() => _type.GetHashCode();
-
-    /// <summary>
-    /// Some values need to be cloned in order to be assigned, like ConcatenatedString.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal JsObjectBase Clone()
-    {
-        // concatenated string and arguments currently may require cloning
-        return (_type & InternalTypes.RequiresCloning) == InternalTypes.Empty
-            ? this
-            : DoClone();
-    }
-
-    internal virtual JsObjectBase DoClone() => this;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal virtual bool IsCallable => this is ICallable;
-
-    /// <summary>
-    /// https://tc39.es/ecma262/#sec-ordinaryhasinstance
-    /// </summary>
-    internal virtual bool OrdinaryHasInstance(JsObjectBase v)
-    {
-        if (!IsCallable)
-        {
-            return false;
-        }
-
-        var o = v as ObjectInstance;
-        if (o is null)
-        {
-            return false;
-        }
-
-        var p = Get(CommonProperties.Prototype);
-        if (p is not ObjectInstance)
-        {
-            Throw.TypeError(o.Engine.Realm,
-                $"Function has non-object prototype '{TypeConverter.ToString(new JsValue(p))}' in instanceof check");
-        }
-
-        while (true)
-        {
-            o = o.Prototype;
-
-            if (o is null)
-            {
-                return false;
-            }
-
-            if (SameValue(p, o))
-            {
-                return true;
-            }
-        }
-    }
+    public bool IsCallable => Obj is ICallable or JsObjectBase { IsCallable: true };
+    public bool IsConstructor => Obj is IConstructor or JsObjectBase { IsConstructor: true };
 
     internal static bool SameValue(JsValue x, JsValue y)
     {
-        if (ReferenceEquals(x, y))
+        if (x.U == y.U && ReferenceEquals(x.Obj, y.Obj))
         {
             return true;
         }
@@ -808,10 +623,10 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
         switch (typea)
         {
             case Types.Number:
-                if (x._type == y._type && x._type == InternalTypes.Integer)
-                {
-                    return x.AsInteger() == y.AsInteger();
-                }
+                // if (x._type == y._type && x._type == InternalTypes.Integer)
+                // {
+                //     return x.AsInteger() == y.AsInteger();
+                // }
 
                 var nx = TypeConverter.ToNumber(x);
                 var ny = TypeConverter.ToNumber(y);
@@ -843,21 +658,46 @@ public abstract partial class JsObjectBase : IEquatable<JsObjectBase>
             case Types.Symbol:
                 return x == y;
             case Types.Object:
-                return x is ObjectWrapper xo && y is ObjectWrapper yo && ReferenceEquals(xo.Target, yo.Target);
+                return x.Obj is ObjectWrapper xo && y.Obj is ObjectWrapper yo && ReferenceEquals(xo.Target, yo.Target);
             case Types.BigInt:
-                return (x is JsBigInt xBigInt && y is JsBigInt yBigInt && xBigInt.Equals(yBigInt));
+                return (x.AsBigInt().Equals(y.AsBigInt()));
             default:
                 return false;
         }
     }
 
-    internal static IConstructor AssertConstructor(Engine engine, JsObjectBase c)
+    internal static IConstructor AssertConstructor(Engine engine, JsValue c)
     {
         if (!c.IsConstructor)
         {
             Throw.TypeError(engine.Realm, c + " is not a constructor");
         }
 
-        return (IConstructor) c;
+        return (IConstructor) c.Obj!;
+    }
+
+    public override string ToString()
+    {
+        switch (Tag)
+        {
+            case Tag.JS_TAG_UNDEFINED:
+                return "undefined";
+            case Tag.JS_TAG_NULL:
+                return "null";
+            case Tag.JS_TAG_BOOL:
+                return GetBoolValue() ? "true" : "false";
+            case >= Tag.JS_TAG_FLOAT64:
+                return TypeConverter.ToString(GetFloat64Value());
+            case Tag.JS_TAG_STRING or Tag.JS_TAG_STRING_CONCAT:
+                return (string) Obj!;
+            case Tag.JS_TAG_SYMBOL:
+                return new JsSymbol(Obj as string).ToString();
+            case Tag.JS_TAG_OBJECT:
+                return Obj!.ToString() ?? "";
+            case Tag.JS_TAG_BIG_INT:
+                return AsBigInt().ToString();
+            default:
+                throw new NotImplementedException();
+        }
     }
 }

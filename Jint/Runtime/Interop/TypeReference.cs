@@ -332,7 +332,7 @@ public sealed class TypeReference : Constructor, IObjectWrapper
                     if (memberNameComparer.Equals(name, exposedName))
                     {
                         var value = enumValues.GetValue(i)!;
-                        return new ConstantValueAccessor(JsNumber.Create(value));
+                        return new ConstantValueAccessor((value));
                     }
                 }
             }
@@ -350,12 +350,12 @@ public sealed class TypeReference : Constructor, IObjectWrapper
 
     private static JsBoolean HasInstance(JsValue thisObject, JsCallArguments arguments)
     {
-        var typeReference = thisObject as TypeReference;
+        var typeReference = thisObject .Obj as TypeReference;
         var other = arguments.At(0);
 
         if (typeReference is null)
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         var baseType = typeReference.ReferenceType;
@@ -368,8 +368,8 @@ public sealed class TypeReference : Constructor, IObjectWrapper
         };
 
         return derivedType != null && baseType != null && (derivedType == baseType || derivedType.IsSubclassOf(baseType))
-            ? JsBoolean.True
-            : JsBoolean.False;
+            ? JsValue.True
+            : JsValue.False;
     }
 
     public override string ToString()

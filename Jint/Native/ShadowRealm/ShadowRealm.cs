@@ -69,17 +69,17 @@ public sealed class ShadowRealm : ObjectInstance
 
     public ShadowRealm SetValue(string name, double value)
     {
-        return SetValue(name, JsNumber.Create(value));
+        return SetValue(name, (value));
     }
 
     public ShadowRealm SetValue(string name, int value)
     {
-        return SetValue(name, JsNumber.Create(value));
+        return SetValue(name, (value));
     }
 
     public ShadowRealm SetValue(string name, bool value)
     {
-        return SetValue(name, value ? JsBoolean.True : JsBoolean.False);
+        return SetValue(name, value ? JsValue.True : JsValue.False);
     }
 
     public ShadowRealm SetValue(string name, JsValue value)
@@ -208,7 +208,7 @@ public sealed class ShadowRealm : ObjectInstance
     /// </summary>
     private static JsValue GetWrappedValue(Realm throwerRealm, Realm callerRealm, JsValue value)
     {
-        if (value is ObjectInstance oi)
+        if (value.Obj is ObjectInstance oi)
         {
             if (!oi.IsCallable)
             {
@@ -244,30 +244,31 @@ public sealed class ShadowRealm : ObjectInstance
     /// </summary>
     private static void CopyNameAndLength(WrappedFunction f, ObjectInstance target, string? prefix = null, int argCount = 0)
     {
-        var L = JsNumber.PositiveZero;
+        var L = JsValue.PositiveZero;
         var targetHasLength = target.HasOwnProperty("length");
         if (targetHasLength)
         {
             var targetLen = target.Get("length");
-            if (targetLen is JsNumber number)
+            if (targetLen.IsNumber())
             {
-                if (number.IsPositiveInfinity())
+                var number = targetLen.AsNumber();
+                if (double.IsPositiveInfinity(number))
                 {
                     L = number;
                 }
-                else if (number.IsNegativeInfinity())
+                else if (double.IsNegativeInfinity(number))
                 {
-                    L = JsNumber.PositiveZero;
+                    L = JsValue.PositiveZero;
                 }
                 else
                 {
                     var targetLenAsInt = TypeConverter.ToIntegerOrInfinity(targetLen);
-                    L = JsNumber.Create(System.Math.Max(targetLenAsInt - argCount, 0));
+                    L = (System.Math.Max(targetLenAsInt - argCount, 0));
                 }
             }
         }
 
-        f.SetFunctionLength(L);
+        f.SetFunctionLength(L.GetFloat64Value());
         var targetName = target.Get(CommonProperties.Name);
         if (!targetName.IsString())
         {
@@ -296,7 +297,7 @@ public sealed class ShadowRealm : ObjectInstance
 
         var onFulfilled = new StepsFunction(_engine, callerRealm, exportNameString);
         var promiseCapability = PromiseConstructor.NewPromiseCapability(_engine, _engine.Realm.Intrinsics.Promise);
-        var value = PromiseOperations.PerformPromiseThen(_engine, (JsPromise) innerCapability.PromiseInstance, onFulfilled, callerRealm.Intrinsics.ThrowTypeError, promiseCapability);
+        var value = PromiseOperations.PerformPromiseThen(_engine, (JsPromise) innerCapability.PromiseInstance.Obj!, onFulfilled, callerRealm.Intrinsics.ThrowTypeError, promiseCapability);
 
         return value;
     }
@@ -308,12 +309,12 @@ public sealed class ShadowRealm : ObjectInstance
         public StepsFunction(Engine engine, Realm realm, string exportNameString) : base(engine, realm, JsString.Empty)
         {
             _exportNameString = exportNameString;
-            SetFunctionLength(JsNumber.PositiveOne);
+            SetFunctionLength(1);
         }
 
         protected internal override JsValue Call(JsValue thisObject, JsCallArguments arguments)
         {
-            var exports = (ModuleNamespace) arguments.At(0);
+            var exports = (ModuleNamespace) arguments.At(0).Obj!;
             var f = this;
             var s = _exportNameString;
             var hasOwn = exports.HasOwnProperty(s);
@@ -330,7 +331,7 @@ public sealed class ShadowRealm : ObjectInstance
 
     private static ShadowRealm ValidateShadowRealmObject(Realm callerRealm, JsValue thisObj)
     {
-        var instance = thisObj as ShadowRealm;
+        var instance = thisObj.Obj as ShadowRealm;
         if (instance is null)
         {
             Throw.TypeError(callerRealm, "object must be a ShadowRealm");
@@ -362,7 +363,7 @@ public sealed class ShadowRealm : ObjectInstance
         /// </summary>
         protected internal override JsValue Call(JsValue thisArgument, JsCallArguments arguments)
         {
-            var target = _wrappedTargetFunction;
+            JsValue target = _wrappedTargetFunction;
             var targetRealm = GetFunctionRealm(target);
             var callerRealm = GetFunctionRealm(this);
 

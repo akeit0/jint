@@ -53,7 +53,7 @@ internal sealed class NumberPrototype : NumberInstance
     /// </summary>
     private JsValue ToLocaleString(JsValue thisObject, JsCallArguments arguments)
     {
-        if (!thisObject.IsNumber() && thisObject is not NumberInstance)
+        if (!thisObject.IsNumber() && thisObject.Obj is  not NumberInstance)
         {
             Throw.TypeError(_realm);
         }
@@ -70,12 +70,12 @@ internal sealed class NumberPrototype : NumberInstance
 
     private JsValue ValueOf(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is NumberInstance ni)
+        if (thisObject.Obj is  NumberInstance ni)
         {
             return ni.NumberData;
         }
 
-        if (thisObject is JsNumber)
+        if (thisObject.Obj is  JsNumber)
         {
             return thisObject;
         }
@@ -135,7 +135,7 @@ internal sealed class NumberPrototype : NumberInstance
         var fractionDigits = arguments.At(0);
         if (fractionDigits.IsUndefined())
         {
-            fractionDigits = JsNumber.PositiveZero;
+            fractionDigits = JsValue.PositiveZero;
         }
 
         var f = (int) TypeConverter.ToInteger(fractionDigits);

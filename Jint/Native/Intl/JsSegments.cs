@@ -49,7 +49,7 @@ internal sealed class JsSegments : ObjectInstance
     {
         // 1. Let segments be the this value.
         // 2. Perform ? RequireInternalSlot(segments, [[SegmentsSegmenter]]).
-        if (thisObject is not JsSegments segments)
+        if (thisObject.Obj is  not JsSegments segments)
         {
             Throw.TypeError(_engine.Realm, "containing requires a Segments object");
             return JsValue.Undefined;
@@ -316,11 +316,11 @@ internal sealed class JsSegments : ObjectInstance
             if (_enumerator.MoveNext())
             {
                 var segmentData = _segments.CreateSegmentDataObject(_enumerator.Current);
-                result = new Iterator.IteratorResult(_engine, segmentData, JsBoolean.False);
+                result = new Iterator.IteratorResult(_engine, segmentData, JsValue.False);
                 return true;
             }
 
-            result = new Iterator.IteratorResult(_engine, JsValue.Undefined, JsBoolean.True);
+            result = new Iterator.IteratorResult(_engine, JsValue.Undefined, JsValue.True);
             return false;
         }
     }

@@ -67,18 +67,18 @@ internal sealed class BigIntPrototype : Prototype
     /// </summary>
     private JsValue ValueOf(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is BigIntInstance ni)
+        if (thisObject.Obj is BigIntInstance ni)
         {
-            return ni.BigIntData;
+            return ni.BigIntData.value;
         }
 
-        if (thisObject is JsBigInt)
+        if (thisObject.IsBigInt())
         {
             return thisObject;
         }
 
         Throw.TypeError(_realm);
-        return null;
+        return default;
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ internal sealed class BigIntPrototype : Prototype
         var value = x.value;
         if (value == BigInteger.Zero)
         {
-            return JsString.NumberZeroString;
+            return "0";
         }
 
         if (radixMV == 10)

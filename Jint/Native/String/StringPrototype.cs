@@ -43,48 +43,167 @@ internal sealed class StringPrototype : StringInstance
         const PropertyFlag lengthFlags = PropertyFlag.Configurable;
         const PropertyFlag propertyFlags = lengthFlags | PropertyFlag.Writable;
 
-        var trimStart = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "trimStart", prototype.TrimStart, 0, lengthFlags), propertyFlags);
-        var trimEnd = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "trimEnd", prototype.TrimEnd, 0, lengthFlags), propertyFlags);
+        var trimStart = new LazyPropertyDescriptor<StringPrototype>(this,
+            static prototype => new ClrFunction(prototype._engine, "trimStart", prototype.TrimStart, 0, lengthFlags),
+            propertyFlags);
+        var trimEnd = new LazyPropertyDescriptor<StringPrototype>(this,
+            static prototype => new ClrFunction(prototype._engine, "trimEnd", prototype.TrimEnd, 0, lengthFlags),
+            propertyFlags);
         var properties = new PropertyDictionary(37, checkExistingKeys: false)
         {
             ["constructor"] = new PropertyDescriptor(_constructor, PropertyFlag.NonEnumerable),
-            ["toString"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toString", prototype.ToStringString, 0, lengthFlags), propertyFlags),
-            ["valueOf"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "valueOf", prototype.ValueOf, 0, lengthFlags), propertyFlags),
-            ["charAt"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "charAt", prototype.CharAt, 1, lengthFlags), propertyFlags),
-            ["charCodeAt"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "charCodeAt", prototype.CharCodeAt, 1, lengthFlags), propertyFlags),
-            ["codePointAt"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "codePointAt", prototype.CodePointAt, 1, lengthFlags), propertyFlags),
-            ["concat"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "concat", prototype.Concat, 1, lengthFlags), propertyFlags),
-            ["indexOf"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "indexOf", prototype.IndexOf, 1, lengthFlags), propertyFlags),
-            ["endsWith"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "endsWith", prototype.EndsWith, 1, lengthFlags), propertyFlags),
-            ["startsWith"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "startsWith", prototype.StartsWith, 1, lengthFlags), propertyFlags),
-            ["lastIndexOf"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "lastIndexOf", prototype.LastIndexOf, 1, lengthFlags), propertyFlags),
-            ["localeCompare"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "localeCompare", prototype.LocaleCompare, 1, lengthFlags), propertyFlags),
-            ["match"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "match", prototype.Match, 1, lengthFlags), propertyFlags),
-            ["matchAll"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "matchAll", prototype.MatchAll, 1, lengthFlags), propertyFlags),
-            ["replace"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "replace", prototype.Replace, 2, lengthFlags), propertyFlags),
-            ["replaceAll"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "replaceAll", prototype.ReplaceAll, 2, lengthFlags), propertyFlags),
-            ["search"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "search", prototype.Search, 1, lengthFlags), propertyFlags),
-            ["slice"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "slice", prototype.Slice, 2, lengthFlags), propertyFlags),
-            ["split"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "split", prototype.Split, 2, lengthFlags), propertyFlags),
-            ["substr"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "substr", Substr, 2), propertyFlags),
-            ["substring"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "substring", prototype.Substring, 2, lengthFlags), propertyFlags),
-            ["toLowerCase"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toLowerCase", prototype.ToLowerCase, 0, lengthFlags), propertyFlags),
-            ["toLocaleLowerCase"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toLocaleLowerCase", prototype.ToLocaleLowerCase, 0, lengthFlags), propertyFlags),
-            ["toUpperCase"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toUpperCase", prototype.ToUpperCase, 0, lengthFlags), propertyFlags),
-            ["toLocaleUpperCase"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toLocaleUpperCase", prototype.ToLocaleUpperCase, 0, lengthFlags), propertyFlags),
-            ["trim"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "trim", prototype.Trim, 0, lengthFlags), propertyFlags),
+            ["toString"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "toString", prototype.ToStringString, 0, lengthFlags),
+                    propertyFlags),
+            ["valueOf"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "valueOf", prototype.ValueOf, 0, lengthFlags),
+                    propertyFlags),
+            ["charAt"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "charAt", prototype.CharAt, 1, lengthFlags),
+                    propertyFlags),
+            ["charCodeAt"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "charCodeAt", prototype.CharCodeAt, 1, lengthFlags),
+                    propertyFlags),
+            ["codePointAt"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "codePointAt", prototype.CodePointAt, 1, lengthFlags),
+                    propertyFlags),
+            ["concat"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "concat", prototype.Concat, 1, lengthFlags),
+                    propertyFlags),
+            ["indexOf"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "indexOf", prototype.IndexOf, 1, lengthFlags),
+                    propertyFlags),
+            ["endsWith"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "endsWith", prototype.EndsWith, 1, lengthFlags),
+                    propertyFlags),
+            ["startsWith"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "startsWith", prototype.StartsWith, 1, lengthFlags),
+                    propertyFlags),
+            ["lastIndexOf"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "lastIndexOf", prototype.LastIndexOf, 1, lengthFlags),
+                    propertyFlags),
+            ["localeCompare"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "localeCompare", prototype.LocaleCompare, 1,
+                        lengthFlags), propertyFlags),
+            ["match"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "match", prototype.Match, 1, lengthFlags),
+                    propertyFlags),
+            ["matchAll"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "matchAll", prototype.MatchAll, 1, lengthFlags),
+                    propertyFlags),
+            ["replace"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "replace", prototype.Replace, 2, lengthFlags),
+                    propertyFlags),
+            ["replaceAll"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "replaceAll", prototype.ReplaceAll, 2, lengthFlags),
+                    propertyFlags),
+            ["search"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "search", prototype.Search, 1, lengthFlags),
+                    propertyFlags),
+            ["slice"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "slice", prototype.Slice, 2, lengthFlags),
+                    propertyFlags),
+            ["split"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "split", prototype.Split, 2, lengthFlags),
+                    propertyFlags),
+            ["substr"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "substr", Substr, 2), propertyFlags),
+            ["substring"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "substring", prototype.Substring, 2, lengthFlags),
+                    propertyFlags),
+            ["toLowerCase"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "toLowerCase", prototype.ToLowerCase, 0, lengthFlags),
+                    propertyFlags),
+            ["toLocaleLowerCase"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "toLocaleLowerCase",
+                        prototype.ToLocaleLowerCase, 0, lengthFlags), propertyFlags),
+            ["toUpperCase"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "toUpperCase", prototype.ToUpperCase, 0, lengthFlags),
+                    propertyFlags),
+            ["toLocaleUpperCase"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "toLocaleUpperCase",
+                        prototype.ToLocaleUpperCase, 0, lengthFlags), propertyFlags),
+            ["trim"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "trim", prototype.Trim, 0, lengthFlags),
+                    propertyFlags),
             ["trimStart"] = trimStart,
             ["trimEnd"] = trimEnd,
             ["trimLeft"] = trimStart,
             ["trimRight"] = trimEnd,
-            ["padStart"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "padStart", prototype.PadStart, 1, lengthFlags), propertyFlags),
-            ["padEnd"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "padEnd", prototype.PadEnd, 1, lengthFlags), propertyFlags),
-            ["includes"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "includes", prototype.Includes, 1, lengthFlags), propertyFlags),
-            ["normalize"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "normalize", prototype.Normalize, 0, lengthFlags), propertyFlags),
-            ["repeat"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "repeat", prototype.Repeat, 1, lengthFlags), propertyFlags),
-            ["at"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "at", prototype.At, 1, lengthFlags), propertyFlags),
-            ["isWellFormed"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "isWellFormed", prototype.IsWellFormed, 0, lengthFlags), propertyFlags),
-            ["toWellFormed"] = new LazyPropertyDescriptor<StringPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toWellFormed", prototype.ToWellFormed, 0, lengthFlags), propertyFlags),
+            ["padStart"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "padStart", prototype.PadStart, 1, lengthFlags),
+                    propertyFlags),
+            ["padEnd"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "padEnd", prototype.PadEnd, 1, lengthFlags),
+                    propertyFlags),
+            ["includes"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "includes", prototype.Includes, 1, lengthFlags),
+                    propertyFlags),
+            ["normalize"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "normalize", prototype.Normalize, 0, lengthFlags),
+                    propertyFlags),
+            ["repeat"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "repeat", prototype.Repeat, 1, lengthFlags),
+                    propertyFlags),
+            ["at"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "at", prototype.At, 1, lengthFlags),
+                    propertyFlags),
+            ["isWellFormed"] =
+                new LazyPropertyDescriptor<StringPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "isWellFormed", prototype.IsWellFormed, 0,
+                        lengthFlags), propertyFlags),
+            ["toWellFormed"] = new LazyPropertyDescriptor<StringPrototype>(this,
+                static prototype =>
+                    new ClrFunction(prototype._engine, "toWellFormed", prototype.ToWellFormed, 0, lengthFlags),
+                propertyFlags),
         };
         SetProperties(properties);
 
@@ -96,9 +215,10 @@ internal sealed class StringPrototype : StringInstance
         SetSymbols(symbols);
     }
 
-    internal override bool HasOriginalIterator => ReferenceEquals(Get(GlobalSymbolRegistry.Iterator), _originalIteratorFunction);
+    internal override bool HasOriginalIterator =>
+        ReferenceEquals(Get(GlobalSymbolRegistry.Iterator).Obj, _originalIteratorFunction);
 
-    private ObjectInstance Iterator(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Iterator(JsValue thisObject, JsCallArguments arguments)
     {
         TypeConverter.RequireObjectCoercible(_engine, thisObject);
         var str = TypeConverter.ToString(thisObject);
@@ -201,6 +321,7 @@ internal sealed class StringPrototype : StringInstance
         {
             return s;
         }
+
         return TrimEx(s.ToString());
     }
 
@@ -215,6 +336,7 @@ internal sealed class StringPrototype : StringInstance
         {
             return s;
         }
+
         return TrimStartEx(s.ToString());
     }
 
@@ -229,6 +351,7 @@ internal sealed class StringPrototype : StringInstance
         {
             return s;
         }
+
         return TrimEndEx(s.ToString());
     }
 
@@ -249,6 +372,7 @@ internal sealed class StringPrototype : StringInstance
                 Throw.RangeError(_realm, "Incorrect culture information provided");
             }
         }
+
         if (string.Equals("lt", culture.Name, StringComparison.OrdinalIgnoreCase))
         {
             s = StringInlHelper.LithuanianStringProcessor(s);
@@ -338,6 +462,7 @@ internal sealed class StringPrototype : StringInstance
                 foundCasedBefore = true;
                 break;
             }
+
             if (!IsCaseIgnorable(c))
             {
                 break;
@@ -357,6 +482,7 @@ internal sealed class StringPrototype : StringInstance
             {
                 return false; // Found cased letter after, so NOT Final_Sigma
             }
+
             if (!IsCaseIgnorable(c))
             {
                 break;
@@ -374,7 +500,8 @@ internal sealed class StringPrototype : StringInstance
     private static bool IsCased(char c)
     {
         // Cased = Lowercase OR Uppercase OR General_Category=Lt
-        return char.IsLetter(c) && (char.IsLower(c) || char.IsUpper(c) || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.TitlecaseLetter);
+        return char.IsLetter(c) && (char.IsLower(c) || char.IsUpper(c) ||
+                                    CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.TitlecaseLetter);
     }
 
     /// <summary>
@@ -386,28 +513,29 @@ internal sealed class StringPrototype : StringInstance
     private static bool IsCaseIgnorable(char c)
     {
         var category = CharUnicodeInfo.GetUnicodeCategory(c);
-        return category == UnicodeCategory.NonSpacingMark ||      // Mn
-               category == UnicodeCategory.EnclosingMark ||       // Me
-               category == UnicodeCategory.Format ||              // Cf (includes U+180E Mongolian Vowel Separator)
-               category == UnicodeCategory.ModifierLetter ||      // Lm
-               category == UnicodeCategory.ModifierSymbol ||      // Sk
-               c == '\u0027' ||                                   // APOSTROPHE (Word_Break=Single_Quote)
-               c == '\u00B7' ||                                   // MIDDLE DOT (Word_Break=MidLetter)
-               c == '\u0387' ||                                   // GREEK ANO TELEIA (Word_Break=MidLetter)
-               c == '\u05F4' ||                                   // HEBREW PUNCTUATION GERSHAYIM (Word_Break=MidLetter)
-               c == '\u2019' ||                                   // RIGHT SINGLE QUOTATION MARK (Word_Break=Single_Quote)
-               c == '\u2027' ||                                   // HYPHENATION POINT (Word_Break=MidLetter)
-               c == '\uFE13' ||                                   // PRESENTATION FORM FOR VERTICAL COLON (Word_Break=MidLetter)
-               c == '\uFE55' ||                                   // SMALL COLON (Word_Break=MidLetter)
-               c == '\uFF07' ||                                   // FULLWIDTH APOSTROPHE (Word_Break=MidNumLet)
-               c == '\uFF1A';                                     // FULLWIDTH COLON (Word_Break=MidLetter)
+        return category == UnicodeCategory.NonSpacingMark || // Mn
+               category == UnicodeCategory.EnclosingMark || // Me
+               category == UnicodeCategory.Format || // Cf (includes U+180E Mongolian Vowel Separator)
+               category == UnicodeCategory.ModifierLetter || // Lm
+               category == UnicodeCategory.ModifierSymbol || // Sk
+               c == '\u0027' || // APOSTROPHE (Word_Break=Single_Quote)
+               c == '\u00B7' || // MIDDLE DOT (Word_Break=MidLetter)
+               c == '\u0387' || // GREEK ANO TELEIA (Word_Break=MidLetter)
+               c == '\u05F4' || // HEBREW PUNCTUATION GERSHAYIM (Word_Break=MidLetter)
+               c == '\u2019' || // RIGHT SINGLE QUOTATION MARK (Word_Break=Single_Quote)
+               c == '\u2027' || // HYPHENATION POINT (Word_Break=MidLetter)
+               c == '\uFE13' || // PRESENTATION FORM FOR VERTICAL COLON (Word_Break=MidLetter)
+               c == '\uFE55' || // SMALL COLON (Word_Break=MidLetter)
+               c == '\uFF07' || // FULLWIDTH APOSTROPHE (Word_Break=MidNumLet)
+               c == '\uFF1A'; // FULLWIDTH COLON (Word_Break=MidLetter)
     }
 
     private static int ToIntegerSupportInfinity(JsValue numberVal)
     {
-        return numberVal._type == InternalTypes.Integer
-            ? numberVal.AsInteger()
-            : ToIntegerSupportInfinityUnlikely(numberVal);
+        return ToIntegerSupportInfinityUnlikely(numberVal);
+        // return numberVal._type == InternalTypes.Integer
+        //     ? numberVal.AsInteger()
+        //     : ToIntegerSupportInfinityUnlikely(numberVal);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -487,6 +615,7 @@ internal sealed class StringPrototype : StringInstance
         {
             return TypeConverter.ToString(s[startIndex]);
         }
+
         return s.Substring(startIndex, l);
     }
 
@@ -501,12 +630,13 @@ internal sealed class StringPrototype : StringInstance
         var limit = arguments.At(1);
 
         // fast path for empty regexp
-        if (separator is JsRegExp R && string.Equals(R.Source, JsRegExp.regExpForMatchingAllCharacters, StringComparison.Ordinal))
+        if (separator.Obj is JsRegExp R &&
+            string.Equals(R.Source, JsRegExp.regExpForMatchingAllCharacters, StringComparison.Ordinal))
         {
             separator = JsString.Empty;
         }
 
-        if (separator is ObjectInstance oi)
+        if (separator.Obj is ObjectInstance oi)
         {
             var splitter = GetMethod(_realm, oi, GlobalSymbolRegistry.Split);
             if (splitter != null)
@@ -623,6 +753,7 @@ internal sealed class StringPrototype : StringInstance
         {
             start = 0;
         }
+
         if (double.IsPositiveInfinity(start))
         {
             return JsString.Empty;
@@ -660,7 +791,7 @@ internal sealed class StringPrototype : StringInstance
         TypeConverter.RequireObjectCoercible(Engine, thisObject);
         var regex = arguments.At(0);
 
-        if (regex is ObjectInstance oi)
+        if (regex.Obj is ObjectInstance oi)
         {
             var searcher = GetMethod(_realm, oi, GlobalSymbolRegistry.Search);
             if (searcher != null)
@@ -686,7 +817,7 @@ internal sealed class StringPrototype : StringInstance
 
         // 2. If searchValue is neither undefined nor null, then
         // Note: spec requires checking if searchValue IS an object, not just not-null/undefined
-        if (searchValue is ObjectInstance)
+        if (searchValue.Obj is ObjectInstance)
         {
             var replacer = GetMethod(_realm, searchValue, GlobalSymbolRegistry.Replace);
             if (replacer != null)
@@ -697,7 +828,7 @@ internal sealed class StringPrototype : StringInstance
 
         var thisString = TypeConverter.ToJsString(thisObject);
         var searchString = TypeConverter.ToString(searchValue);
-        var functionalReplace = replaceValue is ICallable;
+        var functionalReplace = replaceValue.Obj is ICallable;
 
         if (!functionalReplace)
         {
@@ -713,13 +844,14 @@ internal sealed class StringPrototype : StringInstance
         string replStr;
         if (functionalReplace)
         {
-            var replValue = ((ICallable) replaceValue).Call(Undefined, searchString, position, thisString);
+            var replValue = ((ICallable) replaceValue.Obj!).Call(Undefined, searchString, position, thisString);
             replStr = TypeConverter.ToString(replValue);
         }
         else
         {
             var captures = System.Array.Empty<string>();
-            replStr = RegExpPrototype.GetSubstitution(searchString, thisString.ToString(), position, captures, Undefined, TypeConverter.ToString(replaceValue));
+            replStr = RegExpPrototype.GetSubstitution(searchString, thisString.ToString(), position, captures,
+                Undefined, TypeConverter.ToString(replaceValue));
         }
 
         var tailPos = position + searchString.Length;
@@ -740,7 +872,7 @@ internal sealed class StringPrototype : StringInstance
 
         // 2. If searchValue is neither undefined nor null, then
         // Note: spec requires checking if searchValue IS an object, not just not-null/undefined
-        if (searchValue is ObjectInstance)
+        if (searchValue.Obj is ObjectInstance)
         {
             if (searchValue.IsRegExp())
             {
@@ -762,7 +894,7 @@ internal sealed class StringPrototype : StringInstance
         var thisString = TypeConverter.ToString(thisObject);
         var searchString = TypeConverter.ToString(searchValue);
 
-        var functionalReplace = replaceValue is ICallable;
+        var functionalReplace = replaceValue.Obj is ICallable;
 
         if (!functionalReplace)
         {
@@ -803,13 +935,14 @@ internal sealed class StringPrototype : StringInstance
             var preserved = thisString.Substring(endOfLastMatch, position - endOfLastMatch);
             if (functionalReplace)
             {
-                var replValue = ((ICallable) replaceValue).Call(Undefined, searchString, position, thisString);
+                var replValue = ((ICallable) replaceValue.Obj!).Call(Undefined, searchString, position, thisString);
                 replacement = TypeConverter.ToString(replValue);
             }
             else
             {
                 var captures = System.Array.Empty<string>();
-                replacement = RegExpPrototype.GetSubstitution(searchString, thisString, position, captures, Undefined, TypeConverter.ToString(replaceValue));
+                replacement = RegExpPrototype.GetSubstitution(searchString, thisString, position, captures, Undefined,
+                    TypeConverter.ToString(replaceValue));
             }
 
             result.Append(preserved);
@@ -833,7 +966,7 @@ internal sealed class StringPrototype : StringInstance
         TypeConverter.RequireObjectCoercible(Engine, thisObject);
 
         var regex = arguments.At(0);
-        if (regex is ObjectInstance oi)
+        if (regex.Obj is ObjectInstance oi)
         {
             var matcher = GetMethod(_realm, oi, GlobalSymbolRegistry.Match);
             if (matcher != null)
@@ -855,7 +988,7 @@ internal sealed class StringPrototype : StringInstance
         var regex = arguments.At(0);
         // 2. If regexp is neither undefined nor null, then
         // Note: spec requires checking if regexp IS an object, not just not-null/undefined
-        if (regex is ObjectInstance)
+        if (regex.Obj is ObjectInstance)
         {
             if (regex.IsRegExp())
             {
@@ -866,6 +999,7 @@ internal sealed class StringPrototype : StringInstance
                     Throw.TypeError(_realm);
                 }
             }
+
             var matcher = GetMethod(_realm, regex, GlobalSymbolRegistry.MatchAll);
             if (matcher != null)
             {
@@ -893,7 +1027,9 @@ internal sealed class StringPrototype : StringInstance
         var options = arguments.At(2);
 
         // Use Intl.Collator for locale-aware comparison
-        var collator = (JsCollator) Engine.Realm.Intrinsics.Collator.Construct([locales, options], Engine.Realm.Intrinsics.Collator);
+        var collator =
+            (JsCollator) Engine.Realm.Intrinsics.Collator.Construct([locales, options],
+                Engine.Realm.Intrinsics.Collator);
         return collator.Compare(s, that);
     }
 
@@ -920,7 +1056,7 @@ internal sealed class StringPrototype : StringInstance
 
         if (searchLen > len)
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
 
         var s = jsString.ToString();
@@ -943,11 +1079,11 @@ internal sealed class StringPrototype : StringInstance
                     j++;
                 }
             }
+
             if (!found)
             {
                 i--;
             }
-
         } while (!found && i >= 0);
 
         return i;
@@ -985,9 +1121,9 @@ internal sealed class StringPrototype : StringInstance
     {
         TypeConverter.RequireObjectCoercible(Engine, thisObject);
 
-        if (thisObject is not JsString jsString)
+        if (thisObject.Obj is not JsString jsString)
         {
-            jsString = new JsString.ConcatenatedString(TypeConverter.ToString(thisObject));
+            jsString = (TypeConverter.ToString(thisObject));//new JsString.ConcatenatedString
         }
         else
         {
@@ -1011,8 +1147,9 @@ internal sealed class StringPrototype : StringInstance
         var position = (int) TypeConverter.ToInteger(pos);
         if (position < 0 || position >= s.Length)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
+
         return (long) s[position];
     }
 
@@ -1074,17 +1211,18 @@ internal sealed class StringPrototype : StringInstance
         {
             return JsString.Empty;
         }
+
         return JsString.Create(s[(int) position]);
     }
 
     private JsValue ValueOf(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is StringInstance si)
+        if (thisObject.Obj is StringInstance si)
         {
             return si.StringData;
         }
 
-        if (thisObject is JsString)
+        if (thisObject.Obj is JsString)
         {
             return thisObject;
         }
@@ -1132,7 +1270,8 @@ internal sealed class StringPrototype : StringInstance
         targetLength -= s.Length;
         if (targetLength > padString.Length)
         {
-            padString = string.Join("", System.Linq.Enumerable.Repeat(padString, (targetLength / padString.Length) + 1));
+            padString = string.Join("",
+                System.Linq.Enumerable.Repeat(padString, (targetLength / padString.Length) + 1));
         }
 
         return padStart
@@ -1150,7 +1289,7 @@ internal sealed class StringPrototype : StringInstance
         var s = TypeConverter.ToJsString(thisObject);
 
         var searchString = arguments.At(0);
-        if (ReferenceEquals(searchString, Null))
+        if (searchString.IsNull())
         {
             searchString = "null";
         }
@@ -1182,7 +1321,7 @@ internal sealed class StringPrototype : StringInstance
         var s = TypeConverter.ToJsString(thisObject);
 
         var searchString = arguments.At(0);
-        if (ReferenceEquals(searchString, Null))
+        if (searchString.IsNull())
         {
             searchString = "null";
         }
@@ -1227,7 +1366,7 @@ internal sealed class StringPrototype : StringInstance
 
         if (searchStr.Length == 0)
         {
-            return JsBoolean.True;
+            return JsValue.True;
         }
 
         if (pos < 0)
@@ -1340,6 +1479,7 @@ internal sealed class StringPrototype : StringInstance
             {
                 result.Append(s.AsSpan(k, cp.CodeUnitCount));
             }
+
             k += cp.CodeUnitCount;
         }
 

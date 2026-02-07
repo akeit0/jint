@@ -46,11 +46,11 @@ internal sealed class GeneratorPrototype : ObjectInstance
     /// <summary>
     /// https://tc39.es/ecma262/#sec-generator.prototype.next
     /// </summary>
-    private ObjectInstance Next(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Next(JsValue thisObject, JsCallArguments arguments)
     {
         var g = AssertGeneratorInstance(thisObject);
-        var value = arguments.At(0, null!);
-        return g.GeneratorResume(value, null);
+        var value = arguments.At(0, Undefined);
+        return g.GeneratorResume(value, default);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ internal sealed class GeneratorPrototype : ObjectInstance
         var g = AssertGeneratorInstance(thisObject);
         var value = arguments.At(0);
         var C = new Completion(CompletionType.Return, value, null!);
-        return g.GeneratorResumeAbrupt(C, null);
+        return g.GeneratorResumeAbrupt(C, default);
     }
 
     /// <summary>
@@ -72,12 +72,12 @@ internal sealed class GeneratorPrototype : ObjectInstance
         var g = AssertGeneratorInstance(thisObject);
         var exception = arguments.At(0);
         var C = new Completion(CompletionType.Throw, exception, null!);
-        return g.GeneratorResumeAbrupt(C, null);
+        return g.GeneratorResumeAbrupt(C, default);
     }
 
     private GeneratorInstance AssertGeneratorInstance(JsValue thisObj)
     {
-        var generatorInstance = thisObj as GeneratorInstance;
+        var generatorInstance = thisObj.Obj as GeneratorInstance;
         if (generatorInstance is null)
         {
             Runtime.Throw.TypeError(_engine.Realm, "object must be a Generator instance");

@@ -92,7 +92,7 @@ public class RegExpTests
     public void ShouldNotThrowErrorOnRegExNumericNegation()
     {
         var engine = new Engine();
-        Assert.True(ReferenceEquals(JsNumber.DoubleNaN, engine.Evaluate("-/[]/")));
+        Assert.True(ReferenceEquals(JsValue.NaN, engine.Evaluate("-/[]/")));
     }
 
     [Fact]

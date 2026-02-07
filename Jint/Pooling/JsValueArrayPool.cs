@@ -42,14 +42,17 @@ internal sealed class JsValueArrayPool
         {
             return [];
         }
+
         if (size == 1)
         {
             return _poolArray1.Allocate();
         }
+
         if (size == 2)
         {
             return _poolArray2.Allocate();
         }
+
         if (size == 3)
         {
             return _poolArray3.Allocate();
@@ -67,20 +70,20 @@ internal sealed class JsValueArrayPool
         // should be cached.
         if (array.Length == 1)
         {
-            array[0] = null!;
+            array[0] = default;
             _poolArray1.Free(array);
         }
         else if (array.Length == 2)
         {
-            array[0] = null!;
-            array[1] = null!;
+            array[0] = default;
+            array[1] = default;
             _poolArray2.Free(array);
         }
         else if (array.Length == 3)
         {
-            array[0] = null!;
-            array[1] = null!;
-            array[2] = null!;
+            array[0] = default;
+            array[1] = default;
+            array[2] = default;
             _poolArray3.Free(array);
         }
     }

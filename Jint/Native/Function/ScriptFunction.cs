@@ -42,7 +42,7 @@ public sealed class ScriptFunction : Function, IConstructor
         : base(engine, engine.Realm, function, env, thisMode)
     {
         _prototype = proto ?? _engine.Realm.Intrinsics.Function.PrototypeObject;
-        _length = new LazyPropertyDescriptor<JintFunctionDefinition>(function, static function => JsNumber.Create(function.Initialize().Length), PropertyFlag.Configurable);
+        _length = new LazyPropertyDescriptor<JintFunctionDefinition>(function, static function => (function.Initialize().Length), PropertyFlag.Configurable);
 
         if (!function.Strict
             && function.Function is not ArrowFunctionExpression

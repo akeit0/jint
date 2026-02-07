@@ -39,10 +39,10 @@ internal sealed class WeakSetConstructor : Constructor
         var arg1 = arguments.At(0);
         if (!arg1.IsNullOrUndefined())
         {
-            var adder = set.Get("add") as ICallable;
+            var adder = set.Get("add").Obj as ICallable;
 
             // check fast path
-            if (arg1 is JsArray array && ReferenceEquals(adder, _engine.Realm.Intrinsics.WeakSet.PrototypeObject._originalAddFunction))
+            if (arg1.Obj is JsArray array && ReferenceEquals(adder, _engine.Realm.Intrinsics.WeakSet.PrototypeObject._originalAddFunction))
             {
                 foreach (var value in array)
                 {

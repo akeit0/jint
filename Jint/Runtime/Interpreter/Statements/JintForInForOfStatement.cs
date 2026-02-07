@@ -201,11 +201,11 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
         else if (_iterationKind == IterationKind.AsyncIterate)
         {
             // For await-of uses async iteration
-            result = exprValue as IteratorInstance ?? exprValue.GetIterator(engine.Realm, Native.Generator.GeneratorKind.Async);
+            result = exprValue.Obj as IteratorInstance ?? exprValue.GetIterator(engine.Realm, Native.Generator.GeneratorKind.Async);
         }
         else
         {
-            result = exprValue as IteratorInstance ?? exprValue.GetIterator(engine.Realm);
+            result = exprValue.Obj as IteratorInstance ?? exprValue.GetIterator(engine.Realm);
         }
 
         return true;
@@ -250,7 +250,7 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
                 {
                     nextValue = suspendData.CurrentValue;
                     iterationEnv = suspendData.IterationEnv;
-                    suspendData.CurrentValue = null; // Clear after use
+                    suspendData.CurrentValue = default; // Clear after use
                     resuming = false; // Only skip step on first iteration after resume
 
                     // Restore the iteration environment if it was saved
@@ -290,7 +290,7 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
                         else
                         {
                             // Call next() on the iterator - for async iterators this returns a Promise
-                            var nextMethod = iteratorRecord.Instance.Get(CommonProperties.Next) as ICallable;
+                            var nextMethod = iteratorRecord.Instance.Get(CommonProperties.Next).Obj as ICallable;
                             if (nextMethod is null)
                             {
                                 Throw.TypeError(engine.Realm, "Iterator does not have a next method");
@@ -300,7 +300,7 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
                             var nextPromise = nextMethod.Call(iteratorRecord.Instance, Arguments.Empty);
 
                             // If result is a Promise, we need to await it
-                            if (nextPromise is JsPromise promise)
+                            if (nextPromise.Obj is JsPromise promise)
                             {
                                 // Save current state for resume (including iterator)
                                 if (asyncSuspendData is not null)
@@ -317,7 +317,7 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
                             }
 
                             // Not a promise - treat as sync iterator result
-                            nextResult = (nextPromise as ObjectInstance)!;
+                            nextResult = (nextPromise.Obj as ObjectInstance)!;
                             if (nextResult is null)
                             {
                                 Throw.TypeError(engine.Realm, "Iterator result is not an object");
@@ -485,7 +485,7 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
                 {
                     if (generator.Data.TryGet<ForOfSuspendData>(this, out var currentData))
                     {
-                        currentData!.CurrentValue = null;
+                        currentData!.CurrentValue = default;
                     }
                 }
 
@@ -630,7 +630,7 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
                 {
                     // Store the resolved iterator result for resume
                     var resumeSuspendData = asyncInstance.Data.GetOrCreate<ForAwaitSuspendData>(this);
-                    resumeSuspendData.ResolvedIteratorResult = resolvedValue as ObjectInstance;
+                    resumeSuspendData.ResolvedIteratorResult = resolvedValue.Obj as ObjectInstance;
 
                     asyncInstance._resumeValue = JsValue.Undefined;
                     asyncInstance._resumeWithThrow = false;
@@ -680,7 +680,7 @@ internal sealed class JintForInForOfStatement : JintStatement<Statement>
 
                 // Store the resolved iterator result for when we resume
                 var resumeSuspendData = asyncGenerator.Data.GetOrCreate<ForAwaitSuspendData>(this);
-                resumeSuspendData.ResolvedIteratorResult = resolvedValue as ObjectInstance;
+                resumeSuspendData.ResolvedIteratorResult = resolvedValue.Obj as ObjectInstance;
 
                 // Set up for resumption - mark as resuming so the for-await-of loop
                 // knows to use the stored result

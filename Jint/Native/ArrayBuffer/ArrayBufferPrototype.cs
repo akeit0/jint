@@ -29,31 +29,60 @@ internal sealed class ArrayBufferPrototype : Prototype
         const PropertyFlag lengthFlags = PropertyFlag.Configurable;
         var properties = new PropertyDictionary(4, checkExistingKeys: false)
         {
-            ["byteLength"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get byteLength", ByteLength, 0, lengthFlags), Undefined, PropertyFlag.Configurable),
+            ["byteLength"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get byteLength", ByteLength, 0, lengthFlags),
+                    Undefined, PropertyFlag.Configurable),
             [KnownKeys.Constructor] = new PropertyDescriptor(_constructor, PropertyFlag.NonEnumerable),
-            ["detached"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get detached", Detached, 0, lengthFlags), Undefined, PropertyFlag.Configurable),
-            ["immutable"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get immutable", Immutable, 0, lengthFlags), Undefined, PropertyFlag.Configurable),
-            ["maxByteLength"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get maxByteLength", MaxByteLength, 0, lengthFlags), Undefined, PropertyFlag.Configurable),
-            ["resizable"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get resizable", Resizable, 0, lengthFlags), Undefined, PropertyFlag.Configurable),
-            ["resize"] = new PropertyDescriptor(new ClrFunction(_engine, "resize", Resize, 1, lengthFlags), PropertyFlag.NonEnumerable),
-            ["slice"] = new PropertyDescriptor(new ClrFunction(_engine, "slice", Slice, 2, lengthFlags), PropertyFlag.NonEnumerable),
-            ["sliceToImmutable"] = new PropertyDescriptor(new ClrFunction(_engine, "sliceToImmutable", SliceToImmutable, 2, lengthFlags), PropertyFlag.NonEnumerable),
-            ["transfer"] = new PropertyDescriptor(new ClrFunction(_engine, "transfer", Transfer, 0, lengthFlags), PropertyFlag.NonEnumerable),
-            ["transferToFixedLength"] = new PropertyDescriptor(new ClrFunction(_engine, "transferToFixedLength", TransferToFixedLength, 0, lengthFlags), PropertyFlag.NonEnumerable),
-            ["transferToImmutable"] = new PropertyDescriptor(new ClrFunction(_engine, "transferToImmutable", TransferToImmutable, 0, lengthFlags), PropertyFlag.NonEnumerable),
+            ["detached"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get detached", Detached, 0, lengthFlags),
+                    Undefined, PropertyFlag.Configurable),
+            ["immutable"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get immutable", Immutable, 0, lengthFlags),
+                    Undefined, PropertyFlag.Configurable),
+            ["maxByteLength"] =
+                new GetSetPropertyDescriptor(
+                    new ClrFunction(_engine, "get maxByteLength", MaxByteLength, 0, lengthFlags), Undefined,
+                    PropertyFlag.Configurable),
+            ["resizable"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get resizable", Resizable, 0, lengthFlags),
+                    Undefined, PropertyFlag.Configurable),
+            ["resize"] =
+                new PropertyDescriptor(new ClrFunction(_engine, "resize", Resize, 1, lengthFlags),
+                    PropertyFlag.NonEnumerable),
+            ["slice"] =
+                new PropertyDescriptor(new ClrFunction(_engine, "slice", Slice, 2, lengthFlags),
+                    PropertyFlag.NonEnumerable),
+            ["sliceToImmutable"] =
+                new PropertyDescriptor(new ClrFunction(_engine, "sliceToImmutable", SliceToImmutable, 2, lengthFlags),
+                    PropertyFlag.NonEnumerable),
+            ["transfer"] =
+                new PropertyDescriptor(new ClrFunction(_engine, "transfer", Transfer, 0, lengthFlags),
+                    PropertyFlag.NonEnumerable),
+            ["transferToFixedLength"] =
+                new PropertyDescriptor(
+                    new ClrFunction(_engine, "transferToFixedLength", TransferToFixedLength, 0, lengthFlags),
+                    PropertyFlag.NonEnumerable),
+            ["transferToImmutable"] =
+                new PropertyDescriptor(
+                    new ClrFunction(_engine, "transferToImmutable", TransferToImmutable, 0, lengthFlags),
+                    PropertyFlag.NonEnumerable),
         };
         SetProperties(properties);
 
-        var symbols = new SymbolDictionary(1) { [GlobalSymbolRegistry.ToStringTag] = new PropertyDescriptor("ArrayBuffer", PropertyFlag.Configurable) };
+        var symbols = new SymbolDictionary(1)
+        {
+            [GlobalSymbolRegistry.ToStringTag] = new PropertyDescriptor("ArrayBuffer", PropertyFlag.Configurable)
+        };
         SetSymbols(symbols);
     }
 
     private JsValue Detached(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.detached called on incompatible receiver " + thisObject);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.detached called on incompatible receiver " + thisObject);
         }
 
         return o.IsDetachedBuffer;
@@ -64,10 +93,11 @@ internal sealed class ArrayBufferPrototype : Prototype
     /// </summary>
     private JsValue Immutable(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.immutable called on incompatible receiver " + thisObject);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.immutable called on incompatible receiver " + thisObject);
         }
 
         return o.IsImmutableBuffer;
@@ -78,15 +108,16 @@ internal sealed class ArrayBufferPrototype : Prototype
     /// </summary>
     private JsValue MaxByteLength(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.maxByteLength called on incompatible receiver " + thisObject);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.maxByteLength called on incompatible receiver " + thisObject);
         }
 
         if (o.IsDetachedBuffer)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         long length = o.IsFixedLengthArrayBuffer
@@ -101,10 +132,11 @@ internal sealed class ArrayBufferPrototype : Prototype
     /// </summary>
     private JsValue Resizable(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.resizable called on incompatible receiver " + thisObject);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.resizable called on incompatible receiver " + thisObject);
         }
 
         return !o.IsFixedLengthArrayBuffer;
@@ -116,10 +148,11 @@ internal sealed class ArrayBufferPrototype : Prototype
     /// </summary>
     private JsValue Resize(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.resize called on incompatible receiver " + thisObject);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.resize called on incompatible receiver " + thisObject);
         }
 
         // Step 2: Perform ? RequireInternalSlot(O, [[ArrayBufferMaxByteLength]]).
@@ -144,18 +177,19 @@ internal sealed class ArrayBufferPrototype : Prototype
     /// </summary>
     private JsValue ByteLength(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.byteLength called on incompatible receiver " + thisObject);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.byteLength called on incompatible receiver " + thisObject);
         }
 
         if (o.IsDetachedBuffer)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
-        return JsNumber.Create(o.ArrayBufferByteLength);
+        return (o.ArrayBufferByteLength);
     }
 
     /// <summary>
@@ -163,7 +197,7 @@ internal sealed class ArrayBufferPrototype : Prototype
     /// </summary>
     private JsValue Slice(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
             Throw.TypeError(_realm, "Method ArrayBuffer.prototype.slice called on incompatible receiver " + thisObject);
@@ -202,7 +236,7 @@ internal sealed class ArrayBufferPrototype : Prototype
 
         var newLen = System.Math.Max(final - first, 0);
         var ctor = SpeciesConstructor(o, _realm.Intrinsics.ArrayBuffer);
-        var bufferInstance = Construct(ctor, [JsNumber.Create(newLen)]) as JsArrayBuffer;
+        var bufferInstance = Construct(ctor, [(newLen)]) as JsArrayBuffer;
 
         if (bufferInstance is null)
         {
@@ -281,10 +315,11 @@ internal sealed class ArrayBufferPrototype : Prototype
     private JsValue SliceToImmutable(JsValue thisObject, JsCallArguments arguments)
     {
         // 1. Let O be the this value.
-        var o = thisObject as JsArrayBuffer;
+        var o = thisObject.Obj as JsArrayBuffer;
         if (o is null || o.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.sliceToImmutable called on incompatible receiver " + thisObject);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.sliceToImmutable called on incompatible receiver " + thisObject);
         }
 
         // 2. Perform ? RequireInternalSlot(O, [[ArrayBufferData]]).
@@ -334,7 +369,8 @@ internal sealed class ArrayBufferPrototype : Prototype
         var newLen = (uint) System.Math.Max(final - first, 0);
 
         // 14. Let new be ? AllocateArrayBuffer(%ArrayBuffer%, newLen).
-        var newBuffer = _engine.Realm.Intrinsics.ArrayBuffer.AllocateArrayBuffer(_engine.Realm.Intrinsics.ArrayBuffer, newLen);
+        var newBuffer =
+            _engine.Realm.Intrinsics.ArrayBuffer.AllocateArrayBuffer(_engine.Realm.Intrinsics.ArrayBuffer, newLen);
 
         // 15. If IsDetachedBuffer(O) is true, throw a TypeError exception.
         o.AssertNotDetached();
@@ -357,9 +393,10 @@ internal sealed class ArrayBufferPrototype : Prototype
 
     private JsValue ArrayBufferCopyAndDetach(JsValue o, JsValue newLength, PreserveResizability preserveResizability)
     {
-        if (o is not JsArrayBuffer arrayBuffer || arrayBuffer.IsSharedArrayBuffer)
+        if (o.Obj is not JsArrayBuffer arrayBuffer || arrayBuffer.IsSharedArrayBuffer)
         {
-            Throw.TypeError(_realm, "Method ArrayBuffer.prototype.ArrayBufferCopyAndDetach called on incompatible receiver " + o);
+            Throw.TypeError(_realm,
+                "Method ArrayBuffer.prototype.ArrayBufferCopyAndDetach called on incompatible receiver " + o);
             return Undefined;
         }
 
@@ -380,7 +417,8 @@ internal sealed class ArrayBufferPrototype : Prototype
         arrayBuffer.AssertNotImmutable();
 
         uint? newMaxByteLength = null;
-        if (preserveResizability == PreserveResizability.PreserveResizability && arrayBuffer._arrayBufferMaxByteLength != null)
+        if (preserveResizability == PreserveResizability.PreserveResizability &&
+            arrayBuffer._arrayBufferMaxByteLength != null)
         {
             newMaxByteLength = (uint) arrayBuffer._arrayBufferMaxByteLength.Value;
         }
@@ -390,7 +428,8 @@ internal sealed class ArrayBufferPrototype : Prototype
             Throw.TypeError(_realm);
         }
 
-        var newBuffer = _engine.Realm.Intrinsics.ArrayBuffer.AllocateArrayBuffer(_engine.Realm.Intrinsics.ArrayBuffer, newByteLength, newMaxByteLength);
+        var newBuffer = _engine.Realm.Intrinsics.ArrayBuffer.AllocateArrayBuffer(_engine.Realm.Intrinsics.ArrayBuffer,
+            newByteLength, newMaxByteLength);
         var copyLength = System.Math.Min(newByteLength, arrayBuffer.ArrayBufferByteLength);
         var fromBlock = arrayBuffer.ArrayBufferData!;
         var toBlock = newBuffer.ArrayBufferData!;

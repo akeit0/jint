@@ -215,7 +215,7 @@ public class Options
             PropertyDescriptor? descriptorWithoutFallback = null;
 
             if (prototype.HasOwnProperty(key) &&
-                prototype.GetOwnProperty(key).Value is ClrFunction clrFunctionInstance)
+                prototype.GetOwnProperty(key).Value.Obj is ClrFunction clrFunctionInstance)
             {
                 descriptorWithFallback = CreateMethodInstancePropertyDescriptor(clrFunctionInstance);
                 prototype.SetOwnProperty(key, descriptorWithFallback);
@@ -232,7 +232,7 @@ public class Options
                 key = char.ToLower(overloads.Key[0], CultureInfo.InvariantCulture) + overloads.Key.Substring(1);
 
                 if (prototype.HasOwnProperty(key) &&
-                    prototype.GetOwnProperty(key).Value is ClrFunction lowerclrFunctionInstance)
+                    prototype.GetOwnProperty(key).Value.Obj is ClrFunction lowerclrFunctionInstance)
                 {
                     descriptorWithFallback ??= CreateMethodInstancePropertyDescriptor(lowerclrFunctionInstance);
                     prototype.SetOwnProperty(key, descriptorWithFallback);

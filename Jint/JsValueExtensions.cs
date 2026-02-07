@@ -39,7 +39,7 @@ public static class JsValueExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool IsNullOrUndefined(this JsValue value)
     {
-        return value._type < InternalTypes.Boolean;
+        return value.Tag == Tag.JS_TAG_UNDEFINED || value.Tag == Tag.JS_TAG_NULL;
     }
 
     [Pure]
@@ -58,7 +58,7 @@ public static class JsValueExtensions
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsPrivateName(this JsValue value) => value._type == InternalTypes.PrivateName;
+    public static bool IsPrivateName(this JsValue value) => value.Obj is PrivateName;
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -680,7 +680,7 @@ public static class JsValueExtensions
 
     private static JsValue UnwrapIfPromiseCore(JsValue value, TimeSpan timeout, CancellationToken cancellationToken)
     {
-        if (value is JsPromise promise)
+        if (value.Obj is JsPromise promise)
         {
             var engine = promise.Engine;
             var completedEvent = promise.CompletedEvent;
@@ -733,15 +733,15 @@ public static class JsValueExtensions
                 {
                     case PromiseState.Pending:
                         Throw.InvalidOperationException("'UnwrapIfPromise' called before Promise was settled");
-                        return null;
+                        return default;
                     case PromiseState.Fulfilled:
                         return promise.Value;
                     case PromiseState.Rejected:
                         Throw.PromiseRejectedException(promise.Value);
-                        return null;
+                        return default;
                     default:
                         Throw.ArgumentOutOfRangeException();
-                        return null;
+                        return default;
                 }
             }
             finally
@@ -756,7 +756,7 @@ public static class JsValueExtensions
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ThrowWrongTypeException(JsValue value, string expectedType)
     {
-        Throw.ArgumentException($"Expected {expectedType} but got {value._type}");
+        Throw.ArgumentException($"Expected {expectedType} but got {value.Type}");
     }
 
     internal static BigInteger ToBigInteger(this JsValue value, Engine engine)
@@ -774,7 +774,7 @@ public static class JsValueExtensions
 
     internal static ICallable GetCallable(this JsValue source, Realm realm)
     {
-        if (source is ICallable callable)
+        if (source.Obj is ICallable callable)
         {
             return callable;
         }
@@ -807,6 +807,6 @@ public static class JsValueExtensions
     /// </summary>
     internal static JsValue CanonicalizeKeyedCollectionKey(this JsValue key)
     {
-        return key is JsNumber number && number.IsNegativeZero() ? JsNumber.PositiveZero : key;
+        return key is JsNumber number && number.IsNegativeZero() ? JsValue.PositiveZero : key;
     }
 }

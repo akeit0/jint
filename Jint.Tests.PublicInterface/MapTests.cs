@@ -25,14 +25,14 @@ public class MapTests
 
         engine.SetValue("m", map);
         engine.Evaluate("m.size").Should().Be((JsNumber) 2);
-        engine.Evaluate("m.has(42)").Should().Be(JsBoolean.True);
-        engine.Evaluate("m.has('foo')").Should().Be(JsBoolean.True);
-        engine.Evaluate("m.has(24)").Should().Be(JsBoolean.False);
+        engine.Evaluate("m.has(42)").Should().Be(JsValue.True);
+        engine.Evaluate("m.has('foo')").Should().Be(JsValue.True);
+        engine.Evaluate("m.has(24)").Should().Be(JsValue.False);
 
         map.Should().Contain((JsNumber) 42, (JsString) "the meaning of life");
         map.Remove(42).Should().BeTrue();
         map.Has(42).Should().BeFalse();
-        engine.Evaluate("m.has(42)").Should().Be(JsBoolean.False);
+        engine.Evaluate("m.has(42)").Should().Be(JsValue.False);
         engine.Evaluate("m.size").Should().Be((JsNumber) 1);
 
         map.Clear();

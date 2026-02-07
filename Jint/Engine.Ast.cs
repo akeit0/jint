@@ -89,7 +89,7 @@ public partial class Engine
                     var literal = (Literal) node;
 
                     var constantValue = JintLiteralExpression.ConvertToJsValue(literal);
-                    node.UserData = constantValue is not null ? new JintConstantExpression(literal, constantValue) : null;
+                    node.UserData = constantValue is not null ? new JintConstantExpression(literal, constantValue.Value) : null;
                     break;
 
                 case NodeType.MemberExpression:
@@ -145,7 +145,7 @@ public partial class Engine
                         var returnValue = JintLiteralExpression.ConvertToJsValue(returnedLiteral);
                         if (returnValue is not null)
                         {
-                            node.UserData = new ConstantStatement(returnStatement, CompletionType.Return, returnValue);
+                            node.UserData = new ConstantStatement(returnStatement, CompletionType.Return, returnValue.Value);
                         }
                     }
                     break;

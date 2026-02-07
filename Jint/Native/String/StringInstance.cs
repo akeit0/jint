@@ -51,7 +51,7 @@ internal class StringInstance : ObjectInstance, IJsPrimitive
             return desc;
         }
 
-        if ((property._type & (InternalTypes.Number | InternalTypes.Integer | InternalTypes.String)) == InternalTypes.Empty)
+        if ((property.Tag is < Tag.JS_TAG_FLOAT64 and not Tag.JS_TAG_STRING))
         {
             return PropertyDescriptor.Undefined;
         }
@@ -81,7 +81,7 @@ internal class StringInstance : ObjectInstance, IJsPrimitive
 
     internal sealed override IEnumerable<JsValue> GetInitialOwnStringPropertyKeys()
     {
-        yield return JsString.LengthString;
+        yield return "length";
     }
 
     public sealed override List<JsValue> GetOwnPropertyKeys(Types types = Types.String | Types.Symbol)

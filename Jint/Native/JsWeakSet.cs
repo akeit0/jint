@@ -6,11 +6,11 @@ namespace Jint.Native;
 
 internal sealed class JsWeakSet : ObjectInstance
 {
-    private readonly ConditionalWeakTable<JsValue, JsValue> _table;
+    private readonly ConditionalWeakTable<object, object> _table;
 
     public JsWeakSet(Engine engine) : base(engine)
     {
-        _table = new ConditionalWeakTable<JsValue, JsValue>();
+        _table = new ConditionalWeakTable<object, object>();
     }
 
     internal bool WeakSetHas(JsValue value)

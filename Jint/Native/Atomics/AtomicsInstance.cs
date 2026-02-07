@@ -327,11 +327,11 @@ internal sealed class AtomicsInstance : ObjectInstance
         // On modern hardware, all sizes 1, 2, 4, 8 are typically lock-free
         return n switch
         {
-            1 => JsBoolean.True,  // Typically lock-free on modern systems
-            2 => JsBoolean.True,  // Typically lock-free on modern systems
-            4 => JsBoolean.True,  // Required by spec to be true
-            8 => JsBoolean.True,  // Typically lock-free on 64-bit systems
-            _ => JsBoolean.False
+            1 => JsValue.True,  // Typically lock-free on modern systems
+            2 => JsValue.True,  // Typically lock-free on modern systems
+            4 => JsValue.True,  // Required by spec to be true
+            8 => JsValue.True,  // Typically lock-free on 64-bit systems
+            _ => JsValue.False
         };
     }
 
@@ -380,14 +380,14 @@ internal sealed class AtomicsInstance : ObjectInstance
         // Per spec step 7: If IsSharedArrayBuffer(buffer) is false, return +0
         if (!buffer.IsSharedArrayBuffer)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         // Get the buffer's data array as the key - this is the shared memory
         var bufferData = buffer._arrayBufferData;
         if (bufferData is null)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         // Ensure we see the latest updates from other threads (important for ARM memory model)
@@ -397,10 +397,10 @@ internal sealed class AtomicsInstance : ObjectInstance
         if (_waiters.TryGetValue(key, out var waiterList))
         {
             var notified = waiterList.NotifyWaiters(c);
-            return JsNumber.Create(notified);
+            return (notified);
         }
 
-        return JsNumber.PositiveZero;
+        return JsValue.PositiveZero;
     }
 
     /// <summary>
@@ -484,7 +484,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         }
         else
         {
-            return JsNumber.Create(v.DoubleValue);
+            return (v.DoubleValue);
         }
     }
 
@@ -684,7 +684,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         if (!valueMatches)
         {
             var resultObj = OrdinaryObjectCreate(_engine, _realm.Intrinsics.Object.PrototypeObject);
-            resultObj.Set(CommonProperties.Async, JsBoolean.False, throwOnError: true);
+            resultObj.Set(CommonProperties.Async, JsValue.False, throwOnError: true);
             resultObj.Set(CommonProperties.Value, new JsString("not-equal"), throwOnError: true);
             return resultObj;
         }
@@ -693,7 +693,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         if (q <= 0)
         {
             var resultObj = OrdinaryObjectCreate(_engine, _realm.Intrinsics.Object.PrototypeObject);
-            resultObj.Set(CommonProperties.Async, JsBoolean.False, throwOnError: true);
+            resultObj.Set(CommonProperties.Async, JsValue.False, throwOnError: true);
             resultObj.Set(CommonProperties.Value, new JsString("timed-out"), throwOnError: true);
             return resultObj;
         }
@@ -738,7 +738,7 @@ internal sealed class AtomicsInstance : ObjectInstance
 
         // Return an object with async: true and value: promise
         var asyncResultObj = OrdinaryObjectCreate(_engine, _realm.Intrinsics.Object.PrototypeObject);
-        asyncResultObj.Set(CommonProperties.Async, JsBoolean.True, throwOnError: true);
+        asyncResultObj.Set(CommonProperties.Async, JsValue.True, throwOnError: true);
         asyncResultObj.Set(CommonProperties.Value, promiseCapability.PromiseInstance, throwOnError: true);
 
         return asyncResultObj;
@@ -927,12 +927,12 @@ internal sealed class AtomicsInstance : ObjectInstance
 
         return type switch
         {
-            TypedArrayElementType.Int8 => JsNumber.Create((sbyte) buffer[byteIndex]),
-            TypedArrayElementType.Uint8 => JsNumber.Create(buffer[byteIndex]),
-            TypedArrayElementType.Int16 => JsNumber.Create(ReadInt16(buffer, byteIndex)),
-            TypedArrayElementType.Uint16 => JsNumber.Create(ReadUInt16(buffer, byteIndex)),
-            TypedArrayElementType.Int32 => JsNumber.Create(ReadInt32(buffer, byteIndex)),
-            TypedArrayElementType.Uint32 => JsNumber.Create(ReadUInt32(buffer, byteIndex)),
+            TypedArrayElementType.Int8 => ((sbyte) buffer[byteIndex]),
+            TypedArrayElementType.Uint8 => (buffer[byteIndex]),
+            TypedArrayElementType.Int16 => (ReadInt16(buffer, byteIndex)),
+            TypedArrayElementType.Uint16 => (ReadUInt16(buffer, byteIndex)),
+            TypedArrayElementType.Int32 => (ReadInt32(buffer, byteIndex)),
+            TypedArrayElementType.Uint32 => (ReadUInt32(buffer, byteIndex)),
             TypedArrayElementType.BigInt64 => JsBigInt.Create(ReadInt64(buffer, byteIndex)),
             TypedArrayElementType.BigUint64 => JsBigInt.Create((BigInteger) ReadUInt64(buffer, byteIndex)),
             _ => throw new InvalidOperationException($"Unexpected typed array element type: {type}")
@@ -1007,7 +1007,7 @@ internal sealed class AtomicsInstance : ObjectInstance
             _ => throw new ArgumentOutOfRangeException(nameof(op))
         };
         buffer[byteIndex] = (byte) newValue;
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     private static JsValue DoCompareExchangeInt8(byte[] buffer, int byteIndex, sbyte expected, sbyte replacement)
@@ -1017,7 +1017,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         {
             buffer[byteIndex] = (byte) replacement;
         }
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     // Uint8 operations
@@ -1035,7 +1035,7 @@ internal sealed class AtomicsInstance : ObjectInstance
             _ => throw new ArgumentOutOfRangeException(nameof(op))
         };
         buffer[byteIndex] = newValue;
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     private static JsValue DoCompareExchangeUint8(byte[] buffer, int byteIndex, byte expected, byte replacement)
@@ -1045,7 +1045,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         {
             buffer[byteIndex] = replacement;
         }
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     // Int16 operations
@@ -1063,7 +1063,7 @@ internal sealed class AtomicsInstance : ObjectInstance
             _ => throw new ArgumentOutOfRangeException(nameof(op))
         };
         WriteInt16(buffer, byteIndex, newValue);
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     private static JsValue DoCompareExchangeInt16(byte[] buffer, int byteIndex, short expected, short replacement)
@@ -1073,7 +1073,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         {
             WriteInt16(buffer, byteIndex, replacement);
         }
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     // Uint16 operations
@@ -1091,7 +1091,7 @@ internal sealed class AtomicsInstance : ObjectInstance
             _ => throw new ArgumentOutOfRangeException(nameof(op))
         };
         WriteUInt16(buffer, byteIndex, newValue);
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     private static JsValue DoCompareExchangeUint16(byte[] buffer, int byteIndex, ushort expected, ushort replacement)
@@ -1101,7 +1101,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         {
             WriteUInt16(buffer, byteIndex, replacement);
         }
-        return JsNumber.Create(oldValue);
+        return (oldValue);
     }
 
     // Int32 operations - use Interlocked for thread safety
@@ -1136,7 +1136,7 @@ internal sealed class AtomicsInstance : ObjectInstance
                     throw new ArgumentOutOfRangeException(nameof(op));
             }
 
-            return JsNumber.Create(oldValue);
+            return (oldValue);
         }
     }
 
@@ -1146,7 +1146,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         {
             ref int location = ref Unsafe.AsRef<int>(ptr);
             var oldValue = Interlocked.CompareExchange(ref location, replacement, expected);
-            return JsNumber.Create(oldValue);
+            return (oldValue);
         }
     }
 
@@ -1182,7 +1182,7 @@ internal sealed class AtomicsInstance : ObjectInstance
                     throw new ArgumentOutOfRangeException(nameof(op));
             }
 
-            return JsNumber.Create((uint) oldValue);
+            return ((uint) oldValue);
         }
     }
 
@@ -1192,7 +1192,7 @@ internal sealed class AtomicsInstance : ObjectInstance
         {
             ref int location = ref Unsafe.AsRef<int>(ptr);
             var oldValue = Interlocked.CompareExchange(ref location, (int) replacement, (int) expected);
-            return JsNumber.Create((uint) oldValue);
+            return ((uint) oldValue);
         }
     }
 

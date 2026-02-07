@@ -23,13 +23,13 @@ public class SetTests
 
         engine.SetValue("s", set);
         engine.Evaluate("s.size").Should().Be((JsNumber) 2);
-        engine.Evaluate("s.has(42)").Should().Be(JsBoolean.True);
-        engine.Evaluate("s.has('foo')").Should().Be(JsBoolean.True);
-        engine.Evaluate("s.has(24)").Should().Be(JsBoolean.False);
+        engine.Evaluate("s.has(42)").Should().Be(JsValue.True);
+        engine.Evaluate("s.has('foo')").Should().Be(JsValue.True);
+        engine.Evaluate("s.has(24)").Should().Be(JsValue.False);
 
         set.Delete(42).Should().BeTrue();
         set.Has(42).Should().BeFalse();
-        engine.Evaluate("s.has(42)").Should().Be(JsBoolean.False);
+        engine.Evaluate("s.has(42)").Should().Be(JsValue.False);
         engine.Evaluate("s.size").Should().Be((JsNumber) 1);
 
         set.Clear();

@@ -47,7 +47,7 @@ internal sealed class SegmenterPrototype : Prototype
 
     private JsSegmenter ValidateSegmenter(JsValue thisObject)
     {
-        if (thisObject is JsSegmenter segmenter)
+        if (thisObject.Obj is  JsSegmenter segmenter)
         {
             return segmenter;
         }

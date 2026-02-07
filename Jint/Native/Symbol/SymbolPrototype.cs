@@ -31,7 +31,7 @@ internal sealed class SymbolPrototype : Prototype
         const PropertyFlag propertyFlags = PropertyFlag.Configurable;
         SetProperties(new PropertyDictionary(5, checkExistingKeys: false)
         {
-            ["length"] = new PropertyDescriptor(JsNumber.PositiveZero, propertyFlags),
+            ["length"] = new PropertyDescriptor(JsValue.PositiveZero, propertyFlags),
             ["constructor"] = new PropertyDescriptor(_constructor, PropertyFlag.Configurable | PropertyFlag.Writable),
             ["description"] = new GetSetPropertyDescriptor(new ClrFunction(Engine, "description", Description, 0, lengthFlags), Undefined, propertyFlags),
             ["toString"] = new PropertyDescriptor(new ClrFunction(Engine, "toString", ToSymbolString, 0, lengthFlags), PropertyFlag.Configurable | PropertyFlag.Writable),
@@ -52,7 +52,7 @@ internal sealed class SymbolPrototype : Prototype
     private JsValue Description(JsValue thisObject, JsCallArguments arguments)
     {
         var sym = ThisSymbolValue(thisObject);
-        return sym._value;
+        return sym._value ?? JsValue.Undefined;
     }
 
     /// <summary>
@@ -82,17 +82,17 @@ internal sealed class SymbolPrototype : Prototype
 
     private JsSymbol ThisSymbolValue(JsValue thisObject)
     {
-        if (thisObject is JsSymbol s)
+        if (thisObject.Obj is JsSymbol s)
         {
             return s;
         }
 
-        if (thisObject is SymbolInstance instance)
+        if (thisObject.Obj is SymbolInstance instance)
         {
             return instance.SymbolData;
         }
 
         Throw.TypeError(_realm);
-        return null;
+        return default;
     }
 }

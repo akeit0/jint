@@ -90,7 +90,7 @@ internal sealed class AsyncDisposableStackPrototype : Prototype
 
     private DisposableStack AssertDisposableStack(JsValue thisObject)
     {
-        if (thisObject is not DisposableStack { _hint: DisposeHint.Async } stack)
+        if (thisObject.Obj is  not DisposableStack { _hint: DisposeHint.Async } stack)
         {
             Throw.TypeError(_engine.Realm, "This is not a AsyncDisposableStack instance.");
             return null!;

@@ -1118,7 +1118,7 @@ public partial class InteropTests : IDisposable
         engine.SetValue("func1", new Func<bool>(() => true));
         Assert.Equal("true", engine.Evaluate("'' + func1()").AsString());
 
-        engine.SetValue("func2", new Func<JsValue>(() => JsBoolean.True));
+        engine.SetValue("func2", new Func<JsValue>(() => JsValue.True));
         Assert.Equal("true", engine.Evaluate("'' + func2()").AsString());
 
         // but null and undefined should be injected as nulls to c# objects

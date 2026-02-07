@@ -20,7 +20,7 @@ using TypeConverter = Jint.Runtime.TypeConverter;
 namespace Jint.Native.Object;
 
 [DebuggerTypeProxy(typeof(ObjectInstanceDebugView))]
-public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
+public partial class ObjectInstance : JsObjectBase, IEquatable<ObjectInstance>
 {
     private bool _initialized;
     private readonly ObjectClass _class;
@@ -52,8 +52,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
 
     public Engine Engine
     {
-        [DebuggerStepThrough]
-        get => _engine;
+        [DebuggerStepThrough] get => _engine;
     }
 
     /// <summary>
@@ -61,8 +60,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     /// </summary>
     public ObjectInstance? Prototype
     {
-        [DebuggerStepThrough]
-        get => GetPrototypeOf();
+        [DebuggerStepThrough] get => GetPrototypeOf();
         set => SetPrototypeOf(value!);
     }
 
@@ -101,17 +99,22 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     internal static ObjectInstance Construct(IConstructor f, IConstructor? newTarget, JsCallArguments argumentsList)
     {
         newTarget ??= f;
-        return f.Construct(argumentsList, (JsValue) newTarget);
+        return f.Construct(argumentsList, (ObjectInstance) newTarget);
     }
 
     internal static ObjectInstance Construct(IConstructor f, JsCallArguments argumentsList)
     {
-        return f.Construct(argumentsList, (JsValue) f);
+        return f.Construct(argumentsList, (ObjectInstance) f);
     }
 
     internal static ObjectInstance Construct(IConstructor f)
     {
-        return f.Construct([], (JsValue) f);
+        return f.Construct([], (ObjectInstance) f);
+    }
+
+    public JsValue AsJsValue()
+    {
+        return this;
     }
 
 
@@ -126,7 +129,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             return defaultConstructor;
         }
 
-        var oi = c as ObjectInstance;
+        var oi = c.Obj as ObjectInstance;
         if (oi is null)
         {
             Throw.TypeError(o._engine.Realm);
@@ -140,14 +143,15 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
 
         if (s.IsConstructor)
         {
-            return (IConstructor) s;
+            return (IConstructor) s.Obj!;
         }
 
         Throw.TypeError(o._engine.Realm);
         return null;
     }
 
-    internal void SetProperties(StringDictionarySlim<PropertyDescriptor> properties) => SetProperties(new PropertyDictionary(properties));
+    internal void SetProperties(StringDictionarySlim<PropertyDescriptor> properties) =>
+        SetProperties(new PropertyDictionary(properties));
 
     internal void SetProperties(PropertyDictionary? properties)
     {
@@ -155,6 +159,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         {
             properties.CheckExistingKeys = true;
         }
+
         _properties = properties;
     }
 
@@ -166,9 +171,9 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void SetProperty(JsValue property, PropertyDescriptor value)
     {
-        if (property is JsString jsString)
+        if (property.IsString())
         {
-            SetProperty(jsString.ToString(), value);
+            SetProperty(property.ToString(), value);
         }
         else
         {
@@ -202,7 +207,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         else
         {
             _symbols ??= new SymbolDictionary();
-            _symbols[(JsSymbol) propertyKey] = value;
+            _symbols[new JsSymbol(propertyKey.AsString())] = value;
         }
     }
 
@@ -270,6 +275,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                     propertyKeys.RemoveRange(propertyKeyCount, propertyKeys.Count - propertyKeyCount);
                     return GetOwnPropertyKeysSorted(propertyKeys, returningStringKeys, returningSymbols);
                 }
+
                 propertyKeys.Add(new JsString(pair.Key.Name));
             }
 
@@ -287,13 +293,15 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                     propertyKeys.Add(pair.Key);
                 }
             }
+
             return propertyKeys;
         }
 
         return GetOwnPropertyKeysSorted(propertyKeys, returningStringKeys, returningSymbols);
     }
 
-    private List<JsValue> GetOwnPropertyKeysSorted(List<JsValue> initialOwnPropertyKeys, bool returningStringKeys, bool returningSymbols)
+    private List<JsValue> GetOwnPropertyKeysSorted(List<JsValue> initialOwnPropertyKeys, bool returningStringKeys,
+        bool returningSymbols)
     {
         var keys = new List<JsValue>(_properties?.Count ?? 0 + _symbols?.Count ?? 0 + initialOwnPropertyKeys.Count);
         if (returningStringKeys && _properties != null)
@@ -340,7 +348,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             return _properties?.TryGetValue(TypeConverter.ToString(key), out descriptor) == true;
         }
 
-        return _symbols?.TryGetValue((JsSymbol) key, out descriptor) == true;
+        return _symbols?.TryGetValue(key.AsSymbol(), out descriptor) == true;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -360,12 +368,13 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             return;
         }
 
-        _symbols?.Remove((JsSymbol) key);
+        _symbols?.Remove(key.AsSymbol());
     }
 
     public override JsValue Get(JsValue property, JsValue receiver)
     {
-        if ((_type & InternalTypes.PlainObject) != InternalTypes.Empty && ReferenceEquals(this, receiver) && property.IsString())
+        if ((_type & InternalTypes.PlainObject) != InternalTypes.Empty && ReferenceEquals(this, receiver.Obj) &&
+            property.IsString())
         {
             EnsureInitialized();
             if (_properties?.TryGetValue(property.ToString(), out var ownDesc) == true)
@@ -399,9 +408,10 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             : desc._value;
 
         // IsDataDescriptor inlined
-        if ((desc._flags & (PropertyFlag.WritableSet | PropertyFlag.Writable)) != PropertyFlag.None || value is not null)
+        if ((desc._flags & (PropertyFlag.WritableSet | PropertyFlag.Writable)) != PropertyFlag.None ||
+            !value.IsEmpty)
         {
-            return value ?? Undefined;
+            return value.IsEmpty ? Undefined : value;
         }
 
         return UnwrapFromGetter(desc, thisObject);
@@ -413,13 +423,13 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static JsValue UnwrapFromGetter(PropertyDescriptor desc, JsValue thisObject)
     {
-        var getter = desc.Get ?? Undefined;
-        if (getter.IsUndefined())
+        var getter = desc.Get;
+        if (getter is null)
         {
             return Undefined;
         }
 
-        var functionInstance = (Function.Function) getter;
+        var functionInstance = (Function.Function) getter!;
         return functionInstance._engine.Call(functionInstance, thisObject);
     }
 
@@ -441,7 +451,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         }
         else
         {
-            _symbols?.TryGetValue((JsSymbol) key, out descriptor);
+            _symbols?.TryGetValue(key.AsSymbol(), out descriptor);
         }
 
         return descriptor ?? PropertyDescriptor.Undefined;
@@ -460,7 +470,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         if (desc != PropertyDescriptor.Undefined)
         {
             var descValue = desc.Value;
-            if (desc.WritableSet && descValue is not null)
+            if (desc.WritableSet && descValue.IsNotEmpty)
             {
                 value = descValue;
                 return true;
@@ -474,7 +484,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             }
 
             // if getter is not undefined it must be ICallable
-            var callable = (ICallable) getter;
+            var callable = (ICallable) getter.Obj!;
             value = callable.Call(this, Arguments.Empty);
             return true;
         }
@@ -496,9 +506,9 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Set(JsValue property, JsValue value)
     {
-        if ((_type & InternalTypes.PlainObject) != InternalTypes.Empty && property is JsString jsString)
+        if ((_type & InternalTypes.PlainObject) != InternalTypes.Empty && property.TryReadString(out var jsString))
         {
-            if (_properties?.TryGetValue(jsString.ToString(), out var ownDesc) == true)
+            if (_properties?.TryGetValue(jsString, out var ownDesc) == true)
             {
                 if ((ownDesc._flags & PropertyFlag.Writable) != PropertyFlag.None)
                 {
@@ -518,7 +528,8 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     /// </summary>
     public override bool Set(JsValue property, JsValue value, JsValue receiver)
     {
-        if ((_type & InternalTypes.PlainObject) != InternalTypes.Empty && ReferenceEquals(this, receiver) && property.IsString())
+        if ((_type & InternalTypes.PlainObject) != InternalTypes.Empty && ReferenceEquals(this, receiver.Obj) &&
+            property.IsString())
         {
             var key = (Key) property.ToString();
             if (_properties?.TryGetValue(key, out var ownDesc) == true)
@@ -565,7 +576,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                 return false;
             }
 
-            if (receiver is not ObjectInstance oi)
+            if (receiver.Obj is not ObjectInstance oi)
             {
                 return false;
             }
@@ -619,7 +630,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             if (desc.IsAccessorDescriptor())
             {
                 var set = desc.Set;
-                if (set is null || set.IsUndefined())
+                if (set is null)
                 {
                     return false;
                 }
@@ -645,7 +656,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         if (inherited.IsAccessorDescriptor())
         {
             var set = inherited.Set;
-            if (set is null || set.IsUndefined())
+            if (set is null)
             {
                 return false;
             }
@@ -691,6 +702,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         {
             Throw.TypeError(_engine.Realm);
         }
+
         return true;
     }
 
@@ -745,7 +757,8 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     /// <summary>
     /// https://tc39.es/ecma262/#sec-validateandapplypropertydescriptor
     /// </summary>
-    protected static bool ValidateAndApplyPropertyDescriptor(ObjectInstance? o, JsValue property, bool extensible, PropertyDescriptor desc, PropertyDescriptor current)
+    protected static bool ValidateAndApplyPropertyDescriptor(ObjectInstance? o, JsValue property, bool extensible,
+        PropertyDescriptor desc, PropertyDescriptor current)
     {
         var descValue = desc.Value;
         if (current == PropertyDescriptor.Undefined)
@@ -760,31 +773,32 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                 if (desc.IsGenericDescriptor() || desc.IsDataDescriptor())
                 {
                     PropertyDescriptor propertyDescriptor;
-                    if ((desc._flags & PropertyFlag.ConfigurableEnumerableWritable) == PropertyFlag.ConfigurableEnumerableWritable)
+                    if ((desc._flags & PropertyFlag.ConfigurableEnumerableWritable) ==
+                        PropertyFlag.ConfigurableEnumerableWritable)
                     {
-                        propertyDescriptor = new PropertyDescriptor(descValue ?? Undefined, PropertyFlag.ConfigurableEnumerableWritable);
+                        propertyDescriptor = new PropertyDescriptor(descValue.UninitializedToUndefined(),
+                            PropertyFlag.ConfigurableEnumerableWritable);
                     }
                     else if ((desc._flags & PropertyFlag.ConfigurableEnumerableWritable) == PropertyFlag.None)
                     {
-                        propertyDescriptor = new PropertyDescriptor(descValue ?? Undefined, PropertyFlag.AllForbidden);
+                        propertyDescriptor = new PropertyDescriptor(descValue.UninitializedToUndefined(),
+                            PropertyFlag.AllForbidden);
                     }
                     else
                     {
-                        propertyDescriptor = new PropertyDescriptor(desc)
-                        {
-                            Value = descValue ?? Undefined
-                        };
+                        propertyDescriptor =
+                            new PropertyDescriptor(desc) { Value = descValue.UninitializedToUndefined() };
                     }
 
                     o.SetOwnProperty(property, propertyDescriptor);
                 }
                 else
                 {
-                    var descriptor = new GetSetPropertyDescriptor(desc.Get, desc.Set, PropertyFlag.None)
-                    {
-                        Enumerable = desc.Enumerable,
-                        Configurable = desc.Configurable
-                    };
+                    var descriptor =
+                        new GetSetPropertyDescriptor(desc.Get ?? Undefined, desc.Set ?? Undefined, PropertyFlag.None)
+                        {
+                            Enumerable = desc.Enumerable, Configurable = desc.Configurable
+                        };
 
                     o.SetOwnProperty(property, descriptor);
                 }
@@ -799,10 +813,11 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         var currentValue = current.Value;
 
         // 4. If every field in Desc is absent, return true.
-        if ((current._flags & (PropertyFlag.ConfigurableSet | PropertyFlag.EnumerableSet | PropertyFlag.WritableSet)) == PropertyFlag.None &&
+        if ((current._flags & (PropertyFlag.ConfigurableSet | PropertyFlag.EnumerableSet | PropertyFlag.WritableSet)) ==
+            PropertyFlag.None &&
             currentGet is null &&
             currentSet is null &&
-            currentValue is null)
+            currentValue.IsEmpty)
         {
             return true;
         }
@@ -814,9 +829,12 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             current.Configurable == desc.Configurable && current.ConfigurableSet == desc.ConfigurableSet &&
             current.Writable == desc.Writable && current.WritableSet == desc.WritableSet &&
             current.Enumerable == desc.Enumerable && current.EnumerableSet == desc.EnumerableSet &&
-            ((currentGet is null && descGet is null) || (currentGet is not null && descGet is not null && SameValue(currentGet, descGet))) &&
-            ((currentSet is null && descSet is null) || (currentSet is not null && descSet is not null && SameValue(currentSet, descSet))) &&
-            ((currentValue is null && descValue is null) || (currentValue is not null && descValue is not null && currentValue == descValue))
+            ((currentGet is null && descGet is null) ||
+             (currentGet is not null && descGet is not null && SameValue(currentGet, descGet))) &&
+            ((currentSet is null && descSet is null) ||
+             (currentSet is not null && descSet is not null && SameValue(currentSet, descSet))) &&
+            ((currentValue.IsEmpty && descValue.IsEmpty) ||
+             (currentValue.IsNotEmpty && descValue.IsNotEmpty && currentValue == descValue))
         )
         {
             return true;
@@ -846,7 +864,8 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
 
                 if (o is not null)
                 {
-                    var flags = current.Flags & ~(PropertyFlag.Writable | PropertyFlag.WritableSet | PropertyFlag.CustomJsValue);
+                    var flags = current.Flags &
+                                ~(PropertyFlag.Writable | PropertyFlag.WritableSet | PropertyFlag.CustomJsValue);
                     if (current.IsDataDescriptor())
                     {
                         o.SetOwnProperty(property, current = new GetSetPropertyDescriptor(
@@ -875,7 +894,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
 
                     if (!current.Writable)
                     {
-                        if (descValue is not null && !SameValue(descValue, currentValue!))
+                        if (descValue.IsNotEmpty && !SameValue(descValue, currentValue!))
                         {
                             return false;
                         }
@@ -898,7 +917,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
 
         if (o is not null)
         {
-            if (descValue is not null)
+            if (descValue.IsNotEmpty)
             {
                 current.Value = descValue;
             }
@@ -963,176 +982,185 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         return ToObject(new ObjectTraverseStack(_engine));
     }
 
-    private object ToObject(ObjectTraverseStack stack)
-    {
-        if (this is IObjectWrapper wrapper)
-        {
-            return wrapper.Target;
-        }
-
-        stack.Enter(this);
-        object? converted = null;
-        switch (Class)
-        {
-            case ObjectClass.String:
-                if (this is StringInstance stringInstance)
-                {
-                    converted = stringInstance.StringData.ToString();
-                }
-                break;
-
-            case ObjectClass.Date:
-                if (this is JsDate dateInstance)
-                {
-                    converted = dateInstance.ToDateTime();
-                }
-                break;
-
-            case ObjectClass.Boolean:
-                if (this is BooleanInstance booleanInstance)
-                {
-                    converted = booleanInstance.BooleanData._value
-                        ? JsBoolean.BoxedTrue
-                        : JsBoolean.BoxedFalse;
-                }
-                break;
-
-            case ObjectClass.Function:
-                if (this is ICallable function)
-                {
-                    converted = (JsCallDelegate) function.Call;
-                }
-
-                break;
-
-            case ObjectClass.Number:
-                if (this is NumberInstance numberInstance)
-                {
-                    converted = numberInstance.NumberData._value;
-                }
-                break;
-
-            case ObjectClass.RegExp:
-                if (this is JsRegExp regeExpInstance)
-                {
-                    converted = regeExpInstance.Value;
-                }
-                break;
-
-            case ObjectClass.Arguments:
-            case ObjectClass.Object:
-
-                if ((Engine.Options.ExperimentalFeatures & ExperimentalFeature.TaskInterop) != ExperimentalFeature.None)
-                {
-                    if (this is JsPromise asPromise)
-                    {
-                        var promsiseResult = asPromise.UnwrapIfPromise(Engine.Options.Constraints.PromiseTimeout);
-
-                        converted = promsiseResult is ObjectInstance oi
-                                    ? oi.ToObject(stack)
-                                    : promsiseResult.ToObject();
-                        break;
-                    }
-                }
-                if (this is JsArray arrayInstance)
-                {
-                    var result = new object?[arrayInstance.GetLength()];
-                    for (uint i = 0; i < result.Length; i++)
-                    {
-                        var value = arrayInstance[i];
-                        object? valueToSet = null;
-                        if (!value.IsUndefined())
-                        {
-                            valueToSet = value is ObjectInstance oi
-                                ? oi.ToObject(stack)
-                                : value.ToObject();
-                        }
-                        result[i] = valueToSet;
-                    }
-                    converted = result;
-                    break;
-                }
-
-                if (this is JsTypedArray typedArrayInstance)
-                {
-                    converted = typedArrayInstance._arrayElementType switch
-                    {
-                        TypedArrayElementType.Int8 => typedArrayInstance.ToNativeArray<sbyte>(),
-                        TypedArrayElementType.Int16 => typedArrayInstance.ToNativeArray<short>(),
-                        TypedArrayElementType.Int32 => typedArrayInstance.ToNativeArray<int>(),
-                        TypedArrayElementType.BigInt64 => typedArrayInstance.ToNativeArray<long>(),
-#if SUPPORTS_HALF
-                        TypedArrayElementType.Float16 => typedArrayInstance.ToNativeArray<Half>(),
-#endif
-                        TypedArrayElementType.Float32 => typedArrayInstance.ToNativeArray<float>(),
-                        TypedArrayElementType.Float64 => typedArrayInstance.ToNativeArray<double>(),
-                        TypedArrayElementType.Uint8 => typedArrayInstance.ToNativeArray<byte>(),
-                        TypedArrayElementType.Uint8C => typedArrayInstance.ToNativeArray<byte>(),
-                        TypedArrayElementType.Uint16 => typedArrayInstance.ToNativeArray<ushort>(),
-                        TypedArrayElementType.Uint32 => typedArrayInstance.ToNativeArray<uint>(),
-                        TypedArrayElementType.BigUint64 => typedArrayInstance.ToNativeArray<ulong>(),
-                        _ => throw new NotSupportedException("cannot handle element type")
-                    };
-
-                    break;
-                }
-
-                if (this is JsArrayBuffer arrayBuffer)
-                {
-                    // TODO: What to do here when buffer is detached? We're not allowed to return null
-                    arrayBuffer.AssertNotDetached();
-                    converted = arrayBuffer.ArrayBufferData;
-                    break;
-                }
-
-                if (this is JsDataView dataView)
-                {
-                    // TODO: What to do here when buffer is detached? We're not allowed to return null
-                    dataView._viewedArrayBuffer!.AssertNotDetached();
-                    var res = new byte[dataView._byteLength];
-                    System.Array.Copy(dataView._viewedArrayBuffer._arrayBufferData!, dataView._byteOffset, res, 0, dataView._byteLength);
-                    converted = res;
-                    break;
-                }
-
-                if (this is BigIntInstance bigIntInstance)
-                {
-                    converted = bigIntInstance.BigIntData.value;
-                    break;
-                }
-
-                var func = _engine.Options.Interop.CreateClrObject;
-                if (func is null)
-                {
-                    goto default;
-                }
-
-                var o = func(this);
-                foreach (var p in GetOwnProperties())
-                {
-                    if (!p.Value.Enumerable)
-                    {
-                        continue;
-                    }
-
-                    var key = p.Key.ToString();
-                    var propertyValue = Get(p.Key);
-                    var value = propertyValue is ObjectInstance oi
-                        ? oi.ToObject(stack)
-                        : propertyValue.ToObject();
-                    o.Add(key, value);
-                }
-
-                converted = o;
-                break;
-            default:
-                converted = this;
-                break;
-        }
-
-        stack.Exit();
-        return converted!;
-    }
+//     private object ToObject(ObjectTraverseStack stack)
+//     {
+//         if (this is IObjectWrapper wrapper)
+//         {
+//             return wrapper.Target;
+//         }
+//
+//         stack.Enter(this);
+//         object? converted = null;
+//         switch (Class)
+//         {
+//             case ObjectClass.String:
+//                 if (this is StringInstance stringInstance)
+//                 {
+//                     converted = stringInstance.StringData.ToString();
+//                 }
+//
+//                 break;
+//
+//             case ObjectClass.Date:
+//                 if (this is JsDate dateInstance)
+//                 {
+//                     converted = dateInstance.ToDateTime();
+//                 }
+//
+//                 break;
+//
+//             case ObjectClass.Boolean:
+//                 if (this is BooleanInstance booleanInstance)
+//                 {
+//                     converted = booleanInstance.BooleanData
+//                         ? JsBoolean.BoxedTrue
+//                         : JsBoolean.BoxedFalse;
+//                 }
+//
+//                 break;
+//
+//             case ObjectClass.Function:
+//                 if (this is ICallable function)
+//                 {
+//                     converted = (JsCallDelegate) function.Call;
+//                 }
+//
+//                 break;
+//
+//             case ObjectClass.Number:
+//                 if (this is NumberInstance numberInstance)
+//                 {
+//                     converted = numberInstance.NumberData._value;
+//                 }
+//
+//                 break;
+//
+//             case ObjectClass.RegExp:
+//                 if (this is JsRegExp regeExpInstance)
+//                 {
+//                     converted = regeExpInstance.Value;
+//                 }
+//
+//                 break;
+//
+//             case ObjectClass.Arguments:
+//             case ObjectClass.Object:
+//
+//                 if ((Engine.Options.ExperimentalFeatures & ExperimentalFeature.TaskInterop) != ExperimentalFeature.None)
+//                 {
+//                     if (this is JsPromise asPromise)
+//                     {
+//                         var promsiseResult = asPromise.UnwrapIfPromise(Engine.Options.Constraints.PromiseTimeout);
+//
+//                         converted = promsiseResult is ObjectInstance oi
+//                             ? oi.ToObject(stack)
+//                             : promsiseResult.ToObject();
+//                         break;
+//                     }
+//                 }
+//
+//                 if (this is JsArray arrayInstance)
+//                 {
+//                     var result = new object?[arrayInstance.GetLength()];
+//                     for (uint i = 0; i < result.Length; i++)
+//                     {
+//                         var value = arrayInstance[i];
+//                         object? valueToSet = null;
+//                         if (!value.IsUndefined())
+//                         {
+//                             valueToSet = value is ObjectInstance oi
+//                                 ? oi.ToObject(stack)
+//                                 : value.ToObject();
+//                         }
+//
+//                         result[i] = valueToSet;
+//                     }
+//
+//                     converted = result;
+//                     break;
+//                 }
+//
+//                 if (this is JsTypedArray typedArrayInstance)
+//                 {
+//                     converted = typedArrayInstance._arrayElementType switch
+//                     {
+//                         TypedArrayElementType.Int8 => typedArrayInstance.ToNativeArray<sbyte>(),
+//                         TypedArrayElementType.Int16 => typedArrayInstance.ToNativeArray<short>(),
+//                         TypedArrayElementType.Int32 => typedArrayInstance.ToNativeArray<int>(),
+//                         TypedArrayElementType.BigInt64 => typedArrayInstance.ToNativeArray<long>(),
+// #if SUPPORTS_HALF
+//                         TypedArrayElementType.Float16 => typedArrayInstance.ToNativeArray<Half>(),
+// #endif
+//                         TypedArrayElementType.Float32 => typedArrayInstance.ToNativeArray<float>(),
+//                         TypedArrayElementType.Float64 => typedArrayInstance.ToNativeArray<double>(),
+//                         TypedArrayElementType.Uint8 => typedArrayInstance.ToNativeArray<byte>(),
+//                         TypedArrayElementType.Uint8C => typedArrayInstance.ToNativeArray<byte>(),
+//                         TypedArrayElementType.Uint16 => typedArrayInstance.ToNativeArray<ushort>(),
+//                         TypedArrayElementType.Uint32 => typedArrayInstance.ToNativeArray<uint>(),
+//                         TypedArrayElementType.BigUint64 => typedArrayInstance.ToNativeArray<ulong>(),
+//                         _ => throw new NotSupportedException("cannot handle element type")
+//                     };
+//
+//                     break;
+//                 }
+//
+//                 if (this is JsArrayBuffer arrayBuffer)
+//                 {
+//                     // TODO: What to do here when buffer is detached? We're not allowed to return null
+//                     arrayBuffer.AssertNotDetached();
+//                     converted = arrayBuffer.ArrayBufferData;
+//                     break;
+//                 }
+//
+//                 if (this is JsDataView dataView)
+//                 {
+//                     // TODO: What to do here when buffer is detached? We're not allowed to return null
+//                     dataView._viewedArrayBuffer!.AssertNotDetached();
+//                     var res = new byte[dataView._byteLength];
+//                     System.Array.Copy(dataView._viewedArrayBuffer._arrayBufferData!, dataView._byteOffset, res, 0,
+//                         dataView._byteLength);
+//                     converted = res;
+//                     break;
+//                 }
+//
+//                 if (this is BigIntInstance bigIntInstance)
+//                 {
+//                     converted = bigIntInstance.BigIntData.value;
+//                     break;
+//                 }
+//
+//                 var func = _engine.Options.Interop.CreateClrObject;
+//                 if (func is null)
+//                 {
+//                     goto default;
+//                 }
+//
+//                 var o = func(this);
+//                 foreach (var p in GetOwnProperties())
+//                 {
+//                     if (!p.Value.Enumerable)
+//                     {
+//                         continue;
+//                     }
+//
+//                     var key = p.Key.ToString();
+//                     var propertyValue = Get(p.Key);
+//                     var value = propertyValue is ObjectInstance oi
+//                         ? oi.ToObject(stack)
+//                         : propertyValue.ToObject();
+//                     o.Add(key, value);
+//                 }
+//
+//                 converted = o;
+//                 break;
+//             default:
+//                 converted = this;
+//                 break;
+//         }
+//
+//         stack.Exit();
+//         return converted!;
+//     }
 
     /// <summary>
     /// Handles the generic find of (callback[, thisArg])
@@ -1234,6 +1262,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
             {
                 return TypeConverter.ToBoolean(spreadable);
             }
+
             return IsArray();
         }
     }
@@ -1326,6 +1355,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                 ? JsString.Empty
                 : new JsString("[" + symbol._value + "]");
         }
+
         if (!string.IsNullOrWhiteSpace(prefix))
         {
             name = prefix + " " + name;
@@ -1380,10 +1410,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
     /// </summary>
     internal static JsObject OrdinaryObjectCreate(Engine engine, ObjectInstance? proto)
     {
-        var prototype = new JsObject(engine)
-        {
-            _prototype = proto
-        };
+        var prototype = new JsObject(engine) { _prototype = proto };
         return prototype;
     }
 
@@ -1405,7 +1432,8 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                 {
                     JsCallDelegate closure = (_, _) =>
                     {
-                        var promiseCapability = PromiseConstructor.NewPromiseCapability(_engine, _engine.Intrinsics.Promise);
+                        var promiseCapability =
+                            PromiseConstructor.NewPromiseCapability(_engine, _engine.Intrinsics.Promise);
                         try
                         {
                             method.Call(this);
@@ -1415,6 +1443,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                         {
                             promiseCapability.Reject.Call(Undefined, Undefined);
                         }
+
                         return promiseCapability.PromiseInstance;
                     };
 
@@ -1510,6 +1539,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         {
             ThrowIncompatibleReceiver(value, methodName);
         }
+
         return instance!;
     }
 
@@ -1717,7 +1747,8 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
         {
             get
             {
-                var keys = new KeyValuePair<JsValue, JsValue>[(_obj._properties?.Count ?? 0) + (_obj._symbols?.Count ?? 0)];
+                var keys = new KeyValuePair<JsValue, JsValue>[(_obj._properties?.Count ?? 0) +
+                                                              (_obj._symbols?.Count ?? 0)];
 
                 var i = 0;
                 if (_obj._properties is not null)
@@ -1727,6 +1758,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                         keys[i++] = new KeyValuePair<JsValue, JsValue>(key.Key.Name, UnwrapJsValue(key.Value, _obj));
                     }
                 }
+
                 if (_obj._symbols is not null)
                 {
                     foreach (var key in _obj._symbols)
@@ -1734,6 +1766,7 @@ public partial class ObjectInstance :JsObjectBase, IEquatable<ObjectInstance>
                         keys[i++] = new KeyValuePair<JsValue, JsValue>(key.Key, UnwrapJsValue(key.Value, _obj));
                     }
                 }
+
                 return keys;
             }
         }

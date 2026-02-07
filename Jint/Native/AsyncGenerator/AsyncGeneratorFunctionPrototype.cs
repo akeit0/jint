@@ -30,7 +30,7 @@ internal sealed class AsyncGeneratorFunctionPrototype : Prototype
     {
         var properties = new PropertyDictionary(2, checkExistingKeys: false)
         {
-            [KnownKeys.Constructor] = new PropertyDescriptor(_constructor, PropertyFlag.Configurable),
+            [KnownKeys.Constructor] = new PropertyDescriptor(_constructor!, PropertyFlag.Configurable),
             [KnownKeys.Prototype] = new PropertyDescriptor(PrototypeObject, PropertyFlag.Configurable)
         };
         SetProperties(properties);

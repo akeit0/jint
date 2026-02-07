@@ -22,7 +22,7 @@ internal sealed class FunctionPrototype : Function
         : base(engine, realm, JsString.Empty)
     {
         _prototype = objectPrototype;
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(JsValue.PositiveZero, PropertyFlag.Configurable);
     }
 
     protected override void Initialize()
@@ -61,7 +61,7 @@ internal sealed class FunctionPrototype : Function
     /// </summary>
     private JsValue Bind(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is not (ICallable and ObjectInstance oi))
+        if (thisObject.Obj is  not (ICallable and ObjectInstance oi))
         {
             Throw.TypeError(_realm, "Bind must be called on a function");
             return default;
@@ -77,7 +77,7 @@ internal sealed class FunctionPrototype : Function
             var targetLen = oi.Get(CommonProperties.Length);
             if (targetLen is not JsNumber number)
             {
-                l = JsNumber.PositiveZero;
+                l = JsValue.PositiveZero;
             }
             else
             {
@@ -87,20 +87,20 @@ internal sealed class FunctionPrototype : Function
                 }
                 else if (number.IsNegativeInfinity())
                 {
-                    l = JsNumber.PositiveZero;
+                    l = JsValue.PositiveZero;
                 }
                 else
                 {
                     var targetLenAsInt = (long) TypeConverter.ToIntegerOrInfinity(targetLen);
                     // first argument is target
                     var argumentsLength = System.Math.Max(0, arguments.Length - 1);
-                    l = JsNumber.Create((ulong) System.Math.Max(targetLenAsInt - argumentsLength, 0));
+                    l = ((ulong) System.Math.Max(targetLenAsInt - argumentsLength, 0));
                 }
             }
         }
         else
         {
-            l = JsNumber.PositiveZero;
+            l = JsValue.PositiveZero;
         }
 
         f.DefinePropertyOrThrow(CommonProperties.Length, new PropertyDescriptor(l, PropertyFlag.Configurable));
@@ -145,7 +145,7 @@ internal sealed class FunctionPrototype : Function
     /// </summary>
     private JsValue Apply(JsValue thisObject, JsCallArguments arguments)
     {
-        var func = thisObject as ICallable;
+        var func = thisObject .Obj as ICallable;
         if (func is null)
         {
             Throw.TypeError(_realm);
@@ -185,7 +185,7 @@ internal sealed class FunctionPrototype : Function
     /// </summary>
     private JsValue CallImpl(JsValue thisObject, JsCallArguments arguments)
     {
-        var func = thisObject as ICallable;
+        var func = thisObject .Obj as ICallable;
         if (func is null)
         {
             Throw.TypeError(_realm);

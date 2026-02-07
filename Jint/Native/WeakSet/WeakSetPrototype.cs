@@ -58,18 +58,18 @@ internal sealed class WeakSetPrototype : Prototype
     private JsValue Delete(JsValue thisObject, JsCallArguments arguments)
     {
         var set = AssertWeakSetInstance(thisObject);
-        return set.WeakSetDelete(arguments.At(0)) ? JsBoolean.True : JsBoolean.False;
+        return set.WeakSetDelete(arguments.At(0)) ? JsValue.True : JsValue.False;
     }
 
     private JsValue Has(JsValue thisObject, JsCallArguments arguments)
     {
         var set = AssertWeakSetInstance(thisObject);
-        return set.WeakSetHas(arguments.At(0)) ? JsBoolean.True : JsBoolean.False;
+        return set.WeakSetHas(arguments.At(0)) ? JsValue.True : JsValue.False;
     }
 
     private JsWeakSet AssertWeakSetInstance(JsValue thisObject)
     {
-        if (thisObject is JsWeakSet set)
+        if (thisObject.Obj is JsWeakSet set)
         {
             return set;
         }

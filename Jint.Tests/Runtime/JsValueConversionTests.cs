@@ -33,7 +33,7 @@ public class JsValueConversionTests
     [Fact]
     public void ShouldBeABoolean()
     {
-        var value = JsBoolean.True;
+        var value = JsValue.True;
         Assert.Equal(true, value.IsBoolean());
         Assert.Equal(false, value.IsArray());
         Assert.Equal(false, value.IsDate());

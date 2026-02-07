@@ -42,7 +42,7 @@ internal sealed class WeakRefPrototype : Prototype
 
     private JsValue Deref(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is JsWeakRef weakRef)
+        if (thisObject.Obj is JsWeakRef weakRef)
         {
             return weakRef.WeakRefDeref();
         }

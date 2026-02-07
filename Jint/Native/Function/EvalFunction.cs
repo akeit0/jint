@@ -22,7 +22,7 @@ public sealed class EvalFunction : Function
             StrictModeScope.IsStrictModeCode ? FunctionThisMode.Strict : FunctionThisMode.Global)
     {
         _prototype = functionPrototype;
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
     }
 
     protected internal override JsValue Call(JsValue thisObject, JsCallArguments arguments)

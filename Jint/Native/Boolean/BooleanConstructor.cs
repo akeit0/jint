@@ -18,7 +18,7 @@ internal sealed class BooleanConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new BooleanPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 
@@ -39,9 +39,7 @@ internal sealed class BooleanConstructor : Constructor
     /// </summary>
     public override ObjectInstance Construct(JsCallArguments arguments, JsValue newTarget)
     {
-        var b = TypeConverter.ToBoolean(arguments.At(0))
-            ? JsBoolean.True
-            : JsBoolean.False;
+        var b = TypeConverter.ToBoolean(arguments.At(0));
 
         if (newTarget.IsUndefined())
         {
@@ -51,7 +49,7 @@ internal sealed class BooleanConstructor : Constructor
         var o = OrdinaryCreateFromConstructor(
             newTarget,
             static intrinsics => intrinsics.Boolean.PrototypeObject,
-            static (engine, realm, state) => new BooleanInstance(engine, state!), b);
+            static (engine, realm, state) => new BooleanInstance(engine, state), b);
         return o;
     }
 

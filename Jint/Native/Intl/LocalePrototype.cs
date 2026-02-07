@@ -120,7 +120,7 @@ internal sealed class LocalePrototype : Prototype
 
     private JsLocale ValidateLocale(JsValue thisObject)
     {
-        if (thisObject is JsLocale locale)
+        if (thisObject.Obj is  JsLocale locale)
         {
             return locale;
         }
@@ -210,7 +210,7 @@ internal sealed class LocalePrototype : Prototype
     private JsBoolean GetNumeric(JsValue thisObject, JsCallArguments arguments)
     {
         var locale = ValidateLocale(thisObject);
-        return locale.Numeric.HasValue ? (locale.Numeric.Value ? JsBoolean.True : JsBoolean.False) : JsBoolean.False;
+        return locale.Numeric.HasValue ? (locale.Numeric.Value ? JsValue.True : JsValue.False) : JsValue.False;
     }
 
     private JsValue GetRegion(JsValue thisObject, JsCallArguments arguments)

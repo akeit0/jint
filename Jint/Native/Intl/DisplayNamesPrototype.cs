@@ -44,7 +44,7 @@ internal sealed class DisplayNamesPrototype : Prototype
 
     private JsDisplayNames ValidateDisplayNames(JsValue thisObject)
     {
-        if (thisObject is JsDisplayNames displayNames)
+        if (thisObject.Obj is  JsDisplayNames displayNames)
         {
             return displayNames;
         }

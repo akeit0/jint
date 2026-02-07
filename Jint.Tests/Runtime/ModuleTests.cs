@@ -251,8 +251,8 @@ export const result = [fns.act_noargs(), fns.act_args('ok'), fns.fn_noargs(), fn
     [Fact]
     public void ShouldAllowExportMultipleImports()
     {
-        _engine.Modules.Add("@mine/import1", builder => builder.ExportValue("value1", JsNumber.Create(1)));
-        _engine.Modules.Add("@mine/import2", builder => builder.ExportValue("value2", JsNumber.Create(2)));
+        _engine.Modules.Add("@mine/import1", builder => builder.ExportValue("value1", (1)));
+        _engine.Modules.Add("@mine/import2", builder => builder.ExportValue("value2", (2)));
         _engine.Modules.Add("@mine", "export * from '@mine/import1'; export * from '@mine/import2'");
         _engine.Modules.Add("app", "import { value1, value2 } from '@mine'; export const result = `${value1} ${value2}`");
         var ns =  _engine.Modules.Import("app");
@@ -277,7 +277,7 @@ export const result = [fns.act_noargs(), fns.act_args('ok'), fns.fn_noargs(), fn
         _engine.Modules.Add("my-module", builder => builder
             .AddSource("import { dependency } from 'dependent-module';")
             .AddSource("export const output = dependency + 1;")
-            .ExportValue("num", JsNumber.Create(-1))
+            .ExportValue("num", (-1))
         );
         var ns =  _engine.Modules.Import("my-module");
 

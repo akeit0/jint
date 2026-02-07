@@ -52,7 +52,7 @@ internal sealed class AsyncFromSyncIteratorPrototype : ObjectInstance
     /// </summary>
     private JsValue Next(JsValue thisObject, JsCallArguments arguments)
     {
-        var asyncIterator = thisObject as AsyncFromSyncIterator;
+        var asyncIterator = thisObject .Obj as AsyncFromSyncIterator;
         if (asyncIterator is null)
         {
             Runtime.Throw.TypeError(_realm, "Method called on incompatible receiver");
@@ -67,7 +67,7 @@ internal sealed class AsyncFromSyncIteratorPrototype : ObjectInstance
             if (!syncIterator.TryIteratorStep(out result))
             {
                 // Iterator is done
-                result = IteratorResult.CreateValueIteratorPosition(_engine, Undefined, done: JsBoolean.True);
+                result = IteratorResult.CreateValueIteratorPosition(_engine, Undefined, done: JsValue.True);
             }
         }
         catch (JavaScriptException e)
@@ -84,7 +84,7 @@ internal sealed class AsyncFromSyncIteratorPrototype : ObjectInstance
     /// </summary>
     private JsValue Return(JsValue thisObject, JsCallArguments arguments)
     {
-        var asyncIterator = thisObject as AsyncFromSyncIterator;
+        var asyncIterator = thisObject .Obj as AsyncFromSyncIterator;
         if (asyncIterator is null)
         {
             Runtime.Throw.TypeError(_realm, "Method called on incompatible receiver");
@@ -99,7 +99,7 @@ internal sealed class AsyncFromSyncIteratorPrototype : ObjectInstance
         if (returnMethod is null)
         {
             // If return is undefined, create a done iterator result
-            var iterResult = IteratorResult.CreateValueIteratorPosition(_engine, value, done: JsBoolean.True);
+            var iterResult = IteratorResult.CreateValueIteratorPosition(_engine, value, done: JsValue.True);
             promiseCapability.Resolve.Call(Undefined, new[] { iterResult });
             return promiseCapability.PromiseInstance;
         }
@@ -128,7 +128,7 @@ internal sealed class AsyncFromSyncIteratorPrototype : ObjectInstance
     /// </summary>
     private JsValue Throw(JsValue thisObject, JsCallArguments arguments)
     {
-        var asyncIterator = thisObject as AsyncFromSyncIterator;
+        var asyncIterator = thisObject .Obj as AsyncFromSyncIterator;
         if (asyncIterator is null)
         {
             Runtime.Throw.TypeError(_realm, "Method called on incompatible receiver");
@@ -211,7 +211,7 @@ internal sealed class AsyncFromSyncIteratorPrototype : ObjectInstance
         var onFulfilled = new ClrFunction(_engine, "", (_, args) =>
         {
             var resolvedValue = args.At(0);
-            return IteratorResult.CreateValueIteratorPosition(_engine, resolvedValue, done ? JsBoolean.True : JsBoolean.False);
+            return IteratorResult.CreateValueIteratorPosition(_engine, resolvedValue, done ? JsValue.True : JsValue.False);
         }, 1, PropertyFlag.Configurable);
 
         // 11-13. Determine onRejected based on done and closeOnRejection

@@ -55,16 +55,16 @@ internal sealed class PlainTimePrototype : Prototype
 
     private JsPlainTime ValidatePlainTime(JsValue thisObject)
     {
-        if (thisObject is JsPlainTime plainTime)
+        if (thisObject.Obj is JsPlainTime plainTime)
             return plainTime;
         Throw.TypeError(_realm, "Value is not a Temporal.PlainTime");
         return null!;
     }
 
-    private JsNumber GetHour(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainTime(thisObject).IsoTime.Hour);
-    private JsNumber GetMinute(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainTime(thisObject).IsoTime.Minute);
-    private JsNumber GetSecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainTime(thisObject).IsoTime.Second);
-    private JsNumber GetMillisecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainTime(thisObject).IsoTime.Millisecond);
-    private JsNumber GetMicrosecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainTime(thisObject).IsoTime.Microsecond);
-    private JsNumber GetNanosecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainTime(thisObject).IsoTime.Nanosecond);
+    private JsValue GetHour(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainTime(thisObject).IsoTime.Hour);
+    private JsValue GetMinute(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainTime(thisObject).IsoTime.Minute);
+    private JsValue GetSecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainTime(thisObject).IsoTime.Second);
+    private JsValue GetMillisecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainTime(thisObject).IsoTime.Millisecond);
+    private JsValue GetMicrosecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainTime(thisObject).IsoTime.Microsecond);
+    private JsValue GetNanosecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainTime(thisObject).IsoTime.Nanosecond);
 }

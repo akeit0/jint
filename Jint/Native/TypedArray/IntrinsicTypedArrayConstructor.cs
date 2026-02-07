@@ -22,7 +22,7 @@ internal sealed class IntrinsicTypedArrayConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new IntrinsicTypedArrayPrototype(engine, objectPrototype, this);
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(JsValue.PositiveZero, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 
@@ -73,12 +73,12 @@ internal sealed class IntrinsicTypedArrayConstructor : Constructor
         {
             var values = TypedArrayConstructor.IterableToList(_realm, source, usingIterator);
             var iteratorLen = values.Count;
-            var iteratorTarget = TypedArrayCreate(_realm, (IConstructor) c, [iteratorLen]);
+            var iteratorTarget = TypedArrayCreate(_realm, (IConstructor) c.Obj!, [iteratorLen]);
             for (var k = 0; k < iteratorLen; ++k)
             {
                 var kValue = values[k];
                 var mappedValue = mapping
-                    ? ((ICallable) mapFunction).Call(thisArg, kValue, k)
+                    ? ((ICallable) mapFunction.Obj!).Call(thisArg, kValue, k)
                     : kValue;
                 iteratorTarget[k] = mappedValue;
             }
@@ -94,20 +94,20 @@ internal sealed class IntrinsicTypedArrayConstructor : Constructor
         var arrayLike = TypeConverter.ToObject(_realm, source);
         var len = arrayLike.GetLength();
 
-        var argumentList = new JsValue[] { JsNumber.Create(len) };
-        var targetObj = TypedArrayCreate(_realm, (IConstructor) c, argumentList);
+        var argumentList = new JsValue[] { (len) };
+        var targetObj = TypedArrayCreate(_realm, (IConstructor) c.Obj!, argumentList);
 
         var mappingArgs = mapping ? new JsValue[2] : null;
         for (uint k = 0; k < len; ++k)
         {
-            var Pk = JsNumber.Create(k);
+            var Pk = (k);
             var kValue = arrayLike.Get(Pk);
             JsValue mappedValue;
             if (mapping)
             {
                 mappingArgs![0] = kValue;
                 mappingArgs[1] = Pk;
-                mappedValue = ((ICallable) mapFunction).Call(thisArg, mappingArgs);
+                mappedValue = ((ICallable) mapFunction.Obj!).Call(thisArg, mappingArgs);
             }
             else
             {
@@ -132,7 +132,7 @@ internal sealed class IntrinsicTypedArrayConstructor : Constructor
             Throw.TypeError(_realm);
         }
 
-        var newObj = TypedArrayCreate(_realm, (IConstructor) thisObject, [len]);
+        var newObj = TypedArrayCreate(_realm, (IConstructor) thisObject.Obj!, [len]);
 
         var k = 0;
         while (k < len)
@@ -169,13 +169,13 @@ internal sealed class IntrinsicTypedArrayConstructor : Constructor
         var newTypedArray = Construct(constructor, arguments);
         var taRecord = newTypedArray.ValidateTypedArray(realm);
 
-        if (arguments.Length == 1 && arguments[0] is JsNumber number)
+        if (arguments.Length == 1 && arguments[0].IsNumber())
         {
             if (taRecord.IsTypedArrayOutOfBounds)
             {
                 Throw.TypeError(realm, "TypedArray is out of bounds");
             }
-            if (newTypedArray.GetLength() < number._value)
+            if (newTypedArray.GetLength() < arguments[0].GetFloat64Value())
             {
                 Throw.TypeError(realm);
             }

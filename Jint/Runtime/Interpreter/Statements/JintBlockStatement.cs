@@ -62,6 +62,7 @@ internal sealed class JintBlockStatement : JintStatement<NestedBlockStatement>
                 {
                     oldEnv = suspendData.OuterEnvironment;
                 }
+
                 if (!ReferenceEquals(engine.ExecutionContext.LexicalEnvironment, blockEnv))
                 {
                     engine.UpdateLexicalEnvironment(blockEnv);
@@ -70,7 +71,8 @@ internal sealed class JintBlockStatement : JintStatement<NestedBlockStatement>
             else
             {
                 oldEnv = engine.ExecutionContext.LexicalEnvironment;
-                blockEnv = JintEnvironment.NewDeclarativeEnvironment(engine, engine.ExecutionContext.LexicalEnvironment);
+                blockEnv = JintEnvironment.NewDeclarativeEnvironment(engine,
+                    engine.ExecutionContext.LexicalEnvironment);
                 JintStatementList.BlockDeclarationInstantiation(blockEnv, _lexicalDeclarations);
                 engine.UpdateLexicalEnvironment(blockEnv);
             }
@@ -146,7 +148,7 @@ internal sealed class JintBlockStatement : JintStatement<NestedBlockStatement>
         // Check for generator return request
         if (gen?._returnRequested == true)
         {
-            var returnValue = gen._suspendedValue ?? blockValue.Value;
+            var returnValue = gen._suspendedValue.IsEmpty ? blockValue.Value : gen._suspendedValue;
             return new Completion(CompletionType.Return, returnValue, _singleStatement!._statement);
         }
 

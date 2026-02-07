@@ -1,4 +1,5 @@
 using Jint.Native.Object;
+using Jint.Runtime;
 
 namespace Jint.Native;
 
@@ -7,11 +8,15 @@ namespace Jint.Native;
 /// </summary>
 internal sealed class JsWeakRef : ObjectInstance
 {
-    private readonly WeakReference<JsValue> _weakRefTarget;
+    private readonly WeakReference<object> _weakRefTarget;
 
     public JsWeakRef(Engine engine, JsValue target) : base(engine)
     {
-        _weakRefTarget = new WeakReference<JsValue>(target);
+        if (target.IsObject() || target.IsString())
+        {
+            _weakRefTarget = new WeakReference<object>(target.Obj!);
+        }
+        else _weakRefTarget = new WeakReference<object>(target);
     }
 
     public JsValue WeakRefDeref()
@@ -19,7 +24,7 @@ internal sealed class JsWeakRef : ObjectInstance
         if (_weakRefTarget.TryGetTarget(out var target))
         {
             _engine.AddToKeptObjects(target);
-            return target;
+            return JsValue.FromObject(target);
         }
 
         return Undefined;

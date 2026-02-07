@@ -29,7 +29,7 @@ public abstract class TypedArrayConstructor : Constructor
             ? new Uint8ArrayPrototype(engine, objectPrototype, this)
             : new TypedArrayPrototype(engine, objectPrototype, this, type);
 
-        _length = new PropertyDescriptor(JsNumber.PositiveThree, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(3, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 
@@ -39,7 +39,8 @@ public abstract class TypedArrayConstructor : Constructor
     {
         var properties = new PropertyDictionary(1, false)
         {
-            ["BYTES_PER_ELEMENT"] = new(new PropertyDescriptor(JsNumber.Create(_arrayElementType.GetElementSize()), PropertyFlag.AllForbidden))
+            ["BYTES_PER_ELEMENT"] =
+                new(new PropertyDescriptor((_arrayElementType.GetElementSize()), PropertyFlag.AllForbidden))
         };
         SetProperties(properties);
     }
@@ -67,20 +68,23 @@ public abstract class TypedArrayConstructor : Constructor
         var firstArgument = arguments[0];
         if (firstArgument.IsObject())
         {
+            var firstArgObj = (ObjectInstance) firstArgument.Obj!;
             var o = AllocateTypedArray(newTarget);
-            if (firstArgument is JsTypedArray typedArrayInstance)
+            if (firstArgObj is JsTypedArray typedArrayInstance)
             {
                 InitializeTypedArrayFromTypedArray(o, typedArrayInstance);
             }
-            else if (firstArgument is JsArrayBuffer arrayBuffer)
+            else if (firstArgObj is JsArrayBuffer arrayBuffer)
             {
-                int? byteOffset = !arguments.At(1).IsUndefined() ? (int) TypeConverter.ToIndex(_realm, arguments[1]) : null;
+                int? byteOffset = !arguments.At(1).IsUndefined()
+                    ? (int) TypeConverter.ToIndex(_realm, arguments[1])
+                    : null;
                 int? length = !arguments.At(2).IsUndefined() ? (int) TypeConverter.ToIndex(_realm, arguments[2]) : null;
                 InitializeTypedArrayFromArrayBuffer(o, arrayBuffer, byteOffset, length);
             }
             else
             {
-                var usingIterator = GetMethod(_realm, firstArgument, GlobalSymbolRegistry.Iterator);
+                var usingIterator = GetMethod(_realm, firstArgObj, GlobalSymbolRegistry.Iterator);
                 if (usingIterator is not null)
                 {
                     var values = IterableToList(_realm, firstArgument, usingIterator);
@@ -88,7 +92,7 @@ public abstract class TypedArrayConstructor : Constructor
                 }
                 else
                 {
-                    InitializeTypedArrayFromArrayLike(o, (ObjectInstance) firstArgument);
+                    InitializeTypedArrayFromArrayLike(o, firstArgObj);
                 }
             }
 
@@ -127,7 +131,8 @@ public abstract class TypedArrayConstructor : Constructor
         var srcElementSize = srcType.GetElementSize();
         var srcByteOffset = srcArray._byteOffset;
 
-        var srcRecord = IntrinsicTypedArrayPrototype.MakeTypedArrayWithBufferWitnessRecord(srcArray, ArrayBufferOrder.SeqCst);
+        var srcRecord =
+            IntrinsicTypedArrayPrototype.MakeTypedArrayWithBufferWitnessRecord(srcArray, ArrayBufferOrder.SeqCst);
         if (srcRecord.IsTypedArrayOutOfBounds)
         {
             Throw.TypeError(_realm);
@@ -157,8 +162,10 @@ public abstract class TypedArrayConstructor : Constructor
             var count = elementLength;
             while (count > 0)
             {
-                var value = srcData.GetValueFromBuffer(srcByteIndex, srcType, isTypedArray: true, ArrayBufferOrder.Unordered);
-                data.SetValueInBuffer(targetByteIndex, elementType, value, isTypedArray: true, ArrayBufferOrder.Unordered);
+                var value = srcData.GetValueFromBuffer(srcByteIndex, srcType, isTypedArray: true,
+                    ArrayBufferOrder.Unordered);
+                data.SetValueInBuffer(targetByteIndex, elementType, value, isTypedArray: true,
+                    ArrayBufferOrder.Unordered);
                 srcByteIndex += srcElementSize;
                 targetByteIndex += elementSize;
                 count--;
@@ -285,10 +292,7 @@ public abstract class TypedArrayConstructor : Constructor
 
         var proto = GetPrototypeFromConstructor(newTarget, defaultProto);
         var realm = GetFunctionRealm(newTarget);
-        var obj = new JsTypedArray(_engine, realm.Intrinsics, _arrayElementType, length)
-        {
-            _prototype = proto
-        };
+        var obj = new JsTypedArray(_engine, realm.Intrinsics, _arrayElementType, length) { _prototype = proto };
         if (length > 0)
         {
             obj.AllocateTypedArrayBuffer(length);

@@ -17,7 +17,7 @@ internal sealed class BooleanPrototype : BooleanInstance
         Engine engine,
         Realm realm,
         BooleanConstructor constructor,
-        ObjectPrototype objectPrototype) : base(engine, JsBoolean.False)
+        ObjectPrototype objectPrototype) : base(engine, JsValue.False)
     {
         _prototype = objectPrototype;
         _realm = realm;
@@ -42,7 +42,7 @@ internal sealed class BooleanPrototype : BooleanInstance
             return thisObject;
         }
 
-        if (thisObject is BooleanInstance bi)
+        if (thisObject.Obj is  BooleanInstance bi)
         {
             return bi.BooleanData;
         }

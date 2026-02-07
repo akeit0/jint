@@ -1649,7 +1649,7 @@ internal static class IntlUtilities
         // 3. Convert value based on type
         value = type switch
         {
-            OptionType.Boolean => TypeConverter.ToBoolean(value) ? JsBoolean.True : JsBoolean.False,
+            OptionType.Boolean => TypeConverter.ToBoolean(value) ? JsValue.True : JsValue.False,
             OptionType.String => TypeConverter.ToJsString(value),
             _ => value
         };
@@ -1682,7 +1682,7 @@ internal static class IntlUtilities
     /// </summary>
     internal static bool GetBooleanOption(Engine engine, JsValue options, string property, bool fallback)
     {
-        var value = GetOption(engine, options, property, OptionType.Boolean, null, fallback ? JsBoolean.True : JsBoolean.False);
+        var value = GetOption(engine, options, property, OptionType.Boolean, null, fallback ? JsValue.True : JsValue.False);
         return TypeConverter.ToBoolean(value);
     }
 

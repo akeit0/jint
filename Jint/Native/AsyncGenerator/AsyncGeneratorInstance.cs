@@ -274,8 +274,8 @@ internal sealed class AsyncGeneratorInstance : ObjectInstance, ISuspendable
     /// </summary>
     internal void AsyncGeneratorResolve(JsValue value, bool done, PromiseCapability promiseCapability)
     {
-        var iterResult = IteratorResult.CreateValueIteratorPosition(_engine, value, done ? JsBoolean.True : JsBoolean.False);
-        promiseCapability.Resolve.Call(Undefined, new[] { iterResult });
+        var iterResult = IteratorResult.CreateValueIteratorPosition(_engine, value, done);
+        promiseCapability.Resolve.Call(Undefined, iterResult);
     }
 
     /// <summary>
@@ -294,7 +294,7 @@ internal sealed class AsyncGeneratorInstance : ObjectInstance, ISuspendable
     {
         var capability = PromiseConstructor.NewPromiseCapability(_engine, _engine.Realm.Intrinsics.Promise);
         capability.Resolve.Call(JsValue.Undefined, new[] { value });
-        return (JsPromise) capability.PromiseInstance;
+        return (JsPromise) capability.PromiseInstance.Obj!;
     }
 
     /// <summary>

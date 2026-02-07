@@ -17,7 +17,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
     // we have dense and sparse, we usually can start with dense and fall back to sparse when necessary
     // when we have plain JsValues, _denseValues is used - if any operation occurs which requires setting more property flags
     // we convert to _sparse and _denseValues is set to null - it will be a slow array
-    internal JsValue?[]? _dense;
+    internal JsValue[]? _dense;
 
     private Dictionary<uint, PropertyDescriptor?>? _sparse;
 
@@ -36,7 +36,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
 
         if (capacity < MaxDenseArrayLength)
         {
-            _dense = capacity > 0 ? new JsValue?[capacity] : [];
+            _dense = capacity > 0 ? new JsValue[capacity] : [];
         }
         else
         {
@@ -70,7 +70,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
     internal sealed override bool IsArray() => true;
 
     internal sealed override bool HasOriginalIterator
-        => ReferenceEquals(Get(GlobalSymbolRegistry.Iterator), _constructor?.PrototypeObject._originalIteratorFunction);
+        => ReferenceEquals(Get(GlobalSymbolRegistry.Iterator).Obj, _constructor?.PrototypeObject._originalIteratorFunction);
 
     /// <summary>
     /// Checks whether there have been changes to object prototype chain which could render fast access patterns impossible.
@@ -130,7 +130,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
     private bool DefineLength(PropertyDescriptor desc)
     {
         var value = desc.Value;
-        if (value is null)
+        if (value.IsEmpty)
         {
             return base.DefineOwnProperty(CommonProperties.Length, desc);
         }
@@ -180,7 +180,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
             {
                 for (uint keyIndex = 0; keyIndex < _dense.Length; ++keyIndex)
                 {
-                    if (_dense[keyIndex] is null)
+                    if (_dense[keyIndex].IsEmpty)
                     {
                         continue;
                     }
@@ -219,7 +219,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
                         var deleteSucceeded = Delete(TypeConverter.ToString(keyIndex));
                         if (!deleteSucceeded)
                         {
-                            newLenDesc.Value = JsNumber.Create(keyIndex + 1);
+                            newLenDesc.Value = (keyIndex + 1);
                             if (!newWritable)
                             {
                                 newLenDesc.Writable = false;
@@ -255,7 +255,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
 
         if (!newWritable)
         {
-            base.DefineOwnProperty(CommonProperties.Length, new PropertyDescriptor(value: null, PropertyFlag.WritableSet));
+            base.DefineOwnProperty(CommonProperties.Length, new PropertyDescriptor(value: default, PropertyFlag.WritableSet));
         }
 
         return true;
@@ -287,10 +287,10 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal override uint GetLength() => (uint) GetJsNumberLength()._value;
+    internal override uint GetLength() => (uint)(_length is null ? 0 : _length._value!.GetFloat64Value());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private JsNumber GetJsNumberLength() => _length is null ? JsNumber.PositiveZero : (JsNumber) _length._value!;
+    private JsValue GetJsNumberLength() => _length is null ? JsValue.PositiveZero : _length._value!.GetFloat64Value();
 
     protected sealed override bool TryGetProperty(JsValue property, [NotNullWhen(true)] out PropertyDescriptor? descriptor)
     {
@@ -317,7 +317,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
             var length = System.Math.Min(temp.Length, GetLength());
             for (var i = 0; i < length; i++)
             {
-                if (temp[i] is not null)
+                if (temp[i].IsNotEmpty)
                 {
                     properties.Add(JsString.Create(i));
                 }
@@ -354,7 +354,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
 
         if (includeLength && _length != null)
         {
-            yield return new KeyValuePair<string, JsValue>(CommonProperties.Length._value, _length.Value);
+            yield return new KeyValuePair<string, JsValue>(CommonProperties.Length, _length.Value);
         }
     }
 
@@ -367,7 +367,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
             for (uint i = 0; i < length; i++)
             {
                 var value = temp[i];
-                if (value is not null)
+                if (value.IsNotEmpty)
                 {
                     if (_sparse is null || !_sparse.TryGetValue(i, out var descriptor) || descriptor is null)
                     {
@@ -443,7 +443,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
             var length = _length?._value;
             if (length is not null)
             {
-                return length;
+                return length.Value;
             }
         }
 
@@ -455,7 +455,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
         var isSafeSelfTarget = IsSafeSelfTarget(receiver);
         if (isSafeSelfTarget && CanUseFastAccess)
         {
-            if (!ReferenceEquals(property, CommonProperties.Length) && IsArrayIndex(property, out var index))
+            if (!ReferenceEquals(property.Obj, CommonProperties.Length) && IsArrayIndex(property, out var index))
             {
                 SetIndexValue(index, value, updateLength: true);
                 return true;
@@ -620,7 +620,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void SetLength(ulong length) => SetLength(JsNumber.Create(length));
+    internal void SetLength(ulong length) => SetLength((length));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void SetLength(JsNumber length)
@@ -1110,7 +1110,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
     public JsValue Pop()
     {
         var len = GetJsNumberLength();
-        if (JsNumber.PositiveZero.Equals(len))
+        if (JsValue.PositiveZero.Equals(len))
         {
             SetLength(len);
             return Undefined;
@@ -1281,7 +1281,7 @@ public class ArrayInstance : ObjectInstance, IEnumerable<JsValue>
             else
             {
                 // slow path
-                TryGetValue(JsNumber.Create(index), out kValue);
+                TryGetValue((index), out kValue);
             }
             return kValue;
         }

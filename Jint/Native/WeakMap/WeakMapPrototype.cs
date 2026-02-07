@@ -83,7 +83,7 @@ internal sealed class WeakMapPrototype : Prototype
     private JsValue Delete(JsValue thisObject, JsCallArguments arguments)
     {
         var map = AssertWeakMapInstance(thisObject);
-        return arguments.Length > 0 && map.WeakMapDelete(arguments.At(0)) ? JsBoolean.True : JsBoolean.False;
+        return arguments.Length > 0 && map.WeakMapDelete(arguments.At(0)) ? JsValue.True : JsValue.False;
     }
 
     private JsValue Set(JsValue thisObject, JsCallArguments arguments)
@@ -96,12 +96,12 @@ internal sealed class WeakMapPrototype : Prototype
     private JsValue Has(JsValue thisObject, JsCallArguments arguments)
     {
         var map = AssertWeakMapInstance(thisObject);
-        return map.WeakMapHas(arguments.At(0)) ? JsBoolean.True : JsBoolean.False;
+        return map.WeakMapHas(arguments.At(0)) ? JsValue.True : JsValue.False;
     }
 
     private JsWeakMap AssertWeakMapInstance(JsValue thisObject)
     {
-        if (thisObject is JsWeakMap map)
+        if (thisObject.Obj is JsWeakMap map)
         {
             return map;
         }

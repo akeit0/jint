@@ -77,12 +77,12 @@ internal sealed class DateConstructor : Constructor
     private static JsValue Utc(JsValue thisObject, JsCallArguments arguments)
     {
         var y = TypeConverter.ToNumber(arguments.At(0));
-        var m = TypeConverter.ToNumber(arguments.At(1, JsNumber.PositiveZero));
-        var dt = TypeConverter.ToNumber(arguments.At(2, JsNumber.PositiveOne));
-        var h = TypeConverter.ToNumber(arguments.At(3, JsNumber.PositiveZero));
-        var min = TypeConverter.ToNumber(arguments.At(4, JsNumber.PositiveZero));
-        var s = TypeConverter.ToNumber(arguments.At(5, JsNumber.PositiveZero));
-        var milli = TypeConverter.ToNumber(arguments.At(6, JsNumber.PositiveZero));
+        var m = TypeConverter.ToNumber(arguments.At(1, JsValue.PositiveZero));
+        var dt = TypeConverter.ToNumber(arguments.At(2, 1));
+        var h = TypeConverter.ToNumber(arguments.At(3, JsValue.PositiveZero));
+        var min = TypeConverter.ToNumber(arguments.At(4, JsValue.PositiveZero));
+        var s = TypeConverter.ToNumber(arguments.At(5, JsValue.PositiveZero));
+        var milli = TypeConverter.ToNumber(arguments.At(6, JsValue.PositiveZero));
 
         var yInteger = TypeConverter.ToInteger(y);
         if (!double.IsNaN(y) && 0 <= yInteger && yInteger <= 99)
@@ -148,11 +148,11 @@ internal sealed class DateConstructor : Constructor
         {
             var y = TypeConverter.ToNumber(arguments.At(0));
             var m = TypeConverter.ToNumber(arguments.At(1));
-            var dt = TypeConverter.ToNumber(arguments.At(2, JsNumber.PositiveOne));
-            var h = TypeConverter.ToNumber(arguments.At(3, JsNumber.PositiveZero));
-            var min = TypeConverter.ToNumber(arguments.At(4, JsNumber.PositiveZero));
-            var s = TypeConverter.ToNumber(arguments.At(5, JsNumber.PositiveZero));
-            var milli = TypeConverter.ToNumber(arguments.At(6, JsNumber.PositiveZero));
+            var dt = TypeConverter.ToNumber(arguments.At(2, 1));
+            var h = TypeConverter.ToNumber(arguments.At(3, JsValue.PositiveZero));
+            var min = TypeConverter.ToNumber(arguments.At(4, JsValue.PositiveZero));
+            var s = TypeConverter.ToNumber(arguments.At(5, JsValue.PositiveZero));
+            var milli = TypeConverter.ToNumber(arguments.At(6, JsValue.PositiveZero));
 
             var yInteger = TypeConverter.ToInteger(y);
             if (!double.IsNaN(y) && 0 <= yInteger && yInteger <= 99)

@@ -81,15 +81,15 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsNegativeZero(x))
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
         else if (double.IsInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
 
         return System.Math.Abs(x);
@@ -101,7 +101,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x) || (x > 1) || (x < -1))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (x == 1)
         {
@@ -117,7 +117,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x) || x < 1)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         return System.Math.Log(x + System.Math.Sqrt(x * x - 1.0));
@@ -129,7 +129,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x) || (x > 1) || (x < -1))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x) || NumberInstance.IsNegativeZero(x))
         {
@@ -156,7 +156,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x) || NumberInstance.IsNegativeZero(x))
         {
@@ -179,7 +179,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (NumberInstance.IsPositiveZero(x) || NumberInstance.IsNegativeZero(x))
@@ -198,7 +198,7 @@ internal sealed class MathInstance : ObjectInstance
         // If either x or y is NaN, the result is NaN.
         if (double.IsNaN(x) || double.IsNaN(y))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (y > 0 && x.Equals(0))
@@ -211,13 +211,13 @@ internal sealed class MathInstance : ObjectInstance
             // If y is +0 and x>0, the result is +0.
             if (x > 0)
             {
-                return JsNumber.PositiveZero;
+                return JsValue.PositiveZero;
             }
 
             // If y is +0 and x is +0, the result is +0.
             if (NumberInstance.IsPositiveZero(x))
             {
-                return JsNumber.PositiveZero;
+                return JsValue.PositiveZero;
             }
 
             // If y is +0 and x is −0, the result is an implementation-dependent approximation to +π.
@@ -272,7 +272,7 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (double.IsPositiveInfinity(x))
             {
-                return JsNumber.PositiveZero;
+                return JsValue.PositiveZero;
             }
 
             // If y>0 and y is finite and x is −∞, the result if an implementation-dependent approximation to +π.
@@ -344,11 +344,11 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x))
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
         else if (NumberInstance.IsNegativeZero(x))
         {
@@ -356,11 +356,11 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
         else if (double.IsNegativeInfinity(x))
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
 
 #if NETFRAMEWORK
@@ -379,7 +379,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x))
         {
@@ -391,7 +391,7 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsInfinity(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         return System.Math.Cos(x);
@@ -403,7 +403,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x))
         {
@@ -415,7 +415,7 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
 
         return System.Math.Cosh(x);
@@ -427,7 +427,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x) || NumberInstance.IsNegativeZero(x))
         {
@@ -435,11 +435,11 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
         else if (double.IsNegativeInfinity(x))
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         return System.Math.Exp(x);
@@ -467,11 +467,11 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x))
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
         else if (NumberInstance.IsNegativeZero(x))
         {
@@ -479,11 +479,11 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
         else if (double.IsNegativeInfinity(x))
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
 
         return System.Math.Floor(x);
@@ -495,23 +495,23 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         if (x < 0)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (x == 0)
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
         else if (x == 1)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         return System.Math.Log(x);
@@ -523,17 +523,17 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (x < -1)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (x == -1)
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
 
         if (x == 0 || double.IsPositiveInfinity(x))
@@ -550,23 +550,23 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         if (x < 0)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (x == 0)
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
         else if (x == 1)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         return System.Math.Log(x, 2);
@@ -578,23 +578,23 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         if (x < 0)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (x == 0)
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
         else if (x == 1)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         return System.Math.Log10(x);
@@ -607,7 +607,7 @@ internal sealed class MathInstance : ObjectInstance
     {
         if (arguments.Length == 0)
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
 
         var highest = double.NegativeInfinity;
@@ -615,7 +615,7 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (double.IsNaN(number))
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
 
             if (NumberInstance.IsPositiveZero(number) && NumberInstance.IsNegativeZero(highest))
@@ -639,7 +639,7 @@ internal sealed class MathInstance : ObjectInstance
     {
         if (arguments.Length == 0)
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
 
         var lowest = double.PositiveInfinity;
@@ -647,7 +647,7 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (double.IsNaN(number))
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
 
             if (NumberInstance.IsNegativeZero(number) && NumberInstance.IsPositiveZero(lowest))
@@ -687,12 +687,12 @@ internal sealed class MathInstance : ObjectInstance
     {
         if (double.IsNaN(y))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var absX = System.Math.Abs(x);
@@ -700,12 +700,12 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (double.IsPositiveInfinity(y))
             {
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
 
             if (double.IsNegativeInfinity(y))
             {
-                return JsNumber.PositiveZero;
+                return JsValue.PositiveZero;
             }
         }
 
@@ -713,7 +713,7 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (double.IsInfinity(y))
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
         }
 
@@ -726,7 +726,7 @@ internal sealed class MathInstance : ObjectInstance
 
             if (double.IsNegativeInfinity(y))
             {
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
         }
 
@@ -734,12 +734,12 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (y > 0)
             {
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
 
             if (y < 0)
             {
-                return JsNumber.PositiveZero;
+                return JsValue.PositiveZero;
             }
         }
 
@@ -749,10 +749,10 @@ internal sealed class MathInstance : ObjectInstance
             {
                 if (System.Math.Abs(y % 2).Equals(1))
                 {
-                    return JsNumber.DoubleNegativeInfinity;
+                    return double.NegativeInfinity;
                 }
 
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
 
             if (y < 0)
@@ -762,7 +762,7 @@ internal sealed class MathInstance : ObjectInstance
                     return JsNumber.NegativeZero;
                 }
 
-                return JsNumber.PositiveZero;
+                return JsValue.PositiveZero;
             }
         }
 
@@ -777,7 +777,7 @@ internal sealed class MathInstance : ObjectInstance
             // If x is +0 and y<0, the result is +∞.
             if (y < 0)
             {
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
         }
 
@@ -793,7 +793,7 @@ internal sealed class MathInstance : ObjectInstance
                 }
 
                 // If x is −0 and y>0 and y is not an odd integer, the result is +0.
-                return JsNumber.PositiveZero;
+                return JsValue.PositiveZero;
             }
 
             if (y < 0)
@@ -801,18 +801,18 @@ internal sealed class MathInstance : ObjectInstance
                 // If x is −0 and y<0 and y is an odd integer, the result is −∞.
                 if (System.Math.Abs(y % 2).Equals(1))
                 {
-                    return JsNumber.DoubleNegativeInfinity;
+                    return double.NegativeInfinity;
                 }
 
                 // If x is −0 and y<0 and y is not an odd integer, the result is +∞.
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
         }
 
         // If x<0 and x is finite and y is finite and y is not an integer, the result is NaN.
         if (x < 0 && !double.IsInfinity(x) && !double.IsInfinity(y) && !y.Equals((int) y))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         return System.Math.Pow(x, y);
@@ -858,7 +858,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(n))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (double.IsInfinity(n) || NumberInstance.IsPositiveZero(n) || NumberInstance.IsNegativeZero(n))
@@ -879,11 +879,11 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x))
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
         else if (NumberInstance.IsNegativeZero(x))
         {
@@ -891,7 +891,7 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsInfinity(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         return System.Math.Sin(x);
@@ -903,11 +903,11 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x))
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
         else if (NumberInstance.IsNegativeZero(x))
         {
@@ -915,11 +915,11 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsNegativeInfinity(x))
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
 
         return System.Math.Sinh(x);
@@ -949,7 +949,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (NumberInstance.IsPositiveZero(x) || NumberInstance.IsNegativeZero(x))
@@ -959,12 +959,12 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
 
         if (double.IsNegativeInfinity(x))
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
 
         return System.Math.Truncate(x);
@@ -976,7 +976,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (NumberInstance.IsPositiveZero(x) || NumberInstance.IsNegativeZero(x))
@@ -1003,7 +1003,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (double.IsNaN(x))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (NumberInstance.IsPositiveZero(x) || NumberInstance.IsNegativeZero(x))
         {
@@ -1011,11 +1011,11 @@ internal sealed class MathInstance : ObjectInstance
         }
         else if (double.IsPositiveInfinity(x))
         {
-            return JsNumber.DoublePositiveInfinity;
+            return double.PositiveInfinity;
         }
         else if (double.IsNegativeInfinity(x))
         {
-            return JsNumber.DoubleNegativeInfinity;
+            return double.NegativeInfinity;
         }
 
         if (System.Math.Sign(x) >= 0)
@@ -1037,7 +1037,7 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (double.IsInfinity(number))
             {
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
         }
 
@@ -1047,7 +1047,7 @@ internal sealed class MathInstance : ObjectInstance
         {
             if (double.IsNaN(number))
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
 
             if (onlyZero && number != 0)
@@ -1060,7 +1060,7 @@ internal sealed class MathInstance : ObjectInstance
 
         if (onlyZero)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
         return System.Math.Sqrt(y);

@@ -58,14 +58,22 @@ public class JsArrayBuffer : ObjectInstance
     /// </summary>
     internal bool IsImmutableBuffer => _isImmutable;
 
+    internal void DetachArrayBuffer()
+    {
+        if (!_arrayBufferDetachKey.IsUndefined())
+        {
+            Throw.TypeError(_engine.Realm);
+        }
+
+        _arrayBufferData = null;
+    }
+
     /// <summary>
     /// https://tc39.es/ecma262/#sec-detacharraybuffer
     /// </summary>
-    internal void DetachArrayBuffer(JsValue? key = null)
+    internal void DetachArrayBuffer(JsValue key)
     {
-        key ??= Undefined;
-
-        if (!SameValue(_arrayBufferDetachKey, key))
+        if (!JsValue.SameValue(_arrayBufferDetachKey, key))
         {
             Throw.TypeError(_engine.Realm);
         }
@@ -124,7 +132,9 @@ public class JsArrayBuffer : ObjectInstance
         // 8 byte values require a little more at the moment
         var needsReverse = !isLittleEndian
                            && elementSize > 1
-                           && type is TypedArrayElementType.Float16 or TypedArrayElementType.Float32 or TypedArrayElementType.Float64 or TypedArrayElementType.BigInt64 or TypedArrayElementType.BigUint64;
+                           && type is TypedArrayElementType.Float16 or TypedArrayElementType.Float32
+                               or TypedArrayElementType.Float64 or TypedArrayElementType.BigInt64
+                               or TypedArrayElementType.BigUint64;
 
         if (needsReverse)
         {
@@ -151,7 +161,6 @@ public class JsArrayBuffer : ObjectInstance
             Throw.NotImplementedException("Float16/Half type is not supported in this build");
             return default;
 #endif
-
         }
 
         if (type == TypedArrayElementType.Float32)
@@ -197,11 +206,15 @@ public class JsArrayBuffer : ObjectInstance
                 ? (ushort) (rawBytes[byteIndex] | (rawBytes[byteIndex + 1] << 8))
                 : (ushort) (rawBytes[byteIndex + 1] | (rawBytes[byteIndex] << 8)),
             TypedArrayElementType.Int32 => isLittleEndian
-                ? rawBytes[byteIndex] | (rawBytes[byteIndex + 1] << 8) | (rawBytes[byteIndex + 2] << 16) | (rawBytes[byteIndex + 3] << 24)
-                : rawBytes[byteIndex + 3] | (rawBytes[byteIndex + 2] << 8) | (rawBytes[byteIndex + 1] << 16) | (rawBytes[byteIndex + 0] << 24),
+                ? rawBytes[byteIndex] | (rawBytes[byteIndex + 1] << 8) | (rawBytes[byteIndex + 2] << 16) |
+                  (rawBytes[byteIndex + 3] << 24)
+                : rawBytes[byteIndex + 3] | (rawBytes[byteIndex + 2] << 8) | (rawBytes[byteIndex + 1] << 16) |
+                  (rawBytes[byteIndex + 0] << 24),
             TypedArrayElementType.Uint32 => isLittleEndian
-                ? (uint) (rawBytes[byteIndex] | (rawBytes[byteIndex + 1] << 8) | (rawBytes[byteIndex + 2] << 16) | (rawBytes[byteIndex + 3] << 24))
-                : (uint) (rawBytes[byteIndex + 3] | (rawBytes[byteIndex + 2] << 8) | (rawBytes[byteIndex + 1] << 16) | (rawBytes[byteIndex] << 24)),
+                ? (uint) (rawBytes[byteIndex] | (rawBytes[byteIndex + 1] << 8) | (rawBytes[byteIndex + 2] << 16) |
+                          (rawBytes[byteIndex + 3] << 24))
+                : (uint) (rawBytes[byteIndex + 3] | (rawBytes[byteIndex + 2] << 8) | (rawBytes[byteIndex + 1] << 16) |
+                          (rawBytes[byteIndex] << 24)),
             _ => null
         };
 

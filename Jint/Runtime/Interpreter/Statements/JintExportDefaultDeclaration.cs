@@ -82,8 +82,8 @@ internal sealed class JintExportDefaultDeclaration : JintStatement<ExportDefault
             return Completion.Empty();
         }
 
-        if (value is Function functionInstance
-            && string.IsNullOrWhiteSpace(functionInstance._nameDescriptor?._value?.ToString()))
+        if (value.Obj is Function functionInstance
+            && string.IsNullOrWhiteSpace(functionInstance._nameDescriptor?._value.ToString()))
         {
             functionInstance.SetFunctionName("default");
         }

@@ -16,9 +16,9 @@ public sealed class Reference
     private JsValue _base;
     private JsValue _referencedName;
     internal bool _strict;
-    private JsValue? _thisValue;
+    private JsValue _thisValue;
 
-    internal Reference(JsValue baseValue, JsValue referencedName, bool strict, JsValue? thisValue = null)
+    internal Reference(JsValue baseValue, JsValue referencedName, bool strict, JsValue thisValue = default)
     {
         _base = baseValue;
         _referencedName = referencedName;
@@ -61,17 +61,17 @@ public sealed class Reference
     public bool IsUnresolvableReference
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => ReferenceEquals(_base, Unresolvable);
+        get => ReferenceEquals(_base.Obj, Unresolvable.Obj);
     }
 
-    public bool IsSuperReference => _thisValue is not null;
+    public bool IsSuperReference => !_thisValue.IsEmpty;
 
     // https://tc39.es/ecma262/#sec-ispropertyreference
     // Returns true if base is not unresolvable and not an Environment Record
     public bool IsPropertyReference
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !ReferenceEquals(_base, Unresolvable) && (_base._type & InternalTypes.ObjectEnvironmentRecord) == InternalTypes.Empty;
+        get => !ReferenceEquals(_base.Obj, Unresolvable.Obj) && (_base._type & InternalTypes.ObjectEnvironmentRecord) == InternalTypes.Empty;
     }
 
     public JsValue ThisValue

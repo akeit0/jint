@@ -14,12 +14,12 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
     internal GeneratorState _generatorState;
     private ExecutionContext _generatorContext;
 #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
-    private readonly JsValue? _generatorBrand;
+    private readonly JsValue _generatorBrand;
 #pragma warning restore CS0649 // Field is never assigned to, and will always have its default value
     private JintStatementList _generatorBody = null!;
 
-    public JsValue? _nextValue;
-    public JsValue? _error;
+    public JsValue _nextValue;
+    public JsValue _error;
 
     /// <summary>
     /// Tracks whether we are resuming from a suspended yield (vs first call from SuspendedStart).
@@ -32,7 +32,7 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
     /// This is needed because the statement containing the yield might have a different completion value
     /// (e.g., variable declarations return Empty, not the yielded value).
     /// </summary>
-    internal JsValue? _suspendedValue;
+    internal JsValue _suspendedValue;
 
     /// <summary>
     /// The yield expression node we suspended at. Used for node-based yield tracking
@@ -157,12 +157,12 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
     /// <summary>
     /// https://tc39.es/ecma262/#sec-generatorresume
     /// </summary>
-    public ObjectInstance GeneratorResume(JsValue? value, JsValue? generatorBrand)
+    public ObjectInstance GeneratorResume(JsValue value, JsValue generatorBrand)
     {
         var state = GeneratorValidate(generatorBrand);
         if (state == GeneratorState.Completed)
         {
-            return new IteratorResult(_engine, Undefined, JsBoolean.True);
+            return new IteratorResult(_engine, Undefined, true);
         }
 
         var genContext = _generatorContext;
@@ -177,7 +177,7 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
         _isResuming = (state == GeneratorState.SuspendedYield);
 
         // Clear the suspended value from previous suspension
-        _suspendedValue = null;
+        _suspendedValue = default;
 
         var context = _engine._activeEvaluationContext;
         return ResumeExecution(genContext, context ?? new EvaluationContext(_engine));
@@ -186,7 +186,7 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
     /// <summary>
     /// https://tc39.es/ecma262/#sec-generatorresumeabrupt
     /// </summary>
-    public JsValue GeneratorResumeAbrupt(in Completion abruptCompletion, JsValue? generatorBrand)
+    public JsValue GeneratorResumeAbrupt(in Completion abruptCompletion, JsValue generatorBrand)
     {
         var state = GeneratorValidate(generatorBrand);
         if (state == GeneratorState.SuspendedStart)
@@ -199,7 +199,7 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
         {
             if (abruptCompletion.Type == CompletionType.Return)
             {
-                return new IteratorResult(_engine, abruptCompletion.Value, JsBoolean.True);
+                return new IteratorResult(_engine, abruptCompletion.Value, true);
             }
 
             Throw.JavaScriptException(_engine, abruptCompletion.Value, AstExtensions.DefaultLocation);
@@ -223,7 +223,7 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
         // The exception will be thrown at the yield point by JintYieldExpression
 
         // Clear the suspended value from previous suspension
-        _suspendedValue = null;
+        _suspendedValue = default;
 
         var context = _engine._activeEvaluationContext;
         return ResumeExecution(genContext, context ?? new EvaluationContext(_engine));
@@ -242,7 +242,7 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
         {
             _generatorState = GeneratorState.Completed;
             // Per spec 25.4.3.4 step 13.a: normal completion becomes return undefined
-            resultValue = IteratorResult.CreateValueIteratorPosition(_engine, JsValue.Undefined, done: JsBoolean.True);
+            resultValue = IteratorResult.CreateValueIteratorPosition(_engine, JsValue.Undefined, done: true);
         }
         else if (result.Type == CompletionType.Return)
         {
@@ -257,13 +257,13 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
                 }
                 else
                 {
-                    resultValue = IteratorResult.CreateValueIteratorPosition(_engine, result.Value, done: JsBoolean.False);
+                    resultValue = IteratorResult.CreateValueIteratorPosition(_engine, result.Value, done: false);
                 }
             }
             else
             {
                 _generatorState = GeneratorState.Completed;
-                resultValue = IteratorResult.CreateValueIteratorPosition(_engine, result.Value, done: JsBoolean.True);
+                resultValue = IteratorResult.CreateValueIteratorPosition(_engine, result.Value, done: true);
             }
         }
 
@@ -276,9 +276,9 @@ internal sealed class GeneratorInstance : ObjectInstance, ISuspendable
         return resultValue!;
     }
 
-    private GeneratorState GeneratorValidate(JsValue? generatorBrand)
+    private GeneratorState GeneratorValidate(JsValue generatorBrand)
     {
-        if (!ReferenceEquals(generatorBrand, _generatorBrand))
+        if (!(generatorBrand.ValueEquals(_generatorBrand)))
         {
             Throw.TypeError(_engine.Realm, "Generator brand differs from attached brand");
         }

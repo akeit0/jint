@@ -65,26 +65,26 @@ internal sealed class PlainDatePrototype : Prototype
 
     private JsPlainDate ValidatePlainDate(JsValue thisObject)
     {
-        if (thisObject is JsPlainDate plainDate)
+        if (thisObject.Obj is JsPlainDate plainDate)
             return plainDate;
         Throw.TypeError(_realm, "Value is not a Temporal.PlainDate");
         return null!;
     }
 
-    private JsString GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidatePlainDate(thisObject).Calendar);
+    private JsValue GetCalendarId(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).Calendar);
     private JsValue GetEra(JsValue thisObject, JsCallArguments arguments) => Undefined;
     private JsValue GetEraYear(JsValue thisObject, JsCallArguments arguments) => Undefined;
-    private JsNumber GetYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.Year);
-    private JsNumber GetMonth(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.Month);
-    private JsString GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidatePlainDate(thisObject).IsoDate.Month:D2}");
-    private JsNumber GetDay(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.Day);
-    private JsNumber GetDayOfWeek(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.DayOfWeek());
-    private JsNumber GetDayOfYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.DayOfYear());
-    private JsNumber GetWeekOfYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.WeekOfYear());
-    private JsNumber GetYearOfWeek(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.YearOfWeek());
-    private JsNumber GetDaysInWeek(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(7);
-    private JsNumber GetDaysInMonth(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.DaysInMonth());
-    private JsNumber GetDaysInYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDate(thisObject).IsoDate.DaysInYear());
-    private JsNumber GetMonthsInYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(12);
-    private JsBoolean GetInLeapYear(JsValue thisObject, JsCallArguments arguments) => IsoDate.IsLeapYear(ValidatePlainDate(thisObject).IsoDate.Year) ? JsBoolean.True : JsBoolean.False;
+    private JsValue GetYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.Year);
+    private JsValue GetMonth(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.Month);
+    private JsValue GetMonthCode(JsValue thisObject, JsCallArguments arguments) => ($"M{ValidatePlainDate(thisObject).IsoDate.Month:D2}");
+    private JsValue GetDay(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.Day);
+    private JsValue GetDayOfWeek(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.DayOfWeek());
+    private JsValue GetDayOfYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.DayOfYear());
+    private JsValue GetWeekOfYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.WeekOfYear());
+    private JsValue GetYearOfWeek(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.YearOfWeek());
+    private JsValue GetDaysInWeek(JsValue thisObject, JsCallArguments arguments) => (7);
+    private JsValue GetDaysInMonth(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.DaysInMonth());
+    private JsValue GetDaysInYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDate(thisObject).IsoDate.DaysInYear());
+    private JsValue GetMonthsInYear(JsValue thisObject, JsCallArguments arguments) => (12);
+    private JsValue GetInLeapYear(JsValue thisObject, JsCallArguments arguments) => IsoDate.IsLeapYear(ValidatePlainDate(thisObject).IsoDate.Year) ? JsValue.True : JsValue.False;
 }

@@ -53,16 +53,16 @@ internal sealed class TemporalNow : ObjectInstance
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.now.timezoneid
     /// </summary>
-    private JsString TimeZoneId(JsValue thisObject, JsCallArguments arguments)
+    private JsValue TimeZoneId(JsValue thisObject, JsCallArguments arguments)
     {
         var provider = _engine.Options.Temporal.TimeZoneProvider;
-        return new JsString(provider.GetDefaultTimeZone());
+        return (provider.GetDefaultTimeZone());
     }
 
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.now.instant
     /// </summary>
-    private JsInstant Instant(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Instant(JsValue thisObject, JsCallArguments arguments)
     {
         var epochNs = SystemUTCEpochNanoseconds();
         return new JsInstant(_engine, _realm.Intrinsics.TemporalInstant.PrototypeObject, epochNs);
@@ -81,7 +81,7 @@ internal sealed class TemporalNow : ObjectInstance
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.now.plaindatetimeiso
     /// </summary>
-    private JsPlainDateTime PlainDateTimeISO(JsValue thisObject, JsCallArguments arguments)
+    private JsValue PlainDateTimeISO(JsValue thisObject, JsCallArguments arguments)
     {
         var timeZone = arguments.At(0);
         var timeZoneId = timeZone.IsUndefined()
@@ -107,7 +107,7 @@ internal sealed class TemporalNow : ObjectInstance
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.now.zoneddatetimeiso
     /// </summary>
-    private JsZonedDateTime ZonedDateTimeISO(JsValue thisObject, JsCallArguments arguments)
+    private JsValue ZonedDateTimeISO(JsValue thisObject, JsCallArguments arguments)
     {
         var timeZone = arguments.At(0);
         var timeZoneId = timeZone.IsUndefined()
@@ -132,7 +132,7 @@ internal sealed class TemporalNow : ObjectInstance
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.now.plaindateiso
     /// </summary>
-    private JsPlainDate PlainDateISO(JsValue thisObject, JsCallArguments arguments)
+    private JsValue PlainDateISO(JsValue thisObject, JsCallArguments arguments)
     {
         var timeZone = arguments.At(0);
         var timeZoneId = timeZone.IsUndefined()
@@ -148,7 +148,7 @@ internal sealed class TemporalNow : ObjectInstance
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.now.plaintimeiso
     /// </summary>
-    private JsPlainTime PlainTimeISO(JsValue thisObject, JsCallArguments arguments)
+    private JsValue PlainTimeISO(JsValue thisObject, JsCallArguments arguments)
     {
         var timeZone = arguments.At(0);
         var timeZoneId = timeZone.IsUndefined()

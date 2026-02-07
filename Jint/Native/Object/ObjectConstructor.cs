@@ -156,7 +156,7 @@ public sealed class ObjectConstructor : Constructor
 
     public override ObjectInstance Construct(JsCallArguments arguments, JsValue newTarget)
     {
-        if (!ReferenceEquals(this, newTarget) && !newTarget.IsUndefined())
+        if (!ReferenceEquals(this, newTarget.Obj) && !newTarget.IsUndefined())
         {
             return OrdinaryCreateFromConstructor(
                 newTarget,
@@ -167,7 +167,7 @@ public sealed class ObjectConstructor : Constructor
         if (arguments.Length > 0)
         {
             var value = arguments[0];
-            if (value is ObjectInstance oi)
+            if (value.Obj is ObjectInstance oi)
             {
                 return oi;
             }
@@ -196,7 +196,7 @@ public sealed class ObjectConstructor : Constructor
     public JsValue GetPrototypeOf(JsValue thisObject, JsCallArguments arguments)
     {
         var obj = TypeConverter.ToObject(_realm, arguments.At(0));
-        return obj.Prototype ?? Null;
+        return obj.Prototype ?? JsValue.Null;
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public sealed class ObjectConstructor : Constructor
             Throw.TypeError(_realm, $"Object prototype may only be an Object or null: {prototype}");
         }
 
-        if (oArg is not ObjectInstance o)
+        if (oArg.Obj is not ObjectInstance o)
         {
             return oArg;
         }
@@ -232,7 +232,7 @@ public sealed class ObjectConstructor : Constructor
     {
         var o = TypeConverter.ToObject(_realm, arguments.At(0));
         var property = TypeConverter.ToPropertyKey(arguments.At(1));
-        return o.HasOwnProperty(property) ? JsBoolean.True : JsBoolean.False;
+        return o.HasOwnProperty(property) ? JsValue.True : JsValue.False;
     }
 
     /// <summary>
@@ -261,7 +261,7 @@ public sealed class ObjectConstructor : Constructor
         {
             var desc = o.GetOwnProperty(key);
             var descriptor = PropertyDescriptor.FromPropertyDescriptor(Engine, desc);
-            if (!ReferenceEquals(descriptor, Undefined))
+            if (!descriptor.IsUndefined())
             {
                 descriptors.CreateDataProperty(key, descriptor);
             }
@@ -317,10 +317,10 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private JsValue DefineProperty(JsValue thisObject, JsCallArguments arguments)
     {
-        if (arguments.At(0) is not ObjectInstance o)
+        if (arguments.At(0).Obj is not ObjectInstance o)
         {
             Throw.TypeError(_realm, "Object.defineProperty called on non-object");
-            return null;
+            return default;
         }
 
         var p = arguments.At(1);
@@ -339,7 +339,7 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private JsValue DefineProperties(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = arguments.At(0) as ObjectInstance;
+        var o = arguments.At(0).Obj as ObjectInstance;
         if (o is null)
         {
             Throw.TypeError(_realm, "Object.defineProperty called on non-object");
@@ -384,7 +384,7 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private JsValue Seal(JsValue thisObject, JsCallArguments arguments)
     {
-        if (arguments.At(0) is not ObjectInstance o)
+        if (arguments.At(0).Obj is not ObjectInstance o)
         {
             return arguments.At(0);
         }
@@ -404,7 +404,7 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private JsValue Freeze(JsValue thisObject, JsCallArguments arguments)
     {
-        if (arguments.At(0) is not ObjectInstance o)
+        if (arguments.At(0).Obj is not ObjectInstance o)
         {
             return arguments.At(0);
         }
@@ -424,7 +424,7 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private JsValue PreventExtensions(JsValue thisObject, JsCallArguments arguments)
     {
-        if (arguments.At(0) is not ObjectInstance o)
+        if (arguments.At(0).Obj is not ObjectInstance o)
         {
             return arguments.At(0);
         }
@@ -442,9 +442,9 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private static JsValue IsSealed(JsValue thisObject, JsCallArguments arguments)
     {
-        if (arguments.At(0) is not ObjectInstance o)
+        if (arguments.At(0).Obj is not ObjectInstance o)
         {
-            return JsBoolean.True;
+            return JsValue.True;
         }
 
         return TestIntegrityLevel(o, IntegrityLevel.Sealed);
@@ -455,9 +455,9 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private static JsValue IsFrozen(JsValue thisObject, JsCallArguments arguments)
     {
-        if (arguments.At(0) is not ObjectInstance o)
+        if (arguments.At(0).Obj is not ObjectInstance o)
         {
-            return JsBoolean.True;
+            return JsValue.True;
         }
 
         return TestIntegrityLevel(o, IntegrityLevel.Frozen);
@@ -470,7 +470,7 @@ public sealed class ObjectConstructor : Constructor
     {
         if (o.Extensible)
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         foreach (var k in o.GetOwnPropertyKeys())
@@ -480,20 +480,20 @@ public sealed class ObjectConstructor : Constructor
             {
                 if (currentDesc.Configurable)
                 {
-                    return JsBoolean.False;
+                    return JsValue.False;
                 }
 
                 if (level == IntegrityLevel.Frozen && currentDesc.IsDataDescriptor())
                 {
                     if (currentDesc.Writable)
                     {
-                        return JsBoolean.False;
+                        return JsValue.False;
                     }
                 }
             }
         }
 
-        return JsBoolean.True;
+        return JsValue.True;
     }
 
     /// <summary>
@@ -501,9 +501,9 @@ public sealed class ObjectConstructor : Constructor
     /// </summary>
     private static JsValue IsExtensible(JsValue thisObject, JsCallArguments arguments)
     {
-        if (arguments.At(0) is not ObjectInstance o)
+        if (arguments.At(0).Obj is not ObjectInstance o)
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         return o.Extensible;
@@ -555,7 +555,7 @@ public sealed class ObjectConstructor : Constructor
 
         public JsValue Call(JsValue thisObject, params JsCallArguments arguments)
         {
-            var o = (ObjectInstance) thisObject;
+            var o = (ObjectInstance) thisObject.Obj!;
             var key = arguments.At(0);
             var value = arguments.At(1);
             var propertyKey = TypeConverter.ToPropertyKey(key);

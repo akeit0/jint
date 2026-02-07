@@ -69,7 +69,7 @@ public static class ModuleFactory
         catch (Exception)
         {
             Throw.JavaScriptException(engine, $"Could not load module {source}", AstExtensions.DefaultLocation);
-            module = null;
+            module = default;
         }
 
         return BuildJsonModule(engine, module, resolved.Uri?.LocalPath);

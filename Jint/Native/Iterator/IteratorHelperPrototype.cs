@@ -37,17 +37,17 @@ internal sealed class IteratorHelperPrototype : Prototype
     private JsValue Next(JsValue thisObject, JsValue[] arguments)
     {
         // 1. Return ? GeneratorResume(this value, undefined, "Iterator Helper").
-        if (thisObject is IteratorHelper helper)
+        if (thisObject.Obj is  IteratorHelper helper)
         {
             return helper.Next();
         }
 
-        if (thisObject is ConcatIterator concatIterator)
+        if (thisObject.Obj is  ConcatIterator concatIterator)
         {
             return concatIterator.Next();
         }
 
-        if (thisObject is ZipIterator zipIterator)
+        if (thisObject.Obj is  ZipIterator zipIterator)
         {
             return zipIterator.Next();
         }
@@ -63,17 +63,17 @@ internal sealed class IteratorHelperPrototype : Prototype
     {
         // 1. Let O be this value.
         // 2. Perform ? RequireInternalSlot(O, [[UnderlyingIterator]]).
-        if (thisObject is IteratorHelper helper)
+        if (thisObject.Obj is  IteratorHelper helper)
         {
             return helper.Return();
         }
 
-        if (thisObject is ConcatIterator concatIterator)
+        if (thisObject.Obj is  ConcatIterator concatIterator)
         {
             return concatIterator.Return();
         }
 
-        if (thisObject is ZipIterator zipIterator)
+        if (thisObject.Obj is  ZipIterator zipIterator)
         {
             return zipIterator.Return();
         }

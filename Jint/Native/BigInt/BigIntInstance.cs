@@ -13,7 +13,7 @@ internal sealed class BigIntInstance : ObjectInstance, IJsPrimitive
 
     Types IJsPrimitive.Type => Types.BigInt;
 
-    JsValue IJsPrimitive.PrimitiveValue => BigIntData;
+    JsValue IJsPrimitive.PrimitiveValue => BigIntData.ToJsValue();
 
     public JsBigInt BigIntData { get; }
 }

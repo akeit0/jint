@@ -61,7 +61,7 @@ public class ScriptModulePreparationTests
         returnStatement.Should().BeSameAs(builtStatement);
 
         var result = builtStatement.Execute(new EvaluationContext( new Engine())).Value;
-        result.Should().Be(JsBoolean.False);
+        result.Should().Be(JsValue.False);
     }
 
     [Fact]

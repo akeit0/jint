@@ -312,12 +312,12 @@ public sealed class JsTypedArray : ObjectInstance
         {
             return (value.DoubleValue);
             // _arrayElementType.FitsInt32()
-            // ? JsNumber.Create((int) value.DoubleValue)
+            // ? ((int) value.DoubleValue)
             // :
             //(value.DoubleValue);
         }
 
-        return new JsValue(value.BigInteger);
+        return (value.BigInteger);
     }
 
     // helper tot prevent floating point

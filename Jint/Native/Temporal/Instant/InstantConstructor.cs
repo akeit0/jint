@@ -21,7 +21,7 @@ internal sealed class InstantConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new InstantPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.Create(1), PropertyFlag.Configurable);
+        _length = new PropertyDescriptor((1), PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

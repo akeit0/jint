@@ -38,42 +38,153 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         const PropertyFlag PropertyFlags = PropertyFlag.Writable | PropertyFlag.Configurable;
         var properties = new PropertyDictionary(36, false)
         {
-            ["at"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "at", prototype.At, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["buffer"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get buffer", Buffer, 0, LengthFlags), Undefined, PropertyFlag.Configurable),
-            ["byteLength"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get byteLength", ByteLength, 0, LengthFlags), Undefined, PropertyFlag.Configurable),
-            ["byteOffset"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get byteOffset", ByteOffset, 0, LengthFlags), Undefined, PropertyFlag.Configurable),
+            ["at"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "at", prototype.At, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["buffer"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get buffer", Buffer, 0, LengthFlags), Undefined,
+                    PropertyFlag.Configurable),
+            ["byteLength"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get byteLength", ByteLength, 0, LengthFlags),
+                    Undefined, PropertyFlag.Configurable),
+            ["byteOffset"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get byteOffset", ByteOffset, 0, LengthFlags),
+                    Undefined, PropertyFlag.Configurable),
             ["constructor"] = new(_constructor, PropertyFlag.NonEnumerable),
-            ["copyWithin"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "copyWithin", prototype.CopyWithin, 2, PropertyFlag.Configurable), PropertyFlags),
-            ["entries"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "entries", prototype.Entries, 0, PropertyFlag.Configurable), PropertyFlags),
-            ["every"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "every", prototype.Every, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["fill"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "fill", prototype.Fill, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["filter"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "filter", prototype.Filter, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["find"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "find", prototype.Find, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["findIndex"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "findIndex", prototype.FindIndex, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["findLast"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "findLast", prototype.FindLast, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["findLastIndex"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "findLastIndex", prototype.FindLastIndex, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["forEach"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "forEach", prototype.ForEach, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["includes"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "includes", prototype.Includes, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["indexOf"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "indexOf", prototype.IndexOf, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["join"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "join", prototype.Join, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["keys"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "keys", prototype.Keys, 0, PropertyFlag.Configurable), PropertyFlags),
-            ["lastIndexOf"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "lastIndexOf", prototype.LastIndexOf, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["length"] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get length", GetLength, 0, LengthFlags), Undefined, PropertyFlag.Configurable),
-            ["map"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "map", prototype.Map, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["reduce"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "reduce", prototype.Reduce, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["reduceRight"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "reduceRight", prototype.ReduceRight, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["reverse"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "reverse", prototype.Reverse, 0, PropertyFlag.Configurable), PropertyFlags),
-            ["set"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "set", prototype.Set, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["slice"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "slice", prototype.Slice, 2, PropertyFlag.Configurable), PropertyFlags),
-            ["some"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "some", prototype.Some, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["sort"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "sort", prototype.Sort, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["subarray"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "subarray", prototype.Subarray, 2, PropertyFlag.Configurable), PropertyFlags),
-            ["toLocaleString"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toLocaleString", prototype.ToLocaleString, 0, PropertyFlag.Configurable), PropertyFlags),
-            ["toReversed"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toReversed", prototype.ToReversed, 0, PropertyFlag.Configurable), PropertyFlags),
-            ["toSorted"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toSorted", prototype.ToSorted, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["toString"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "toLocaleString", prototype._realm.Intrinsics.Array.PrototypeObject.ToString, 0, PropertyFlag.Configurable), PropertyFlags),
-            ["values"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "values", prototype.Values, 0, PropertyFlag.Configurable), PropertyFlags),
-            ["with"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this, static prototype => new ClrFunction(prototype._engine, "with", prototype.With, 2, PropertyFlag.Configurable), PropertyFlags),
+            ["copyWithin"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "copyWithin", prototype.CopyWithin, 2,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["entries"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "entries", prototype.Entries, 0,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["every"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "every", prototype.Every, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["fill"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "fill", prototype.Fill, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["filter"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "filter", prototype.Filter, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["find"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "find", prototype.Find, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["findIndex"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "findIndex", prototype.FindIndex, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["findLast"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "findLast", prototype.FindLast, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["findLastIndex"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "findLastIndex", prototype.FindLastIndex, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["forEach"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "forEach", prototype.ForEach, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["includes"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "includes", prototype.Includes, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["indexOf"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "indexOf", prototype.IndexOf, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["join"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "join", prototype.Join, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["keys"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "keys", prototype.Keys, 0, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["lastIndexOf"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "lastIndexOf", prototype.LastIndexOf, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["length"] =
+                new GetSetPropertyDescriptor(new ClrFunction(_engine, "get length", GetLength, 0, LengthFlags),
+                    Undefined, PropertyFlag.Configurable),
+            ["map"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "map", prototype.Map, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["reduce"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "reduce", prototype.Reduce, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["reduceRight"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "reduceRight", prototype.ReduceRight, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["reverse"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "reverse", prototype.Reverse, 0,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["set"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "set", prototype.Set, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["slice"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "slice", prototype.Slice, 2,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["some"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "some", prototype.Some, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["sort"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype =>
+                        new ClrFunction(prototype._engine, "sort", prototype.Sort, 1, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["subarray"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "subarray", prototype.Subarray, 2,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["toLocaleString"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "toLocaleString", prototype.ToLocaleString,
+                        0, PropertyFlag.Configurable), PropertyFlags),
+            ["toReversed"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "toReversed", prototype.ToReversed, 0,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["toSorted"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "toSorted", prototype.ToSorted, 1,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["toString"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "toLocaleString",
+                        prototype._realm.Intrinsics.Array.PrototypeObject.ToString, 0, PropertyFlag.Configurable),
+                    PropertyFlags),
+            ["values"] =
+                new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                    static prototype => new ClrFunction(prototype._engine, "values", prototype.Values, 0,
+                        PropertyFlag.Configurable), PropertyFlags),
+            ["with"] = new LazyPropertyDescriptor<IntrinsicTypedArrayPrototype>(this,
+                static prototype =>
+                    new ClrFunction(prototype._engine, "with", prototype.With, 2, PropertyFlag.Configurable),
+                PropertyFlags),
         };
         SetProperties(properties);
 
@@ -81,7 +192,9 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         var symbols = new SymbolDictionary(2)
         {
             [GlobalSymbolRegistry.Iterator] = new(_originalIteratorFunction, PropertyFlags),
-            [GlobalSymbolRegistry.ToStringTag] = new GetSetPropertyDescriptor(new ClrFunction(_engine, "get [Symbol.toStringTag]", ToStringTag, 0, PropertyFlag.Configurable), Undefined, PropertyFlag.Configurable)
+            [GlobalSymbolRegistry.ToStringTag] = new GetSetPropertyDescriptor(
+                new ClrFunction(_engine, "get [Symbol.toStringTag]", ToStringTag, 0, PropertyFlag.Configurable),
+                Undefined, PropertyFlag.Configurable)
         };
         SetSymbols(symbols);
     }
@@ -91,7 +204,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// </summary>
     private JsValue Buffer(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsTypedArray;
+        var o = thisObject.Obj as JsTypedArray;
         if (o is null)
         {
             Throw.TypeError(_realm);
@@ -105,14 +218,14 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// </summary>
     private JsValue ByteLength(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsTypedArray;
+        var o = thisObject.Obj as JsTypedArray;
         if (o is null)
         {
             Throw.TypeError(_realm);
         }
 
         var taRecord = MakeTypedArrayWithBufferWitnessRecord(o, ArrayBufferOrder.SeqCst);
-        return JsNumber.Create(taRecord.TypedArrayByteLength);
+        return (taRecord.TypedArrayByteLength);
     }
 
     /// <summary>
@@ -120,7 +233,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// </summary>
     private JsValue ByteOffset(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsTypedArray;
+        var o = thisObject.Obj as JsTypedArray;
         if (o is null)
         {
             Throw.TypeError(_realm);
@@ -129,10 +242,10 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         var taRecord = MakeTypedArrayWithBufferWitnessRecord(o, ArrayBufferOrder.SeqCst);
         if (taRecord.IsTypedArrayOutOfBounds)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
-        return JsNumber.Create(o._byteOffset);
+        return (o._byteOffset);
     }
 
     /// <summary>
@@ -140,7 +253,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// </summary>
     private JsValue GetLength(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsTypedArray;
+        var o = thisObject.Obj as JsTypedArray;
         if (o is null)
         {
             Throw.TypeError(_realm);
@@ -149,10 +262,10 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         var taRecord = MakeTypedArrayWithBufferWitnessRecord(o, ArrayBufferOrder.SeqCst);
         if (taRecord.IsTypedArrayOutOfBounds)
         {
-            return JsNumber.PositiveZero;
+            return JsValue.PositiveZero;
         }
 
-        return JsNumber.Create(taRecord.TypedArrayLength);
+        return (taRecord.TypedArrayLength);
     }
 
     internal readonly record struct TypedArrayWithBufferWitnessRecord(JsTypedArray Object, int CachedBufferByteLength)
@@ -242,7 +355,8 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         }
     }
 
-    internal static TypedArrayWithBufferWitnessRecord MakeTypedArrayWithBufferWitnessRecord(JsTypedArray obj, ArrayBufferOrder order)
+    internal static TypedArrayWithBufferWitnessRecord MakeTypedArrayWithBufferWitnessRecord(JsTypedArray obj,
+        ArrayBufferOrder order)
     {
         var buffer = obj._viewedArrayBuffer;
         var byteLength = buffer.IsDetachedBuffer
@@ -370,8 +484,10 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             {
                 if (fromByteIndex < bufferByteLimit && toByteIndex < bufferByteLimit)
                 {
-                    var value = buffer.GetValueFromBuffer((int) fromByteIndex, TypedArrayElementType.Uint8, isTypedArray: true, ArrayBufferOrder.Unordered);
-                    buffer.SetValueInBuffer((int) toByteIndex, TypedArrayElementType.Uint8, value, isTypedArray: true, ArrayBufferOrder.Unordered);
+                    var value = buffer.GetValueFromBuffer((int) fromByteIndex, TypedArrayElementType.Uint8,
+                        isTypedArray: true, ArrayBufferOrder.Unordered);
+                    buffer.SetValueInBuffer((int) toByteIndex, TypedArrayElementType.Uint8, value, isTypedArray: true,
+                        ArrayBufferOrder.Unordered);
                     fromByteIndex += direction;
                     toByteIndex += direction;
                     countBytes--;
@@ -407,7 +523,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
 
         if (len == 0)
         {
-            return JsBoolean.True;
+            return JsValue.True;
         }
 
         var predicate = GetCallable(arguments.At(0));
@@ -421,13 +537,13 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             args[1] = k;
             if (!TypeConverter.ToBoolean(predicate.Call(thisArg, args)))
             {
-                return JsBoolean.False;
+                return JsValue.False;
             }
         }
 
         _engine._jsValueArrayPool.ReturnArray(args);
 
-        return JsBoolean.True;
+        return JsValue.True;
     }
 
     /// <summary>
@@ -446,11 +562,11 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         JsValue value;
         if (o._contentType == TypedArrayContentType.BigInt)
         {
-            value = JsBigInt.Create(jsValue.ToBigInteger(_engine));
+            value = (jsValue.ToBigInteger(_engine));
         }
         else
         {
-            value = JsNumber.Create(jsValue);
+            value = (jsValue);
         }
 
         int k;
@@ -580,7 +696,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
 
         if (len == 0)
         {
-            return new KeyValuePair<JsValue, JsValue>(JsNumber.IntegerNegativeOne, Undefined);
+            return new KeyValuePair<JsValue, JsValue>(-1, Undefined);
         }
 
         var args = _engine._jsValueArrayPool.RentArray(3);
@@ -589,7 +705,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         {
             for (var k = 0; k < len; k++)
             {
-                var kNumber = JsNumber.Create(k);
+                var kNumber = (k);
                 var kValue = o[k];
                 args[0] = kValue;
                 args[1] = kNumber;
@@ -603,7 +719,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         {
             for (var k = (int) (len - 1); k >= 0; k--)
             {
-                var kNumber = JsNumber.Create(k);
+                var kNumber = (k);
                 var kValue = o[k];
                 args[0] = kValue;
                 args[1] = kNumber;
@@ -614,7 +730,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             }
         }
 
-        return new KeyValuePair<JsValue, JsValue>(JsNumber.IntegerNegativeOne, Undefined);
+        return new KeyValuePair<JsValue, JsValue>(-1, Undefined);
     }
 
     /// <summary>
@@ -664,7 +780,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         var n = TypeConverter.ToIntegerOrInfinity(fromIndex);
         if (double.IsPositiveInfinity(n))
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
         else if (double.IsNegativeInfinity(n))
         {
@@ -690,13 +806,13 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             var value = o[(int) k];
             if (SameValueZeroComparer.Equals(value, searchElement))
             {
-                return JsBoolean.True;
+                return JsValue.True;
             }
 
             k++;
         }
 
-        return JsBoolean.False;
+        return JsValue.False;
     }
 
     /// <summary>
@@ -713,13 +829,13 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
 
         if (len == 0)
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
 
         var n = TypeConverter.ToIntegerOrInfinity(fromIndex);
         if (double.IsPositiveInfinity(n))
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
         else if (double.IsNegativeInfinity(n))
         {
@@ -753,7 +869,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             }
         }
 
-        return JsNumber.IntegerNegativeOne;
+        return -1;
     }
 
     /// <summary>
@@ -767,7 +883,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         var o = taRecord.Object;
         var len = taRecord.TypedArrayLength;
 
-        var sep = TypeConverter.ToString(separator.IsUndefined() ? JsString.CommaString : separator);
+        var sep = TypeConverter.ToString(separator.IsUndefined() ? "," : separator);
         // as per the spec, this has to be called after ToString(separator)
         if (len == 0)
         {
@@ -821,7 +937,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
 
         if (len == 0)
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
 
         var fromIndex = arguments.At(1, len - 1);
@@ -829,7 +945,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
 
         if (double.IsNegativeInfinity(n))
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
 
         long k;
@@ -855,13 +971,13 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             }
         }
 
-        return JsNumber.IntegerNegativeOne;
+        return -1;
     }
 
     /// <summary>
     /// https://tc39.es/ecma262/#sec-%typedarray%.prototype.map
     /// </summary>
-    private ObjectInstance Map(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Map(JsValue thisObject, JsCallArguments arguments)
     {
         var taRecord = thisObject.ValidateTypedArray(_realm, ArrayBufferOrder.SeqCst);
         var o = taRecord.Object;
@@ -977,7 +1093,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// <summary>
     /// https://tc39.es/ecma262/#sec-%typedarray%.prototype.reverse
     /// </summary>
-    private ObjectInstance Reverse(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Reverse(JsValue thisObject, JsCallArguments arguments)
     {
         var taRecord = thisObject.ValidateTypedArray(_realm, ArrayBufferOrder.SeqCst);
         var o = taRecord.Object;
@@ -1006,7 +1122,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// </summary>
     private JsValue Set(JsValue thisObject, JsCallArguments arguments)
     {
-        var target = thisObject as JsTypedArray;
+        var target = thisObject.Obj as JsTypedArray;
         if (target is null)
         {
             Throw.TypeError(_realm);
@@ -1021,7 +1137,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             Throw.RangeError(_realm, "Invalid offset");
         }
 
-        if (source is JsTypedArray typedArrayInstance)
+        if (source.Obj is JsTypedArray typedArrayInstance)
         {
             SetTypedArrayFromTypedArray(target, targetOffset, typedArrayInstance);
         }
@@ -1100,8 +1216,10 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             // NOTE: If srcType and targetType are the same, the transfer must be performed in a manner that preserves the bit-level encoding of the source data.
             while (targetByteIndex < limit)
             {
-                var value = srcBuffer.GetValueFromBuffer(srcByteIndex, TypedArrayElementType.Uint8, isTypedArray: true, ArrayBufferOrder.Unordered);
-                targetBuffer.SetValueInBuffer(targetByteIndex, TypedArrayElementType.Uint8, value, isTypedArray: true, ArrayBufferOrder.Unordered);
+                var value = srcBuffer.GetValueFromBuffer(srcByteIndex, TypedArrayElementType.Uint8, isTypedArray: true,
+                    ArrayBufferOrder.Unordered);
+                targetBuffer.SetValueInBuffer(targetByteIndex, TypedArrayElementType.Uint8, value, isTypedArray: true,
+                    ArrayBufferOrder.Unordered);
                 srcByteIndex += 1;
                 targetByteIndex += 1;
             }
@@ -1110,8 +1228,10 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         {
             while (targetByteIndex < limit)
             {
-                var value = srcBuffer.GetValueFromBuffer(srcByteIndex, srcType, isTypedArray: true, ArrayBufferOrder.Unordered);
-                targetBuffer.SetValueInBuffer(targetByteIndex, targetType, value, isTypedArray: true, ArrayBufferOrder.Unordered);
+                var value = srcBuffer.GetValueFromBuffer(srcByteIndex, srcType, isTypedArray: true,
+                    ArrayBufferOrder.Unordered);
+                targetBuffer.SetValueInBuffer(targetByteIndex, targetType, value, isTypedArray: true,
+                    ArrayBufferOrder.Unordered);
                 srcByteIndex += srcElementSize;
                 targetByteIndex += targetElementSize;
             }
@@ -1268,8 +1388,10 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
                 var limit = targetByteIndex + countBytes * elementSize;
                 while (targetByteIndex < limit)
                 {
-                    var value = srcBuffer.GetValueFromBuffer(srcByteIndex, TypedArrayElementType.Uint8, true, ArrayBufferOrder.Unordered);
-                    targetBuffer.SetValueInBuffer(targetByteIndex, TypedArrayElementType.Uint8, value, true, ArrayBufferOrder.Unordered);
+                    var value = srcBuffer.GetValueFromBuffer(srcByteIndex, TypedArrayElementType.Uint8, true,
+                        ArrayBufferOrder.Unordered);
+                    targetBuffer.SetValueInBuffer(targetByteIndex, TypedArrayElementType.Uint8, value, true,
+                        ArrayBufferOrder.Unordered);
                     srcByteIndex++;
                     targetByteIndex++;
                 }
@@ -1299,12 +1421,12 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             args[1] = k;
             if (TypeConverter.ToBoolean(callbackfn.Call(thisArg, args)))
             {
-                return JsBoolean.True;
+                return JsValue.True;
             }
         }
 
         _engine._jsValueArrayPool.ReturnArray(args);
-        return JsBoolean.False;
+        return JsValue.False;
     }
 
     /// <summary>
@@ -1347,7 +1469,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// </summary>
     private JsValue Subarray(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsTypedArray;
+        var o = thisObject.Obj as JsTypedArray;
         if (o is null)
         {
             Throw.TypeError(_realm);
@@ -1461,6 +1583,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             {
                 r.Append(Separator);
             }
+
             if (array.TryGetValue(k, out var nextElement) && !nextElement.IsNullOrUndefined())
             {
                 var s = TypeConverter.ToString(Invoke(nextElement, "toLocaleString", invokeArgs));
@@ -1486,7 +1609,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
     /// </summary>
     private static JsValue ToStringTag(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is not JsTypedArray o)
+        if (thisObject.Obj is not JsTypedArray o)
         {
             return Undefined;
         }
@@ -1500,7 +1623,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         var o = taRecord.Object;
         var len = taRecord.TypedArrayLength;
 
-        var a = TypedArrayCreateSameType(o, [JsNumber.Create(len)]);
+        var a = TypedArrayCreateSameType(o, [(len)]);
         uint k = 0;
         while (k < len)
         {
@@ -1521,7 +1644,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
 
         var buffer = o._viewedArrayBuffer;
 
-        var a = TypedArrayCreateSameType(o, [JsNumber.Create(len)]);
+        var a = TypedArrayCreateSameType(o, [(len)]);
 
         var array = SortArray(buffer, compareFn, o);
         for (var i = 0; (uint) i < (uint) array.Length; ++i)
@@ -1532,7 +1655,7 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         return a;
     }
 
-    private ObjectInstance With(JsValue thisObject, JsCallArguments arguments)
+    private JsValue With(JsValue thisObject, JsCallArguments arguments)
     {
         var taRecord = thisObject.ValidateTypedArray(_realm, ArrayBufferOrder.SeqCst);
         var o = taRecord.Object;
@@ -1553,15 +1676,15 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         }
 
         value = o._contentType == TypedArrayContentType.BigInt
-            ? TypeConverter.ToJsBigInt(value)
-            : TypeConverter.ToJsNumber(value);
+            ? TypeConverter.ToJsBigInt(value).ToJsValue()
+            : TypeConverter.ToNumber(value);
 
         if (!o.IsValidIntegerIndex(actualIndex))
         {
             Throw.RangeError(_realm, "Invalid start index");
         }
 
-        var a = TypedArrayCreateSameType(o, [JsNumber.Create(len)]);
+        var a = TypedArrayCreateSameType(o, [(len)]);
 
         var k = 0;
         while (k < len)
@@ -1585,11 +1708,12 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
         ICallable? compareFn = null;
         if (!compareArg.IsUndefined())
         {
-            if (compareArg is not ICallable callable)
+            if (compareArg.Obj is not ICallable callable)
             {
                 Throw.TypeError(_realm, "The comparison function must be either a function or undefined");
                 return null;
             }
+
             compareFn = callable;
         }
 
@@ -1627,24 +1751,24 @@ internal sealed class IntrinsicTypedArrayPrototype : Prototype
             _compare = compare;
         }
 
-        public int Compare(JsValue? x, JsValue? y)
+        public int Compare(JsValue x, JsValue y)
         {
-            if (x is null && y is null)
+            if (x.IsEmpty && y.IsEmpty)
             {
                 return 0;
             }
 
-            if (x is not null && y is null)
+            if (!x.IsEmpty && y.IsEmpty)
             {
                 return 1;
             }
 
-            if (x is null)
+            if (x.IsEmpty)
             {
                 return -1;
             }
 
-            if (y is null)
+            if (y.IsEmpty)
             {
                 return 1;
             }

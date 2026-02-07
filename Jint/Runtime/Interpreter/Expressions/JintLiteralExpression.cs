@@ -28,7 +28,7 @@ internal sealed class JintLiteralExpression : JintExpression
         switch (literal.Kind)
         {
             case TokenKind.BooleanLiteral:
-                return ((BooleanLiteral) literal).Value ? JsBoolean.True : JsBoolean.False;
+                return ((BooleanLiteral) literal).Value ? JsValue.True : JsValue.False;
             case TokenKind.NullLiteral:
                 return JsValue.Null;
             case TokenKind.NumericLiteral:
@@ -36,14 +36,14 @@ internal sealed class JintLiteralExpression : JintExpression
                     var numericValue = ((NumericLiteral) literal).Value;
                     var intValue = (int) numericValue;
                     return numericValue == intValue
-                           && (intValue != 0 || BitConverter.DoubleToInt64Bits(numericValue) != JsNumber.NegativeZeroBits)
-                        ? JsNumber.Create(intValue)
-                        : JsNumber.Create(numericValue);
+                           && (intValue != 0 || (ulong)BitConverter.DoubleToInt64Bits(numericValue) != JsValue.NegativeZeroBits)
+                        ? (intValue)
+                        : (numericValue);
                 }
             case TokenKind.StringLiteral:
-                return JsString.Create(((StringLiteral) literal).Value);
+                return (((StringLiteral) literal).Value);
             case TokenKind.BigIntLiteral:
-                return JsBigInt.Create(((BigIntLiteral) literal).Value);
+                return ((BigIntLiteral) literal).Value;
             case TokenKind.RegExpLiteral:
                 break;
         }

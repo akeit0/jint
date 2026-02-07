@@ -28,7 +28,7 @@ public sealed class ClrFunction : Function, IEquatable<ClrFunction>
 
         _length = lengthFlags == PropertyFlag.AllForbidden
             ? PropertyDescriptor.AllForbiddenDescriptor.ForNumber(length)
-            : new PropertyDescriptor(JsNumber.Create(length), lengthFlags);
+            : new PropertyDescriptor((length), lengthFlags);
 
         _bubbleExceptions = _engine.Options.Interop.ExceptionHandler == Options.InteropOptions._defaultExceptionHandler;
     }

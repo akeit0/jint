@@ -41,20 +41,28 @@ internal sealed class PromiseConstructor : Constructor
         var properties = new PropertyDictionary(8, checkExistingKeys: false)
         {
             ["all"] = new(new PropertyDescriptor(new ClrFunction(Engine, "all", All, 1, LengthFlags), PropertyFlags)),
-            ["allSettled"] = new(new PropertyDescriptor(new ClrFunction(Engine, "allSettled", AllSettled, 1, LengthFlags), PropertyFlags)),
+            ["allSettled"] =
+                new(new PropertyDescriptor(new ClrFunction(Engine, "allSettled", AllSettled, 1, LengthFlags),
+                    PropertyFlags)),
             ["any"] = new(new PropertyDescriptor(new ClrFunction(Engine, "any", Any, 1, LengthFlags), PropertyFlags)),
-            ["race"] = new(new PropertyDescriptor(new ClrFunction(Engine, "race", Race, 1, LengthFlags), PropertyFlags)),
-            ["reject"] = new(new PropertyDescriptor(new ClrFunction(Engine, "reject", Reject, 1, LengthFlags), PropertyFlags)),
-            ["resolve"] = new(new PropertyDescriptor(new ClrFunction(Engine, "resolve", Resolve, 1, LengthFlags), PropertyFlags)),
+            ["race"] =
+                new(new PropertyDescriptor(new ClrFunction(Engine, "race", Race, 1, LengthFlags), PropertyFlags)),
+            ["reject"] =
+                new(new PropertyDescriptor(new ClrFunction(Engine, "reject", Reject, 1, LengthFlags), PropertyFlags)),
+            ["resolve"] =
+                new(new PropertyDescriptor(new ClrFunction(Engine, "resolve", Resolve, 1, LengthFlags), PropertyFlags)),
             ["try"] = new(new PropertyDescriptor(new ClrFunction(Engine, "try", Try, 1, LengthFlags), PropertyFlags)),
-            ["withResolvers"] = new(new PropertyDescriptor(new ClrFunction(Engine, "withResolvers", WithResolvers, 0, LengthFlags), PropertyFlags)),
+            ["withResolvers"] =
+                new(new PropertyDescriptor(new ClrFunction(Engine, "withResolvers", WithResolvers, 0, LengthFlags),
+                    PropertyFlags)),
         };
         SetProperties(properties);
 
         var symbols = new SymbolDictionary(1)
         {
             [GlobalSymbolRegistry.Species] = new GetSetPropertyDescriptor(
-                get: new ClrFunction(_engine, "get [Symbol.species]", (thisObj, _) => thisObj, 0, PropertyFlag.Configurable),
+                get: new ClrFunction(_engine, "get [Symbol.species]", (thisObj, _) => thisObj, 0,
+                    PropertyFlag.Configurable),
                 set: Undefined, PropertyFlag.Configurable)
         };
         SetSymbols(symbols);
@@ -70,7 +78,7 @@ internal sealed class PromiseConstructor : Constructor
             Throw.TypeError(_realm, "Constructor Promise requires 'new'");
         }
 
-        if (arguments.At(0) is not ICallable executor)
+        if (arguments.At(0).Obj is not ICallable executor)
         {
             Throw.TypeError(_realm, $"Promise executor {(arguments.At(0))} is not a function");
             return null;
@@ -104,7 +112,7 @@ internal sealed class PromiseConstructor : Constructor
             Throw.TypeError(_realm, "PromiseResolve called on non-object");
         }
 
-        if (thisObject is not IConstructor)
+        if (thisObject.Obj is not IConstructor)
         {
             Throw.TypeError(_realm, "Promise.resolve invoked on a non-constructor value");
         }
@@ -113,7 +121,7 @@ internal sealed class PromiseConstructor : Constructor
         return PromiseResolve(thisObject, x);
     }
 
-    private JsObject WithResolvers(JsValue thisObject, JsCallArguments arguments)
+    private JsValue WithResolvers(JsValue thisObject, JsCallArguments arguments)
     {
         var promiseCapability = NewPromiseCapability(_engine, thisObject);
         var obj = OrdinaryObjectCreate(_engine, _engine.Realm.Intrinsics.Object.PrototypeObject);
@@ -156,7 +164,7 @@ internal sealed class PromiseConstructor : Constructor
             Throw.TypeError(_realm, "Promise.reject called on non-object");
         }
 
-        if (thisObject is not IConstructor)
+        if (thisObject.Obj is not IConstructor)
         {
             Throw.TypeError(_realm, "Promise.reject invoked on a non-constructor value");
         }
@@ -199,7 +207,8 @@ internal sealed class PromiseConstructor : Constructor
     // This helper methods executes the first 6 steps in the specs belonging to static Promise methods like all, any etc.
     // If it returns false, that means it has an error and it is already rejected
     // If it returns true, the logic specific to the calling function should continue executing
-    private bool TryGetPromiseCapabilityAndIterator(JsValue thisObject, JsCallArguments arguments, string callerName, out PromiseCapability capability, out ICallable promiseResolve, out IteratorInstance iterator)
+    private bool TryGetPromiseCapabilityAndIterator(JsValue thisObject, JsCallArguments arguments, string callerName,
+        out PromiseCapability capability, out ICallable promiseResolve, out IteratorInstance iterator)
     {
         if (!thisObject.IsObject())
         {
@@ -252,7 +261,8 @@ internal sealed class PromiseConstructor : Constructor
     // https://tc39.es/ecma262/#sec-promise.all
     private JsValue All(JsValue thisObject, JsCallArguments arguments)
     {
-        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.all", out var capability, out var promiseResolve, out var iterator))
+        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.all", out var capability,
+                out var promiseResolve, out var iterator))
             return capability.PromiseInstance;
 
         var results = new List<JsValue>();
@@ -264,7 +274,7 @@ internal sealed class PromiseConstructor : Constructor
             // Note that "Undefined" is not null, thus the logic is sound, even though awkward
             // also note that it is important to check if we are done iterating.
             // if "then" method is sync then it will be resolved BEFORE the next iteration cycle
-            if (results.TrueForAll(static x => x is not null) && doneIterating)
+            if (results.TrueForAll(static x => !x.IsEmpty) && doneIterating)
             {
                 var array = _realm.Intrinsics.Array.ConstructFast(results);
                 capability.Resolve.Call(Undefined, array);
@@ -301,11 +311,11 @@ internal sealed class PromiseConstructor : Constructor
                 // note that null here is important
                 // it will help to detect if all inner promises were resolved
                 // In F# it would be Option<JsValue>
-                results.Add(null!);
+                results.Add(default);
 
                 var item = promiseResolve.Call(thisObject, value);
                 var thenProps = item.Get("then");
-                if (thenProps is ICallable thenFunc)
+                if (thenProps.Obj is ICallable thenFunc)
                 {
                     var capturedIndex = index;
 
@@ -343,6 +353,7 @@ internal sealed class PromiseConstructor : Constructor
             {
                 // ignore any errors from closing the iterator
             }
+
             capability.Reject.Call(Undefined, e.Error);
             return capability.PromiseInstance;
         }
@@ -353,7 +364,8 @@ internal sealed class PromiseConstructor : Constructor
     // https://tc39.es/ecma262/#sec-promise.allsettled
     private JsValue AllSettled(JsValue thisObject, JsCallArguments arguments)
     {
-        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.allSettled", out var capability, out var promiseResolve, out var iterator))
+        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.allSettled", out var capability,
+                out var promiseResolve, out var iterator))
             return capability.PromiseInstance;
 
         var results = new List<JsValue>();
@@ -365,7 +377,7 @@ internal sealed class PromiseConstructor : Constructor
             // Note that "Undefined" is not null, thus the logic is sound, even though awkward
             // also note that it is important to check if we are done iterating.
             // if "then" method is sync then it will be resolved BEFORE the next iteration cycle
-            if (results.TrueForAll(static x => x is not null) && doneIterating)
+            if (results.TrueForAll(static x => !x.IsEmpty) && doneIterating)
             {
                 var array = _realm.Intrinsics.Array.ConstructFast(results);
                 capability.Resolve.Call(Undefined, array);
@@ -402,11 +414,11 @@ internal sealed class PromiseConstructor : Constructor
                 // note that null here is important
                 // it will help to detect if all inner promises were resolved
                 // In F# it would be Option<JsValue>
-                results.Add(null!);
+                results.Add(default);
 
                 var item = promiseResolve.Call(thisObject, value);
                 var thenProps = item.Get("then");
-                if (thenProps is ICallable thenFunc)
+                if (thenProps.Obj is ICallable thenFunc)
                 {
                     var capturedIndex = index;
 
@@ -466,6 +478,7 @@ internal sealed class PromiseConstructor : Constructor
             {
                 // ignore any errors from closing the iterator
             }
+
             capability.Reject.Call(Undefined, e.Error);
             return capability.PromiseInstance;
         }
@@ -476,7 +489,8 @@ internal sealed class PromiseConstructor : Constructor
     // https://tc39.es/ecma262/#sec-promise.any
     private JsValue Any(JsValue thisObject, JsCallArguments arguments)
     {
-        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.any", out var capability, out var promiseResolve, out var iterator))
+        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.any", out var capability,
+                out var promiseResolve, out var iterator))
         {
             return capability.PromiseInstance;
         }
@@ -491,7 +505,7 @@ internal sealed class PromiseConstructor : Constructor
             // also note that it is important to check if we are done iterating.
             // if "then" method is sync then it will be resolved BEFORE the next iteration cycle
 
-            if (errors.TrueForAll(static x => x is not null) && doneIterating)
+            if (errors.TrueForAll(static x => !x.IsEmpty) && doneIterating)
             {
                 var array = _realm.Intrinsics.Array.ConstructFast(errors);
 
@@ -525,6 +539,7 @@ internal sealed class PromiseConstructor : Constructor
                     {
                         throw;
                     }
+
                     errors.Add(e.Error);
                     continue;
                 }
@@ -575,6 +590,7 @@ internal sealed class PromiseConstructor : Constructor
             {
                 // ignore any errors from closing the iterator
             }
+
             capability.Reject.Call(Undefined, e.Error);
             return capability.PromiseInstance;
         }
@@ -585,7 +601,8 @@ internal sealed class PromiseConstructor : Constructor
     // https://tc39.es/ecma262/#sec-promise.race
     private JsValue Race(JsValue thisObject, JsCallArguments arguments)
     {
-        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.race", out var capability, out var promiseResolve, out var iterator))
+        if (!TryGetPromiseCapabilityAndIterator(thisObject, arguments, "Promise.race", out var capability,
+                out var promiseResolve, out var iterator))
             return capability.PromiseInstance;
 
         // 7. Let result be PerformPromiseRace(iteratorRecord, C, promiseCapability, promiseResolve).
@@ -628,6 +645,7 @@ internal sealed class PromiseConstructor : Constructor
             {
                 // ignore any errors from closing the iterator
             }
+
             capability.Reject.Call(Undefined, e.Error);
             return capability.PromiseInstance;
         }
@@ -682,7 +700,7 @@ internal sealed class PromiseConstructor : Constructor
     // 12. Return promiseCapability.
     internal static PromiseCapability NewPromiseCapability(Engine engine, JsValue c)
     {
-        var ctor = AssertConstructor(engine, c);
+        var ctor = JsValue.AssertConstructor(engine, c);
 
         JsValue? resolveArg = null;
         JsValue? rejectArg = null;

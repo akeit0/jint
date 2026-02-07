@@ -54,7 +54,7 @@ internal sealed class CollatorPrototype : Prototype
 
     private JsCollator ValidateCollator(JsValue thisObject)
     {
-        if (thisObject is JsCollator collator)
+        if (thisObject.Obj is  JsCollator collator)
         {
             return collator;
         }

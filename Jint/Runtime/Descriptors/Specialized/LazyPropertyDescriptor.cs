@@ -10,16 +10,23 @@ internal sealed class LazyPropertyDescriptor<T> : PropertyDescriptor
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LazyPropertyDescriptor(T state, Func<T, JsValue> resolver, PropertyFlag flags)
-        : base(null, flags | PropertyFlag.CustomJsValue)
+        : base(default, flags | PropertyFlag.CustomJsValue)
     {
         _flags &= ~PropertyFlag.NonData;
         _state = state;
         _resolver = resolver;
     }
 
-    protected internal override JsValue? CustomValue
+    protected internal override JsValue CustomValue
     {
-        get => _value ??= _resolver(_state);
+        get
+        {
+            if (_value.IsEmpty)
+            {
+                _value = _resolver(_state);
+            }
+            return _value;
+        }
         set => _value = value;
     }
 }

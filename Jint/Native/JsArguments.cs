@@ -157,7 +157,7 @@ public sealed class JsArguments : ObjectInstance
 
         if (desc.IsAccessorDescriptor())
         {
-            if (desc.Set.Obj is not ICallable setter)
+            if (desc.Set is not ICallable setter)
             {
                 return false;
             }

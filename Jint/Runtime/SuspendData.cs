@@ -42,7 +42,7 @@ internal sealed class ForOfSuspendData : SuspendData
     /// The current value being processed (from TryIteratorStep).
     /// Needed when yield happens during destructuring or body execution.
     /// </summary>
-    public JsValue? CurrentValue { get; set; }
+    public JsValue CurrentValue { get; set; }
 
     /// <summary>
     /// The accumulated result value (v) from previous iterations.

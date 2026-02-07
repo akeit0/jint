@@ -21,7 +21,7 @@ internal sealed class AggregateErrorConstructor : Constructor
     {
         _prototype = errorConstructor;
         PrototypeObject = new AggregateErrorPrototype(engine, realm, this, errorConstructor.PrototypeObject);
-        _length = new PropertyDescriptor(JsNumber.PositiveTwo, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(2, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

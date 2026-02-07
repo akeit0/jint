@@ -45,7 +45,7 @@ internal sealed class ListFormatPrototype : Prototype
 
     private JsListFormat ValidateListFormat(JsValue thisObject)
     {
-        if (thisObject is JsListFormat listFormat)
+        if (thisObject.Obj is  JsListFormat listFormat)
         {
             return listFormat;
         }

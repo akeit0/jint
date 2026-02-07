@@ -30,12 +30,19 @@ internal sealed class ShadowRealmPrototype : Prototype
         {
             ["length"] = new PropertyDescriptor(0, PropertyFlag.Configurable),
             ["constructor"] = new PropertyDescriptor(_constructor, PropertyFlag.NonEnumerable),
-            ["evaluate"] = new PropertyDescriptor(new ClrFunction(Engine, "evaluate", Evaluate, 1, PropertyFlag.Configurable), propertyFlags),
-            ["importValue"] = new PropertyDescriptor(new ClrFunction(Engine, "importValue", ImportValue, 2, PropertyFlag.Configurable), propertyFlags),
+            ["evaluate"] =
+                new PropertyDescriptor(new ClrFunction(Engine, "evaluate", Evaluate, 1, PropertyFlag.Configurable),
+                    propertyFlags),
+            ["importValue"] =
+                new PropertyDescriptor(
+                    new ClrFunction(Engine, "importValue", ImportValue, 2, PropertyFlag.Configurable), propertyFlags),
         };
         SetProperties(properties);
 
-        var symbols = new SymbolDictionary(1) { [GlobalSymbolRegistry.ToStringTag] = new PropertyDescriptor("ShadowRealm", false, false, true) };
+        var symbols = new SymbolDictionary(1)
+        {
+            [GlobalSymbolRegistry.ToStringTag] = new PropertyDescriptor("ShadowRealm", false, false, true)
+        };
         SetSymbols(symbols);
     }
 
@@ -59,7 +66,7 @@ internal sealed class ShadowRealmPrototype : Prototype
             : parserOptions;
         var parser = _engine.GetParserFor(adjustedParserOptions);
 
-        return shadowRealm.PerformShadowRealmEval(sourceText.AsString(), parserOptions, parser, _realm);
+        return shadowRealm.PerformShadowRealmEval(sourceText.AsString()!, parserOptions, parser, _realm);
     }
 
     /// <summary>
@@ -88,7 +95,7 @@ internal sealed class ShadowRealmPrototype : Prototype
 
     private ShadowRealm ValidateShadowRealmObject(JsValue thisObject)
     {
-        if (thisObject is ShadowRealm shadowRealm)
+        if (thisObject.Obj is ShadowRealm shadowRealm)
         {
             return shadowRealm;
         }

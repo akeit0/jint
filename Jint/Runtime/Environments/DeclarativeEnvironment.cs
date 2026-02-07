@@ -25,7 +25,7 @@ internal class DeclarativeEnvironment : Environment
 
     internal sealed override bool HasBinding(Key name) => _dictionary is not null && _dictionary.ContainsKey(name);
 
-    internal override bool TryGetBinding(BindingName name, bool strict, [NotNullWhen(true)] out JsValue? value)
+    internal override bool TryGetBinding(BindingName name, bool strict, out JsValue value)
     {
         if (_dictionary?.TryGetValue(name.Key, out var binding) == true)
         {
@@ -33,7 +33,7 @@ internal class DeclarativeEnvironment : Environment
             return true;
         }
 
-        value = null;
+        value = default;
         return false;
     }
 
@@ -129,7 +129,7 @@ internal class DeclarativeEnvironment : Environment
         }
 
         ThrowUninitializedBindingError(name);
-        return null!;
+        return default;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -215,12 +215,12 @@ internal static class DictionaryExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void CreateMutableBinding<T>(this T dictionary, Key name, bool canBeDeleted = false) where T : IEngineDictionary<Key, Binding>
     {
-        dictionary[name] = new Binding(null!, canBeDeleted, mutable: true, strict: false);
+        dictionary[name] = new Binding(default, canBeDeleted, mutable: true, strict: false);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void CreateImmutableBinding<T>(this T dictionary, Key name, bool strict = true) where T : IEngineDictionary<Key, Binding>
     {
-        dictionary[name] = new Binding(null!, canBeDeleted: false, mutable: false, strict);
+        dictionary[name] = new Binding(default, canBeDeleted: false, mutable: false, strict);
     }
 }

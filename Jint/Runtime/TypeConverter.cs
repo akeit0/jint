@@ -51,9 +51,9 @@ public static class TypeConverter
         {
             var hint = preferredType switch
             {
-                Types.String => JsString.StringString,
-                Types.Number => JsString.NumberString,
-                _ => JsString.DefaultString
+                Types.String => "string",
+                Types.Number => "number",
+                _ => "default"
             };
 
             var str = exoticToPrim.Call(oi, hint);
@@ -206,37 +206,37 @@ public static class TypeConverter
                 return ToNumber(ToPrimitive(o, Types.Number));
         }
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static JsNumber ToJsNumber(JsValue o)
-    {
-        return o.IsNumber() ? (JsNumber) o : ToJsNumberUnlikely(o);
-    }
-
-    private static JsNumber ToJsNumberUnlikely(JsValue o)
-    {
-        var type = o._type & ~InternalTypes.InternalFlags;
-
-        switch (type)
-        {
-            case InternalTypes.Undefined:
-                return JsNumber.DoubleNaN;
-            case InternalTypes.Null:
-                return JsNumber.PositiveZero;
-            case InternalTypes.Boolean:
-                return ((JsBoolean) o)._value ? JsNumber.PositiveOne : JsNumber.PositiveZero;
-            case InternalTypes.String:
-                return new JsNumber(ToNumber(o.ToString()));
-            case InternalTypes.Symbol:
-            case InternalTypes.BigInt:
-            case InternalTypes.Empty:
-                // TODO proper TypeError would require Engine instance and a lot of API changes
-                Throw.TypeErrorNoEngine("Cannot convert a " + type + " value to a number");
-                return JsNumber.PositiveZero;
-            default:
-                return new JsNumber(ToNumber(ToPrimitive(o, Types.Number)));
-        }
-    }
+    //
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // public static JsNumber ToJsNumber(JsValue o)
+    // {
+    //     return o.IsNumber() ? (JsNumber) o : ToJsNumberUnlikely(o);
+    // }
+    //
+    // private static JsNumber ToJsNumberUnlikely(JsValue o)
+    // {
+    //     var type = o._type & ~InternalTypes.InternalFlags;
+    //
+    //     switch (type)
+    //     {
+    //         case InternalTypes.Undefined:
+    //             return JsValue.NaN;
+    //         case InternalTypes.Null:
+    //             return JsValue.PositiveZero;
+    //         case InternalTypes.Boolean:
+    //             return ((JsBoolean) o)._value ? 1 : JsValue.PositiveZero;
+    //         case InternalTypes.String:
+    //             return new JsNumber(ToNumber(o.ToString()));
+    //         case InternalTypes.Symbol:
+    //         case InternalTypes.BigInt:
+    //         case InternalTypes.Empty:
+    //             // TODO proper TypeError would require Engine instance and a lot of API changes
+    //             Throw.TypeErrorNoEngine("Cannot convert a " + type + " value to a number");
+    //             return JsValue.PositiveZero;
+    //         default:
+    //             return new JsNumber(ToNumber(ToPrimitive(o, Types.Number)));
+    //     }
+    // }
 
     private static double ToNumber(string input)
     {
@@ -442,10 +442,10 @@ public static class TypeConverter
     /// </summary>
     public static int ToInt32(JsValue o)
     {
-        if (o._type == InternalTypes.Integer)
-        {
-            return o.AsInteger();
-        }
+        // if (o._type == InternalTypes.Integer)
+        // {
+        //     return o.AsInteger();
+        // }
 
         var doubleVal = ToNumber(o);
         if (doubleVal >= -(double) int.MinValue && doubleVal <= int.MaxValue)
@@ -462,10 +462,10 @@ public static class TypeConverter
     /// </summary>
     public static uint ToUint32(JsValue o)
     {
-        if (o._type == InternalTypes.Integer)
-        {
-            return (uint) o.AsInteger();
-        }
+        // if (o._type == InternalTypes.Integer)
+        // {
+        //     return (uint) o.AsInteger();
+        // }
 
         var doubleVal = ToNumber(o);
         if (doubleVal is >= 0.0 and <= uint.MaxValue)
@@ -482,14 +482,14 @@ public static class TypeConverter
     /// </summary>
     public static ushort ToUint16(JsValue o)
     {
-        if (o._type == InternalTypes.Integer)
-        {
-            var integer = o.AsInteger();
-            if (integer is >= 0 and <= ushort.MaxValue)
-            {
-                return (ushort) integer;
-            }
-        }
+        // if (o._type == InternalTypes.Integer)
+        // {
+        //     var integer = o.AsInteger();
+        //     if (integer is >= 0 and <= ushort.MaxValue)
+        //     {
+        //         return (ushort) integer;
+        //     }
+        // }
 
         var number = ToNumber(o);
         if (double.IsNaN(number) || number == 0 || double.IsInfinity(number))
@@ -512,9 +512,10 @@ public static class TypeConverter
     /// </summary>
     internal static double ToInt16(JsValue o)
     {
-        return o._type == InternalTypes.Integer
-            ? (short) o.AsInteger()
-            : (short) (long) ToNumber(o);
+        return (short) (long) ToNumber(o);
+        // return o._type == InternalTypes.Integer
+        //     ? (short) o.AsInteger()
+        //     : (short) (long) ToNumber(o);
     }
 
     /// <summary>
@@ -522,9 +523,10 @@ public static class TypeConverter
     /// </summary>
     internal static double ToInt8(JsValue o)
     {
-        return o._type == InternalTypes.Integer
-            ? (sbyte) o.AsInteger()
-            : (sbyte) (long) ToNumber(o);
+        return (sbyte) (long) ToNumber(o);
+        // return o._type == InternalTypes.Integer
+        //     ? (sbyte) o.AsInteger()
+        //     : (sbyte) (long) ToNumber(o);
     }
 
     /// <summary>
@@ -532,9 +534,10 @@ public static class TypeConverter
     /// </summary>
     internal static double ToUint8(JsValue o)
     {
-        return o._type == InternalTypes.Integer
-            ? (byte) o.AsInteger()
-            : (byte) (long) ToNumber(o);
+        return (byte) (long) ToNumber(o);
+        // return o._type == InternalTypes.Integer
+        //     ? (byte) o.AsInteger()
+        //     : (byte) (long) ToNumber(o);
     }
 
     /// <summary>
@@ -542,14 +545,14 @@ public static class TypeConverter
     /// </summary>
     internal static byte ToUint8Clamp(JsValue o)
     {
-        if (o._type == InternalTypes.Integer)
-        {
-            var intValue = o.AsInteger();
-            if (intValue is > -1 and < 256)
-            {
-                return (byte) intValue;
-            }
-        }
+        // if (o._type == InternalTypes.Integer)
+        // {
+        //     var intValue = o.AsInteger();
+        //     if (intValue is > -1 and < 256)
+        //     {
+        //         return (byte) intValue;
+        //     }
+        // }
 
         return ToUint8ClampUnlikely(o);
     }
@@ -596,21 +599,21 @@ public static class TypeConverter
     /// </summary>
     public static BigInteger ToBigInt(JsValue value)
     {
-        return value is JsBigInt bigInt
-            ? bigInt.value
+        return value.IsBigInt()
+            ? value.AsBigInt().value
             : ToBigIntUnlikely(value);
     }
 
     private static BigInteger ToBigIntUnlikely(JsValue value)
     {
         var prim = ToPrimitive(value, Types.Number);
-        switch (prim.Type)
+        switch (prim.Tag)
         {
-            case Types.BigInt:
-                return ((JsBigInt) prim).value;
-            case Types.Boolean:
-                return ((JsBoolean) prim)._value ? BigInteger.One : BigInteger.Zero;
-            case Types.String:
+            case Tag.JS_TAG_BIG_INT:
+                return value.AsBigInt().value;
+            case Tag.JS_TAG_BOOL:
+                return value.GetInt32Value() != 0 ? BigInteger.One : BigInteger.Zero;
+            case Tag.JS_TAG_STRING:
                 return StringToBigInt(prim.ToString());
             default:
                 Throw.TypeErrorNoEngine("Cannot convert a " + prim.Type + " to a BigInt");
@@ -620,24 +623,9 @@ public static class TypeConverter
 
     public static JsBigInt ToJsBigInt(JsValue value)
     {
-        return value as JsBigInt ?? ToJsBigIntUnlikely(value);
-    }
-
-    private static JsBigInt ToJsBigIntUnlikely(JsValue value)
-    {
-        var prim = ToPrimitive(value, Types.Number);
-        switch (prim.Type)
-        {
-            case Types.BigInt:
-                return (JsBigInt) prim;
-            case Types.Boolean:
-                return ((JsBoolean) prim)._value ? JsBigInt.One : JsBigInt.Zero;
-            case Types.String:
-                return new JsBigInt(StringToBigInt(prim.ToString()));
-            default:
-                Throw.TypeErrorNoEngine("Cannot convert a " + prim.Type + " to a BigInt");
-                return JsBigInt.One;
-        }
+        return value.IsBigInt()
+            ? value.AsBigInt()
+            : new JsBigInt(ToBigIntUnlikely(value));
     }
 
     internal static BigInteger StringToBigInt(string str)

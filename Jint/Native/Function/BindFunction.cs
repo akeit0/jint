@@ -20,7 +20,7 @@ public sealed class BindFunction : ObjectInstance, IConstructor, ICallable
     {
         _realm = realm;
         _prototype = proto;
-        BoundTargetFunction = targetFunction;
+        BoundTargetFunction = targetFunction as Function;
         BoundThis = boundThis;
         BoundArguments = boundArgs;
     }
@@ -28,7 +28,7 @@ public sealed class BindFunction : ObjectInstance, IConstructor, ICallable
     /// <summary>
     /// The wrapped function object.
     /// </summary>
-    public JsValue BoundTargetFunction { get; }
+    public Function? BoundTargetFunction { get; }
 
     /// <summary>
     /// The value that is always passed as the this value when calling the wrapped function.
@@ -42,7 +42,7 @@ public sealed class BindFunction : ObjectInstance, IConstructor, ICallable
 
     JsValue ICallable.Call(JsValue thisObject, params JsCallArguments arguments)
     {
-        var f = BoundTargetFunction as Function;
+        var f = BoundTargetFunction;
         if (f is null)
         {
             Throw.TypeError(_realm);
@@ -65,9 +65,9 @@ public sealed class BindFunction : ObjectInstance, IConstructor, ICallable
 
         var args = CreateArguments(arguments);
 
-        if (ReferenceEquals(this, newTarget))
+        if (ReferenceEquals(this, newTarget.Obj))
         {
-            newTarget = BoundTargetFunction;
+            newTarget = BoundTargetFunction!;
         }
 
         var value = target.Construct(args, newTarget);
@@ -76,7 +76,7 @@ public sealed class BindFunction : ObjectInstance, IConstructor, ICallable
         return value;
     }
 
-    internal override bool OrdinaryHasInstance(JsValue v)
+    internal override bool OrdinaryHasInstance(JsObjectBase v)
     {
         var f = BoundTargetFunction as Function;
         if (f is null)
@@ -95,7 +95,7 @@ public sealed class BindFunction : ObjectInstance, IConstructor, ICallable
         return combined;
     }
 
-    internal override bool IsConstructor => BoundTargetFunction.IsConstructor;
+    internal override bool IsConstructor => BoundTargetFunction is { IsConstructor: true };
 
     public override string ToString() => "function () { [native code] }";
 }

@@ -70,7 +70,7 @@ internal sealed class DataViewPrototype : Prototype
     /// </summary>
     private JsValue Buffer(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsDataView;
+        var o = thisObject .Obj as JsDataView;
         if (o is null)
         {
             Throw.TypeError(_realm, "Method get DataView.prototype.buffer called on incompatible receiver " + thisObject);
@@ -84,7 +84,7 @@ internal sealed class DataViewPrototype : Prototype
     /// </summary>
     private JsValue ByteLength(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsDataView;
+        var o = thisObject .Obj as JsDataView;
         if (o is null)
         {
             Throw.TypeError(_realm, "Method get DataView.prototype.byteLength called on incompatible receiver " + thisObject);
@@ -99,7 +99,7 @@ internal sealed class DataViewPrototype : Prototype
         var buffer = o._viewedArrayBuffer!;
         buffer.AssertNotDetached();
 
-        return JsNumber.Create(viewRecord.ViewByteLength);
+        return (viewRecord.ViewByteLength);
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ internal sealed class DataViewPrototype : Prototype
     /// </summary>
     private JsValue ByteOffset(JsValue thisObject, JsCallArguments arguments)
     {
-        var o = thisObject as JsDataView;
+        var o = thisObject .Obj as JsDataView;
         if (o is null)
         {
             Throw.TypeError(_realm, "Method get DataView.prototype.byteOffset called on incompatible receiver " + thisObject);
@@ -122,7 +122,7 @@ internal sealed class DataViewPrototype : Prototype
         var buffer = o._viewedArrayBuffer!;
         buffer.AssertNotDetached();
 
-        return JsNumber.Create(o._byteOffset);
+        return (o._byteOffset);
     }
 
     private JsValue GetBigInt64(JsValue thisObject, JsCallArguments arguments)
@@ -137,47 +137,47 @@ internal sealed class DataViewPrototype : Prototype
 
     private JsValue GetFloat16(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsBoolean.False), TypedArrayElementType.Float16);
+        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsValue.False), TypedArrayElementType.Float16);
     }
 
     private JsValue GetFloat32(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsBoolean.False), TypedArrayElementType.Float32);
+        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsValue.False), TypedArrayElementType.Float32);
     }
 
     private JsValue GetFloat64(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsBoolean.False), TypedArrayElementType.Float64);
+        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsValue.False), TypedArrayElementType.Float64);
     }
 
     private JsValue GetInt8(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), JsBoolean.True, TypedArrayElementType.Int8);
+        return GetViewValue(thisObject, arguments.At(0), JsValue.True, TypedArrayElementType.Int8);
     }
 
     private JsValue GetInt16(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsBoolean.False), TypedArrayElementType.Int16);
+        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsValue.False), TypedArrayElementType.Int16);
     }
 
     private JsValue GetInt32(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsBoolean.False), TypedArrayElementType.Int32);
+        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsValue.False), TypedArrayElementType.Int32);
     }
 
     private JsValue GetUint8(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), JsBoolean.True, TypedArrayElementType.Uint8);
+        return GetViewValue(thisObject, arguments.At(0), JsValue.True, TypedArrayElementType.Uint8);
     }
 
     private JsValue GetUint16(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsBoolean.False), TypedArrayElementType.Uint16);
+        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsValue.False), TypedArrayElementType.Uint16);
     }
 
     private JsValue GetUint32(JsValue thisObject, JsCallArguments arguments)
     {
-        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsBoolean.False), TypedArrayElementType.Uint32);
+        return GetViewValue(thisObject, arguments.At(0), arguments.At(1, JsValue.False), TypedArrayElementType.Uint32);
     }
 
     private JsValue SetBigInt64(JsValue thisObject, JsCallArguments arguments)
@@ -192,47 +192,47 @@ internal sealed class DataViewPrototype : Prototype
 
     private JsValue SetFloat16(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsBoolean.False), TypedArrayElementType.Float16, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsValue.False), TypedArrayElementType.Float16, arguments.At(1));
     }
 
     private JsValue SetFloat32(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsBoolean.False), TypedArrayElementType.Float32, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsValue.False), TypedArrayElementType.Float32, arguments.At(1));
     }
 
     private JsValue SetFloat64(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsBoolean.False), TypedArrayElementType.Float64, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsValue.False), TypedArrayElementType.Float64, arguments.At(1));
     }
 
     private JsValue SetInt8(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), JsBoolean.True, TypedArrayElementType.Int8, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), JsValue.True, TypedArrayElementType.Int8, arguments.At(1));
     }
 
     private JsValue SetInt16(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsBoolean.False), TypedArrayElementType.Int16, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsValue.False), TypedArrayElementType.Int16, arguments.At(1));
     }
 
     private JsValue SetInt32(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsBoolean.False), TypedArrayElementType.Int32, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsValue.False), TypedArrayElementType.Int32, arguments.At(1));
     }
 
     private JsValue SetUint8(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), JsBoolean.True, TypedArrayElementType.Uint8, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), JsValue.True, TypedArrayElementType.Uint8, arguments.At(1));
     }
 
     private JsValue SetUint16(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsBoolean.False), TypedArrayElementType.Uint16, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsValue.False), TypedArrayElementType.Uint16, arguments.At(1));
     }
 
     private JsValue SetUint32(JsValue thisObject, JsCallArguments arguments)
     {
-        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsBoolean.False), TypedArrayElementType.Uint32, arguments.At(1));
+        return SetViewValue(thisObject, arguments.At(0), arguments.At(2, JsValue.False), TypedArrayElementType.Uint32, arguments.At(1));
     }
 
     /// <summary>

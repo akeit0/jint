@@ -42,7 +42,7 @@ internal sealed class JintUnaryExpression : JintExpression
             if (value is not null)
             {
                 // valid for caching
-                var evaluatedValue = EvaluateMinus(value);
+                var evaluatedValue = EvaluateMinus(value.Value);
                 return new JintConstantExpression(expression, evaluatedValue);
             }
         }
@@ -72,12 +72,12 @@ internal sealed class JintUnaryExpression : JintExpression
             var result = _argument.Evaluate(context);
             JsValue v;
 
-            if (result is Reference rf)
+            if (result.Obj is Reference rf)
             {
                 if (rf.IsUnresolvableReference)
                 {
                     engine._referencePool.Return(rf);
-                    return JsString.UndefinedString;
+                    return "undefined";
                 }
 
                 v = engine.GetValue(rf, returnReferenceToPool: true);
@@ -94,29 +94,29 @@ internal sealed class JintUnaryExpression : JintExpression
         {
             if (v.IsUndefined())
             {
-                return JsString.UndefinedString;
+                return "undefined";
             }
 
             if (v.IsNull())
             {
-                return JsString.ObjectString;
+                return "object";
             }
 
             switch (v.Type)
             {
-                case Types.Boolean: return JsString.BooleanString;
-                case Types.Number: return JsString.NumberString;
-                case Types.BigInt: return JsString.BigIntString;
-                case Types.String: return JsString.StringString;
-                case Types.Symbol: return JsString.SymbolString;
+                case Types.Boolean: return "boolean";
+                case Types.Number: return "number";
+                case Types.BigInt: return "BigInt";
+                case Types.String: return "string";
+                case Types.Symbol: return "symbol";
             }
 
             if (v.IsCallable)
             {
-                return JsString.FunctionString;
+                return "function";
             }
 
-            return JsString.ObjectString;
+            return "object";
         }
     }
 
@@ -145,11 +145,11 @@ internal sealed class JintUnaryExpression : JintExpression
                         return JsValue.Undefined;
                     }
 
-                    if (context.OperatorOverloadingAllowed &&
-                        TryOperatorOverloading(context, v, "op_UnaryPlus", out var result))
-                    {
-                        return result;
-                    }
+                    // if (context.OperatorOverloadingAllowed &&
+                    //     TryOperatorOverloading(context, v, "op_UnaryPlus", out var result))
+                    // {
+                    //     return result;
+                    // }
 
                     return TypeConverter.ToNumber(v);
                 }
@@ -161,11 +161,11 @@ internal sealed class JintUnaryExpression : JintExpression
                         return JsValue.Undefined;
                     }
 
-                    if (context.OperatorOverloadingAllowed &&
-                        TryOperatorOverloading(context, v, "op_UnaryNegation", out var result))
-                    {
-                        return result;
-                    }
+                    // if (context.OperatorOverloadingAllowed &&
+                    //     TryOperatorOverloading(context, v, "op_UnaryNegation", out var result))
+                    // {
+                    //     return result;
+                    // }
 
                     return EvaluateMinus(v);
                 }
@@ -177,19 +177,19 @@ internal sealed class JintUnaryExpression : JintExpression
                         return JsValue.Undefined;
                     }
 
-                    if (context.OperatorOverloadingAllowed &&
-                        TryOperatorOverloading(context, v, "op_OnesComplement", out var result))
-                    {
-                        return result;
-                    }
+                    // if (context.OperatorOverloadingAllowed &&
+                    //     TryOperatorOverloading(context, v, "op_OnesComplement", out var result))
+                    // {
+                    //     return result;
+                    // }
 
                     var value = TypeConverter.ToNumeric(v);
                     if (value.IsNumber())
                     {
-                        return JsNumber.Create(~TypeConverter.ToInt32(value));
+                        return (~TypeConverter.ToInt32(value));
                     }
 
-                    return JsBigInt.Create(~value.AsBigInt());
+                    return (~value.AsBigInt().value);
                 }
             case Operator.LogicalNot:
                 {
@@ -199,20 +199,20 @@ internal sealed class JintUnaryExpression : JintExpression
                         return JsValue.Undefined;
                     }
 
-                    if (context.OperatorOverloadingAllowed &&
-                        TryOperatorOverloading(context, v, "op_LogicalNot", out var result))
-                    {
-                        return result;
-                    }
+                    // if (context.OperatorOverloadingAllowed &&
+                    //     TryOperatorOverloading(context, v, "op_LogicalNot", out var result))
+                    // {
+                    //     return result;
+                    // }
 
-                    return !TypeConverter.ToBoolean(v) ? JsBoolean.True : JsBoolean.False;
+                    return !TypeConverter.ToBoolean(v) ? JsValue.True : JsValue.False;
                 }
 
             case Operator.Delete:
                 // https://262.ecma-international.org/5.1/#sec-11.4.1
-                if (_argument.Evaluate(context) is not Reference r)
+                if (_argument.Evaluate(context).Obj is not Reference r)
                 {
-                    return JsBoolean.True;
+                    return JsValue.True;
                 }
 
                 if (r.IsUnresolvableReference)
@@ -223,7 +223,7 @@ internal sealed class JintUnaryExpression : JintExpression
                     }
 
                     engine._referencePool.Return(r);
-                    return JsBoolean.True;
+                    return JsValue.True;
                 }
 
                 if (r.IsPropertyReference)
@@ -252,7 +252,7 @@ internal sealed class JintUnaryExpression : JintExpression
                     }
 
                     engine._referencePool.Return(r);
-                    return deleteStatus ? JsBoolean.True : JsBoolean.False;
+                    return deleteStatus ? JsValue.True : JsValue.False;
                 }
 
                 if (r.Strict)
@@ -260,10 +260,10 @@ internal sealed class JintUnaryExpression : JintExpression
                     Throw.SyntaxError(engine.Realm);
                 }
 
-                var bindings = (Environment) r.Base;
+                var bindings = (Environment) r.Base.Obj!;
                 engine._referencePool.Return(r);
 
-                return bindings.DeleteBinding(r.ReferencedName.ToString()) ? JsBoolean.True : JsBoolean.False;
+                return bindings.DeleteBinding(r.ReferencedName.ToString()) ? JsValue.True : JsValue.False;
 
             case Operator.Void:
                 _argument.GetValue(context);
@@ -272,7 +272,7 @@ internal sealed class JintUnaryExpression : JintExpression
 
             default:
                 Throw.ArgumentException();
-                return null;
+                return default;
         }
     }
 
@@ -283,57 +283,57 @@ internal sealed class JintUnaryExpression : JintExpression
             var asInteger = value.AsInteger();
             if (asInteger != 0)
             {
-                return JsNumber.Create(asInteger * -1);
+                return (asInteger * -1);
             }
         }
 
         value = TypeConverter.ToNumeric(value);
         if (value.IsNumber())
         {
-            var n = ((JsNumber) value)._value;
-            return double.IsNaN(n) ? JsNumber.DoubleNaN : JsNumber.Create(n * -1);
+            var n = value.GetFloat64Value();
+            return double.IsNaN(n) ? JsValue.NaN : (n * -1);
         }
 
-        var bigInt = value.AsBigInt();
-        return JsBigInt.Create(BigInteger.Negate(bigInt));
+        var bigInt = value.AsBigInt().value;
+        return (BigInteger.Negate(bigInt));
     }
 
-    internal static bool TryOperatorOverloading(EvaluationContext context, JsValue value, string clrName, [NotNullWhen(true)] out JsValue? result)
-    {
-        var operand = value.ToObject();
-
-        if (operand != null)
-        {
-            var operandType = operand.GetType();
-            var arguments = new[] { value };
-
-            var key = new OperatorKey(clrName, operandType);
-            var method = _knownOperators.GetOrAdd(key, _ =>
-            {
-                MethodInfo? foundMethod = null;
-                foreach (var x in operandType.GetOperatorOverloadMethods())
-                {
-                    if (string.Equals(x.Name, clrName, StringComparison.Ordinal) && x.GetParameters().Length == 1)
-                    {
-                        foundMethod = x;
-                        break;
-                    }
-                }
-
-                if (foundMethod != null)
-                {
-                    return new MethodDescriptor(foundMethod);
-                }
-                return null;
-            });
-
-            if (method != null)
-            {
-                result = method.Call(context.Engine, null, arguments);
-                return true;
-            }
-        }
-        result = null;
-        return false;
-    }
+    // internal static bool TryOperatorOverloading(EvaluationContext context, JsValue value, string clrName, [NotNullWhen(true)] out JsValue? result)
+    // {
+    //     var operand = value.ToObject();
+    //
+    //     if (operand != null)
+    //     {
+    //         var operandType = operand.GetType();
+    //         var arguments = new[] { value };
+    //
+    //         var key = new OperatorKey(clrName, operandType);
+    //         var method = _knownOperators.GetOrAdd(key, _ =>
+    //         {
+    //             MethodInfo? foundMethod = null;
+    //             foreach (var x in operandType.GetOperatorOverloadMethods())
+    //             {
+    //                 if (string.Equals(x.Name, clrName, StringComparison.Ordinal) && x.GetParameters().Length == 1)
+    //                 {
+    //                     foundMethod = x;
+    //                     break;
+    //                 }
+    //             }
+    //
+    //             if (foundMethod != null)
+    //             {
+    //                 return new MethodDescriptor(foundMethod);
+    //             }
+    //             return null;
+    //         });
+    //
+    //         if (method != null)
+    //         {
+    //             result = method.Call(context.Engine, null, arguments);
+    //             return true;
+    //         }
+    //     }
+    //     result = null;
+    //     return false;
+    // }
 }

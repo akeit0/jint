@@ -35,7 +35,7 @@ internal sealed class NumberFormatConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new NumberFormatPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(JsValue.PositiveZero, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

@@ -69,7 +69,7 @@ internal sealed class GlobalEnvironment : Environment
         return _global.HasProperty(name.Value);
     }
 
-    internal override bool TryGetBinding(BindingName name, bool strict, [NotNullWhen(true)] out JsValue? value)
+    internal override bool TryGetBinding(BindingName name, bool strict, out JsValue value)
     {
         if (_declarativeRecord._dictionary is not null && _declarativeRecord.TryGetBinding(name, strict, out value))
         {
@@ -98,7 +98,7 @@ internal sealed class GlobalEnvironment : Environment
     [MethodImpl(MethodImplOptions.NoInlining)]
     private bool TryGetBindingForGlobalParent(
         BindingName name,
-        [NotNullWhen(true)] out JsValue? value)
+         out JsValue value)
     {
         value = default;
 
@@ -394,7 +394,7 @@ internal sealed class GlobalEnvironment : Environment
         return names.ToArray();
     }
 
-    public override bool Equals(JsValue? other)
+    public override bool Equals(JsObjectBase? other)
     {
         return ReferenceEquals(this, other);
     }

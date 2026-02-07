@@ -133,11 +133,11 @@ internal sealed class JintAssignmentExpression : JintExpression
 
                         if (AreIntegerOperands(originalLeftValue, rval))
                         {
-                            newLeftValue = JsNumber.Create(originalLeftValue.AsInteger() - rval.AsInteger());
+                            newLeftValue = (originalLeftValue.AsInteger() - rval.AsInteger());
                         }
                         else if (JintBinaryExpression.AreNonBigIntOperands(originalLeftValue, rval))
                         {
-                            newLeftValue = JsNumber.Create(TypeConverter.ToNumber(originalLeftValue) - TypeConverter.ToNumber(rval));
+                            newLeftValue = (TypeConverter.ToNumber(originalLeftValue) - TypeConverter.ToNumber(rval));
                         }
                         else
                         {
@@ -350,7 +350,7 @@ internal sealed class JintAssignmentExpression : JintExpression
 
                         if (!originalLeftValue.IsBigInt() && !rval.IsBigInt())
                         {
-                            newLeftValue = JsNumber.Create(Math.Pow(TypeConverter.ToNumber(originalLeftValue), TypeConverter.ToNumber(rval)));
+                            newLeftValue = (Math.Pow(TypeConverter.ToNumber(originalLeftValue), TypeConverter.ToNumber(rval)));
                         }
                         else
                         {

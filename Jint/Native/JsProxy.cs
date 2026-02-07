@@ -139,7 +139,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
             if (targetDesc.IsDataDescriptor())
             {
                 var targetValue = targetDesc.Value;
-                if (!targetDesc.Configurable && !targetDesc.Writable && !SameValue(result, targetValue))
+                if (!targetDesc.Configurable && !targetDesc.Writable && !JsValue.SameValue(result, targetValue))
                 {
                     Throw.TypeError(_engine.Realm, $"'get' on proxy: property '{property}' is a read-only and non-configurable data property on the proxy target but the proxy did not return its actual value (expected '{targetValue}' but got '{result}')");
                 }
@@ -336,7 +336,7 @@ internal sealed class JsProxy : ObjectInstance, IConstructor, ICallable
             if (targetDesc.IsDataDescriptor() && !targetDesc.Configurable && !targetDesc.Writable)
             {
                 var targetValue = targetDesc.Value;
-                if (!SameValue(targetValue, value))
+                if (!JsValue.SameValue(targetValue, value))
                 {
                     Throw.TypeError(_engine.Realm, $"'set' on proxy: trap returned truish for property '{property}' which exists in the proxy target as a non-configurable and non-writable data property with a different value");
                 }

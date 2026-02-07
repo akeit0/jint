@@ -76,29 +76,29 @@ internal sealed class DurationPrototype : Prototype
 
     private JsDuration ValidateDuration(JsValue thisObject)
     {
-        if (thisObject is JsDuration duration)
+        if (thisObject.Obj is JsDuration duration)
             return duration;
         Throw.TypeError(_realm, "Value is not a Temporal.Duration");
         return null!;
     }
 
-    private JsNumber GetYears(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Years);
-    private JsNumber GetMonths(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Months);
-    private JsNumber GetWeeks(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Weeks);
-    private JsNumber GetDays(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Days);
-    private JsNumber GetHours(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Hours);
-    private JsNumber GetMinutes(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Minutes);
-    private JsNumber GetSeconds(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Seconds);
-    private JsNumber GetMilliseconds(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Milliseconds);
-    private JsNumber GetMicroseconds(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Microseconds);
-    private JsNumber GetNanoseconds(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).Nanoseconds);
-    private JsNumber GetSign(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidateDuration(thisObject).DurationRecord.Sign());
-    private JsBoolean GetBlank(JsValue thisObject, JsCallArguments arguments) => ValidateDuration(thisObject).DurationRecord.IsZero() ? JsBoolean.True : JsBoolean.False;
+    private JsValue GetYears(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Years);
+    private JsValue GetMonths(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Months);
+    private JsValue GetWeeks(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Weeks);
+    private JsValue GetDays(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Days);
+    private JsValue GetHours(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Hours);
+    private JsValue GetMinutes(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Minutes);
+    private JsValue GetSeconds(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Seconds);
+    private JsValue GetMilliseconds(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Milliseconds);
+    private JsValue GetMicroseconds(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Microseconds);
+    private JsValue GetNanoseconds(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).Nanoseconds);
+    private JsValue GetSign(JsValue thisObject, JsCallArguments arguments) => (ValidateDuration(thisObject).DurationRecord.Sign());
+    private JsValue GetBlank(JsValue thisObject, JsCallArguments arguments) => ValidateDuration(thisObject).DurationRecord.IsZero() ? JsValue.True : JsValue.False;
 
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.with
     /// </summary>
-    private JsDuration With(JsValue thisObject, JsCallArguments arguments)
+    private JsValue With(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         var temporalDurationLike = arguments.At(0);
@@ -155,7 +155,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.negated
     /// </summary>
-    private JsDuration Negated(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Negated(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         return _constructor.Construct(duration.DurationRecord.Negated());
@@ -164,7 +164,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.abs
     /// </summary>
-    private JsDuration Abs(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Abs(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         return _constructor.Construct(duration.DurationRecord.Abs());
@@ -173,7 +173,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.add
     /// </summary>
-    private JsDuration Add(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Add(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         var other = _constructor.ToTemporalDuration(arguments.At(0));
@@ -217,7 +217,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.subtract
     /// </summary>
-    private JsDuration Subtract(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Subtract(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         var other = _constructor.ToTemporalDuration(arguments.At(0));
@@ -261,7 +261,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.round
     /// </summary>
-    private JsDuration Round(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Round(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         var options = arguments.At(0);
@@ -450,7 +450,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.total
     /// </summary>
-    private JsNumber Total(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Total(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         var options = arguments.At(0);
@@ -501,13 +501,13 @@ internal sealed class DurationPrototype : Prototype
             Throw.RangeError(_realm, $"Cannot compute total for unit '{unit}' without relativeTo");
         }
 
-        return JsNumber.Create((double) totalNs / nsPerUnit);
+        return ((double) totalNs / nsPerUnit);
     }
 
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.tostring
     /// </summary>
-    private JsString ToStringMethod(JsValue thisObject, JsCallArguments arguments)
+    private JsValue ToStringMethod(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         return new JsString(TemporalHelpers.FormatDuration(duration.DurationRecord));
@@ -516,7 +516,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.tojson
     /// </summary>
-    private JsString ToJSON(JsValue thisObject, JsCallArguments arguments)
+    private JsValue ToJSON(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         return new JsString(TemporalHelpers.FormatDuration(duration.DurationRecord));
@@ -525,7 +525,7 @@ internal sealed class DurationPrototype : Prototype
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.prototype.tolocalestring
     /// </summary>
-    private JsString ToLocaleString(JsValue thisObject, JsCallArguments arguments)
+    private JsValue ToLocaleString(JsValue thisObject, JsCallArguments arguments)
     {
         var duration = ValidateDuration(thisObject);
         // For now, just return the ISO string representation

@@ -47,7 +47,7 @@ internal sealed class ModuleNamespace : ObjectInstance
     private bool SetImmutablePrototype(JsValue value)
     {
         var current = GetPrototypeOf();
-        return SameValue(value, current ?? Null);
+        return SameValue(value, current ?? JsValue.Null);
     }
 
     /// <summary>

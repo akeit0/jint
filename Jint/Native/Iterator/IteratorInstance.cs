@@ -213,7 +213,7 @@ internal abstract class IteratorInstance : ObjectInstance
                 return true;
             }
 
-            nextItem = IteratorResult.CreateValueIteratorPosition(_engine, done: JsBoolean.True);
+            nextItem = IteratorResult.CreateValueIteratorPosition(_engine, done: JsValue.True);
             return false;
         }
     }
@@ -229,7 +229,7 @@ internal abstract class IteratorInstance : ObjectInstance
 
         public override bool TryIteratorStep(out ObjectInstance nextItem)
         {
-            nextItem = IteratorResult.CreateValueIteratorPosition(_engine, done: JsBoolean.True);
+            nextItem = IteratorResult.CreateValueIteratorPosition(_engine, done: JsValue.True);
             return false;
         }
     }

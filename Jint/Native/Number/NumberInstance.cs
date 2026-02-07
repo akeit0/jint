@@ -11,7 +11,7 @@ internal class NumberInstance : ObjectInstance, IJsPrimitive
     private protected NumberInstance(Engine engine, InternalTypes type)
         : base(engine, ObjectClass.Number, type)
     {
-        NumberData = JsNumber.PositiveZero;
+        NumberData = JsValue.PositiveZero;
     }
 
     public NumberInstance(Engine engine, JsNumber value)

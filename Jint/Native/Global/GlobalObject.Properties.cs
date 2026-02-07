@@ -78,8 +78,8 @@ public partial class GlobalObject
     private static readonly Key propertyEval = "eval";
     private static readonly Key propertyToString = "toString";
 
-    private static readonly PropertyDescriptor _propertyDescriptorNan = new(JsNumber.DoubleNaN, PropertyFlag.AllForbidden);
-    private static readonly PropertyDescriptor _propertyDescriptorPositiveInfinity = new(JsNumber.DoublePositiveInfinity, PropertyFlag.AllForbidden);
+    private static readonly PropertyDescriptor _propertyDescriptorNan = new(JsValue.NaN, PropertyFlag.AllForbidden);
+    private static readonly PropertyDescriptor _propertyDescriptorPositiveInfinity = new(double.PositiveInfinity, PropertyFlag.AllForbidden);
     private static readonly PropertyDescriptor _propertyDescriptorUndefined = new(Undefined, PropertyFlag.AllForbidden);
 
     protected override void Initialize()

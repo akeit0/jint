@@ -27,7 +27,7 @@ internal sealed class Uint8ArrayPrototype : Prototype
         const PropertyFlag PropertyFlags = PropertyFlag.Configurable | PropertyFlag.Writable;
         var properties = new PropertyDictionary(6, checkExistingKeys: false)
         {
-            ["BYTES_PER_ELEMENT"] = new(JsNumber.PositiveOne, PropertyFlag.AllForbidden),
+            ["BYTES_PER_ELEMENT"] = new(1, PropertyFlag.AllForbidden),
             ["constructor"] = new(_constructor, PropertyFlag.NonEnumerable),
             ["setFromBase64"] = new(new ClrFunction(Engine, "setFromBase64", SetFromBase64, 1, PropertyFlag.Configurable), PropertyFlags),
             ["setFromHex"] = new(new ClrFunction(Engine, "setFromHex", SetFromHex, 1, PropertyFlag.Configurable), PropertyFlags),
@@ -37,7 +37,7 @@ internal sealed class Uint8ArrayPrototype : Prototype
         SetProperties(properties);
     }
 
-    private JsObject SetFromBase64(JsValue thisObject, JsCallArguments arguments)
+    private JsValue SetFromBase64(JsValue thisObject, JsCallArguments arguments)
     {
         var into = ValidateUint8Array(thisObject);
         var s = arguments.At(0);
@@ -86,7 +86,7 @@ internal sealed class Uint8ArrayPrototype : Prototype
         }
     }
 
-    private JsObject SetFromHex(JsValue thisObject, JsCallArguments arguments)
+    private JsValue SetFromHex(JsValue thisObject, JsCallArguments arguments)
     {
         var into = ValidateUint8Array(thisObject);
         var s = arguments.At(0);
@@ -180,7 +180,7 @@ internal sealed class Uint8ArrayPrototype : Prototype
 
     private JsTypedArray ValidateUint8Array(JsValue ta)
     {
-        if (ta is not JsTypedArray { _arrayElementType: TypedArrayElementType.Uint8 } typedArray)
+        if (ta.Obj is not JsTypedArray { _arrayElementType: TypedArrayElementType.Uint8 } typedArray)
         {
             Throw.TypeError(_engine.Realm, "Not a Uint8Array");
             return default;

@@ -14,23 +14,23 @@ internal sealed class IteratorResult : ObjectInstance
     private PropertyDescriptor? _valueDesc;
     private PropertyDescriptor? _doneDesc;
 
-    public IteratorResult(Engine engine, JsValue value, JsBoolean done) : base(engine)
+    public IteratorResult(Engine engine, JsValue value, bool done) : base(engine)
     {
         _valueDesc = new PropertyDescriptor(value, PropertyFlag.ConfigurableEnumerableWritable);
         _doneDesc = new PropertyDescriptor(done, PropertyFlag.ConfigurableEnumerableWritable);
     }
 
-    public static IteratorResult CreateValueIteratorPosition(Engine engine, JsValue? value = null, JsBoolean? done = null)
+    public static IteratorResult CreateValueIteratorPosition(Engine engine, JsValue? value = null, bool? done = null)
     {
-        return new IteratorResult(engine, value ?? Undefined, done ?? JsBoolean.False);
+        return new IteratorResult(engine, value ?? Undefined, done ?? false);
     }
 
-    public static IteratorResult CreateKeyValueIteratorPosition(Engine engine, JsValue? key = null, JsValue? value = null)
+    public static IteratorResult CreateKeyValueIteratorPosition(Engine engine, JsValue key = default, JsValue value = default)
     {
-        var done = key is null && value is null;
+        var done = key.IsEmpty && value.IsEmpty;
         var array = done ? Undefined : new JsArray(engine, [key!, value!]);
 
-        return new IteratorResult(engine, array, JsBoolean.Create(done));
+        return new IteratorResult(engine, array, (done));
     }
 
     public override JsValue Get(JsValue property, JsValue receiver)

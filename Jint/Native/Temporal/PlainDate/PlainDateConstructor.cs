@@ -21,7 +21,7 @@ internal sealed class PlainDateConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new PlainDatePrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.Create(3), PropertyFlag.Configurable);
+        _length = new PropertyDescriptor((3), PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

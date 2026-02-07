@@ -17,7 +17,7 @@ internal sealed class SuppressedErrorConstructor : Constructor
     {
         _prototype = errorConstructor;
         PrototypeObject = new SuppressedErrorPrototype(engine, realm, this, errorConstructor.PrototypeObject);
-        _length = new PropertyDescriptor(JsNumber.PositiveThree, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(3, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

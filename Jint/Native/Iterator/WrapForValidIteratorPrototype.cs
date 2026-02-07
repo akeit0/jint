@@ -36,7 +36,7 @@ internal sealed class WrapForValidIteratorPrototype : Prototype
     {
         // 1. Let O be this value.
         // 2. Perform ? RequireInternalSlot(O, [[Iterated]]).
-        if (thisObject is not WrapForValidIterator wrapper)
+        if (thisObject.Obj is  not WrapForValidIterator wrapper)
         {
             Throw.TypeError(_realm, "Method WrapForValidIterator.prototype.next called on incompatible receiver");
             return Undefined;
@@ -55,7 +55,7 @@ internal sealed class WrapForValidIteratorPrototype : Prototype
     {
         // 1. Let O be this value.
         // 2. Perform ? RequireInternalSlot(O, [[Iterated]]).
-        if (thisObject is not WrapForValidIterator wrapper)
+        if (thisObject.Obj is  not WrapForValidIterator wrapper)
         {
             Throw.TypeError(_realm, "Method WrapForValidIterator.prototype.return called on incompatible receiver");
             return Undefined;
@@ -70,7 +70,7 @@ internal sealed class WrapForValidIteratorPrototype : Prototype
         // 5. If returnMethod is undefined, return CreateIteratorResultObject(undefined, true).
         if (returnMethod is null)
         {
-            return IteratorResult.CreateValueIteratorPosition(_engine, Undefined, JsBoolean.True);
+            return IteratorResult.CreateValueIteratorPosition(_engine, Undefined, JsValue.True);
         }
 
         // 6. Return ? Call(returnMethod, iterator).

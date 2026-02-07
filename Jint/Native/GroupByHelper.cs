@@ -56,7 +56,7 @@ internal static class GroupByHelper
             JsValue key;
             if (_mapMode)
             {
-                key = (value as JsNumber)?.IsNegativeZero() == true ? JsNumber.PositiveZero : value;
+                key = value.IsNegativeZero ? JsValue.PositiveZero : value;
             }
             else
             {

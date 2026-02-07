@@ -6,6 +6,7 @@ using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Interop;
 
+#pragma warning disable MA0006
 namespace Jint.Native.TypedArray;
 
 public sealed class Uint8ArrayConstructor : TypedArrayConstructor
@@ -14,7 +15,8 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
         Engine engine,
         Realm realm,
         IntrinsicTypedArrayConstructor functionPrototype,
-        IntrinsicTypedArrayPrototype objectPrototype) : base(engine, realm, functionPrototype, objectPrototype, TypedArrayElementType.Uint8)
+        IntrinsicTypedArrayPrototype objectPrototype) : base(engine, realm, functionPrototype, objectPrototype,
+        TypedArrayElementType.Uint8)
     {
     }
 
@@ -23,9 +25,11 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
         const PropertyFlag PropertyFlags = PropertyFlag.Configurable | PropertyFlag.Writable;
         var properties = new PropertyDictionary(3, checkExistingKeys: false)
         {
-            ["BYTES_PER_ELEMENT"] = new(new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.AllForbidden)),
-            ["fromBase64"] = new(new ClrFunction(Engine, "fromBase64", FromBase64, 1, PropertyFlag.Configurable), PropertyFlags),
-            ["fromHex"] = new(new ClrFunction(Engine, "fromHex", FromHex, 1, PropertyFlag.Configurable), PropertyFlags),
+            ["BYTES_PER_ELEMENT"] = new(new PropertyDescriptor(1, PropertyFlag.AllForbidden)),
+            ["fromBase64"] =
+                new(new ClrFunction(Engine, "fromBase64", FromBase64, 1, PropertyFlag.Configurable), PropertyFlags),
+            ["fromHex"] = new(new ClrFunction(Engine, "fromHex", FromHex, 1, PropertyFlag.Configurable),
+                PropertyFlags),
         };
         SetProperties(properties);
     }
@@ -37,7 +41,7 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
         return array;
     }
 
-    private JsTypedArray FromBase64(JsValue thisObject, JsCallArguments arguments)
+    private JsValue FromBase64(JsValue thisObject, JsCallArguments arguments)
     {
         var s = arguments.At(0);
 
@@ -65,12 +69,13 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
         var lastChunkHandling = opts.Get("lastChunkHandling");
         if (lastChunkHandling.IsUndefined())
         {
-            lastChunkHandling = "loose";
+            return "loose";
         }
 
-        if (lastChunkHandling is not JsString s || (s != "loose" && s != "strict" && s != "stop-before-partial"))
+        if (lastChunkHandling.AsString() is not { } s || (s != "loose" && s != "strict" && s != "stop-before-partial"))
         {
-            Throw.TypeError(engine.Realm, "lastChunkHandling must be either 'loose', 'strict' or 'stop-before-partial'");
+            Throw.TypeError(engine.Realm,
+                "lastChunkHandling must be either 'loose', 'strict' or 'stop-before-partial'");
             return default;
         }
 
@@ -85,7 +90,7 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
             alphabet = "base64";
         }
 
-        if (alphabet is not JsString s || (s != "base64" && s != "base64url"))
+        if (alphabet.AsString() is not { } s || (s != "base64" && s != "base64url"))
         {
             Throw.TypeError(engine.Realm, "alphabet must be either 'base64' or 'base64url'");
             return default;
@@ -96,9 +101,11 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
 
     internal readonly record struct FromEncodingResult(byte[] Bytes, JavaScriptException? Error, int Read);
 
-    private static readonly SearchValues<char> Base64Alphabet = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+    private static readonly SearchValues<char> Base64Alphabet =
+        SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 
-    internal static FromEncodingResult FromBase64(Engine engine, string input, string alphabet, string lastChunkHandling, uint maxLength = uint.MaxValue)
+    internal static FromEncodingResult FromBase64(Engine engine, string input, string alphabet,
+        string lastChunkHandling, uint maxLength = uint.MaxValue)
     {
         if (maxLength == 0)
         {
@@ -133,14 +140,16 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
                     {
                         if (chunkLength == 1)
                         {
-                            return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Invalid base64 chunk length."), read);
+                            return new FromEncodingResult(bytes.ToArray(),
+                                Throw.CreateSyntaxError(engine.Realm, "Invalid base64 chunk length."), read);
                         }
 
                         DecodeBase64Chunk(engine, bytes, chunk, chunkLength, throwOnExtraBits: false);
                     }
                     else // strict
                     {
-                        return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Invalid base64 chunk length in strict mode."), read);
+                        return new FromEncodingResult(bytes.ToArray(),
+                            Throw.CreateSyntaxError(engine.Realm, "Invalid base64 chunk length in strict mode."), read);
                     }
                 }
 
@@ -154,7 +163,8 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
             {
                 if (chunkLength < 2)
                 {
-                    return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Invalid '=' placement in base64 string."), read);
+                    return new FromEncodingResult(bytes.ToArray(),
+                        Throw.CreateSyntaxError(engine.Realm, "Invalid '=' placement in base64 string."), read);
                 }
 
                 index = SkipAsciiWhitespace(input, index);
@@ -167,13 +177,15 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
                             return new FromEncodingResult(bytes.ToArray(), Error: null, read);
                         }
 
-                        return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Invalid base64 string termination."), read);
+                        return new FromEncodingResult(bytes.ToArray(),
+                            Throw.CreateSyntaxError(engine.Realm, "Invalid base64 string termination."), read);
                     }
 
                     currentChar = input[index];
                     if (currentChar != '=')
                     {
-                        return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Expected '=' in base64 string."), read);
+                        return new FromEncodingResult(bytes.ToArray(),
+                            Throw.CreateSyntaxError(engine.Realm, "Expected '=' in base64 string."), read);
                     }
 
                     index = SkipAsciiWhitespace(input, index + 1);
@@ -181,7 +193,8 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
 
                 if (index < length)
                 {
-                    return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Extra characters after base64 string."), read);
+                    return new FromEncodingResult(bytes.ToArray(),
+                        Throw.CreateSyntaxError(engine.Realm, "Extra characters after base64 string."), read);
                 }
 
                 DecodeBase64Chunk(engine, bytes, chunk, chunkLength, throwOnExtraBits);
@@ -192,7 +205,8 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
             {
                 if (currentChar is '+' or '/')
                 {
-                    return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Invalid character in base64url string."), read);
+                    return new FromEncodingResult(bytes.ToArray(),
+                        Throw.CreateSyntaxError(engine.Realm, "Invalid character in base64url string."), read);
                 }
 
                 if (currentChar == '-')
@@ -208,7 +222,8 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
 
             if (!Base64Alphabet.Contains(currentChar))
             {
-                return new FromEncodingResult(bytes.ToArray(), Throw.CreateSyntaxError(engine.Realm, "Invalid base64 character."), read);
+                return new FromEncodingResult(bytes.ToArray(),
+                    Throw.CreateSyntaxError(engine.Realm, "Invalid base64 character."), read);
             }
 
             ulong remaining = maxLength - (ulong) bytes.Count;
@@ -274,6 +289,7 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
             {
                 Throw.SyntaxError(engine.Realm, "Invalid padding in base64 chunk.");
             }
+
             into.Add(bytes[0]);
             return;
         }
@@ -284,6 +300,7 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
             {
                 Throw.SyntaxError(engine.Realm, "Invalid padding in base64 chunk.");
             }
+
             into.Add(bytes[0]);
             into.Add(bytes[1]);
             return;
@@ -292,7 +309,7 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
         into.AddRange(bytes);
     }
 
-    private JsTypedArray FromHex(JsValue thisObject, JsCallArguments arguments)
+    private JsValue FromHex(JsValue thisObject, JsCallArguments arguments)
     {
         var s = arguments.At(0);
 
@@ -329,7 +346,8 @@ public sealed class Uint8ArrayConstructor : TypedArrayConstructor
             var hexits = s.AsSpan(read, 2);
             if (!hexits[0].IsHexDigit() || !hexits[1].IsHexDigit())
             {
-                return new FromEncodingResult(bytes.AsSpan(0, byteIndex).ToArray(), Throw.CreateSyntaxError(engine.Realm, "Invalid hex value"), read);
+                return new FromEncodingResult(bytes.AsSpan(0, byteIndex).ToArray(),
+                    Throw.CreateSyntaxError(engine.Realm, "Invalid hex value"), read);
             }
 
 #if SUPPORTS_SPAN_PARSE

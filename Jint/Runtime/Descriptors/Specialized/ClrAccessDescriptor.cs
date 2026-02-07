@@ -18,7 +18,7 @@ internal sealed class ClrAccessDescriptor : PropertyDescriptor
         DeclarativeEnvironment env,
         Engine engine,
         string name)
-        : base(value: null, PropertyFlag.Configurable)
+        : base(value: default, PropertyFlag.Configurable)
     {
         _flags |= PropertyFlag.NonData;
         _env = env;

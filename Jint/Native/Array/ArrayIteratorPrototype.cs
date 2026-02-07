@@ -79,9 +79,9 @@ internal sealed class ArrayIteratorPrototype : IteratorPrototype
                 _array.TryGetValue(position, out var value);
                 nextItem = _kind switch
                 {
-                    ArrayIteratorType.Key => IteratorResult.CreateValueIteratorPosition(_engine, JsNumber.Create(position)),
+                    ArrayIteratorType.Key => IteratorResult.CreateValueIteratorPosition(_engine, (position)),
                     ArrayIteratorType.Value => IteratorResult.CreateValueIteratorPosition(_engine, value),
-                    _ => IteratorResult.CreateKeyValueIteratorPosition(_engine, JsNumber.Create(position), value)
+                    _ => IteratorResult.CreateKeyValueIteratorPosition(_engine, (position), value)
                 };
 
                 _position++;
@@ -138,9 +138,9 @@ internal sealed class ArrayIteratorPrototype : IteratorPrototype
                 {
                     nextItem = _kind switch
                     {
-                        ArrayIteratorType.Key => IteratorResult.CreateValueIteratorPosition(_engine, JsNumber.Create(_position)),
+                        ArrayIteratorType.Key => IteratorResult.CreateValueIteratorPosition(_engine, (_position)),
                         ArrayIteratorType.Value => IteratorResult.CreateValueIteratorPosition(_engine, _typedArray[(int) _position]),
-                        _ => IteratorResult.CreateKeyValueIteratorPosition(_engine, JsNumber.Create(_position), _typedArray[(int) _position])
+                        _ => IteratorResult.CreateKeyValueIteratorPosition(_engine, (_position), _typedArray[(int) _position])
                     };
                 }
                 else
@@ -148,9 +148,9 @@ internal sealed class ArrayIteratorPrototype : IteratorPrototype
                     _operations!.TryGetValue(_position, out var value);
                     nextItem = _kind switch
                     {
-                        ArrayIteratorType.Key => IteratorResult.CreateValueIteratorPosition(_engine, JsNumber.Create(_position)),
+                        ArrayIteratorType.Key => IteratorResult.CreateValueIteratorPosition(_engine, (_position)),
                         ArrayIteratorType.Value => IteratorResult.CreateValueIteratorPosition(_engine, value),
-                        _ => IteratorResult.CreateKeyValueIteratorPosition(_engine, JsNumber.Create(_position), value)
+                        _ => IteratorResult.CreateKeyValueIteratorPosition(_engine, (_position), value)
                     };
                 }
 

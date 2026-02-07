@@ -18,7 +18,7 @@ internal sealed class ReferencePool
 
     private static Reference Factory()
     {
-        return new Reference(JsValue.Undefined, JsString.Empty, false, null);
+        return new Reference(JsValue.Undefined, "", false, default);
     }
 
     public Reference Rent(JsValue baseValue, JsValue name, bool strict, JsValue? thisValue)
@@ -32,6 +32,7 @@ internal sealed class ReferencePool
         {
             return;
         }
+
         _pool.Free(reference);
     }
 }

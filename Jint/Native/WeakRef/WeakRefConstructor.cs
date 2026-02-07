@@ -47,7 +47,7 @@ internal sealed class WeakRefConstructor : Constructor
             static (engine, _, target) => new JsWeakRef(engine, target!),
             target);
 
-        _engine.AddToKeptObjects(target);
+        _engine.AddToKeptObjects(target.Obj!);
 
         return weakRef;
     }

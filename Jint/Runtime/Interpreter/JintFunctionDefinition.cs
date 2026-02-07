@@ -6,6 +6,7 @@ using Jint.Native.AsyncGenerator;
 using Jint.Native.Generator;
 using Jint.Native.Promise;
 using Jint.Runtime.Interpreter.Expressions;
+using System.Runtime.InteropServices;
 
 namespace Jint.Runtime.Interpreter;
 
@@ -48,7 +49,8 @@ internal sealed class JintFunctionDefinition
                 var function = functionObject;
                 var jsValues = argumentsList;
 
-                var promiseCapability = PromiseConstructor.NewPromiseCapability(context.Engine, context.Engine.Realm.Intrinsics.Promise);
+                var promiseCapability =
+                    PromiseConstructor.NewPromiseCapability(context.Engine, context.Engine.Realm.Intrinsics.Promise);
                 // Expression bodies don't have a statement list (used only for resumption)
                 AsyncFunctionStart(context, promiseCapability, body: null, context =>
                 {
@@ -88,7 +90,8 @@ internal sealed class JintFunctionDefinition
                 var function = functionObject;
                 var arguments = argumentsList;
 
-                var promiseCapability = PromiseConstructor.NewPromiseCapability(context.Engine, context.Engine.Realm.Intrinsics.Promise);
+                var promiseCapability =
+                    PromiseConstructor.NewPromiseCapability(context.Engine, context.Engine.Realm.Intrinsics.Promise);
                 // Each async function invocation needs its own JintStatementList to track its own position
                 var bodyStatementList = new JintStatementList(Function);
                 AsyncFunctionStart(context, promiseCapability, bodyStatementList, context =>
@@ -266,7 +269,8 @@ internal sealed class JintFunctionDefinition
         public List<VariableValuePair>? VarsToInitialize;
         public bool NeedsEvalContext;
 
-        internal readonly record struct VariableValuePair(Key Name, JsValue? InitialValue);
+        [StructLayout(LayoutKind.Auto)]
+        internal readonly record struct VariableValuePair(Key Name, JsValue InitialValue);
     }
 
     internal static State BuildState(IFunction function)
@@ -312,7 +316,8 @@ internal sealed class JintFunctionDefinition
         }
         else if (!state.HasParameterExpressions)
         {
-            if (state.FunctionNames.Contains(KnownKeys.Arguments) || lexicalNames?.Contains(KnownKeys.Arguments.Name) == true)
+            if (state.FunctionNames.Contains(KnownKeys.Arguments) ||
+                lexicalNames?.Contains(KnownKeys.Arguments.Name) == true)
             {
                 state.ArgumentsObjectNeeded = false;
             }
@@ -340,12 +345,13 @@ internal sealed class JintFunctionDefinition
         if (function.Type == NodeType.ArrowFunctionExpression)
         {
             state.RequiresInputArgumentsOwnership = state.ArgumentsObjectNeeded ||
-                (function.Async && ArgumentsUsageAstVisitor.HasArgumentsReference(function));
+                                                    (function.Async &&
+                                                     ArgumentsUsageAstVisitor.HasArgumentsReference(function));
         }
         else
         {
             state.RequiresInputArgumentsOwnership = state.ArgumentsObjectNeeded &&
-                (function.Async || function.Generator);
+                                                    (function.Async || function.Generator);
         }
 
         state.ParameterBindings = parameterBindings;
@@ -362,7 +368,7 @@ internal sealed class JintFunctionDefinition
             {
                 if (instantiatedVarNames.Add(fn))
                 {
-                    varsToInitialize.Add(new State.VariableValuePair(Name: fn, InitialValue: null));
+                    varsToInitialize.Add(new State.VariableValuePair(Name: fn, InitialValue: default));
                 }
             }
 
@@ -371,7 +377,7 @@ internal sealed class JintFunctionDefinition
                 var n = state.VarNames[i];
                 if (instantiatedVarNames.Add(n))
                 {
-                    varsToInitialize.Add(new State.VariableValuePair(Name: n, InitialValue: null));
+                    varsToInitialize.Add(new State.VariableValuePair(Name: n, InitialValue: default));
                 }
             }
         }
@@ -388,11 +394,12 @@ internal sealed class JintFunctionDefinition
                 {
                     instantiatedVarNames ??= new HashSet<Key>();
                     instantiatedVarNames.Add(fn);
-                    JsValue? initialValue = null;
+                    JsValue initialValue = default;
                     if (!state.ParameterBindings.Contains(fn))
                     {
                         initialValue = JsValue.Undefined;
                     }
+
                     varsToInitialize.Add(new State.VariableValuePair(Name: fn, InitialValue: initialValue));
                 }
             }
@@ -402,7 +409,7 @@ internal sealed class JintFunctionDefinition
                 var n = state.VarNames[i];
                 if (instantiatedVarNames!.Add(n))
                 {
-                    JsValue? initialValue = null;
+                    JsValue initialValue = default;
                     if (!state.ParameterBindings.Contains(n) || state.FunctionNames.Contains(n))
                     {
                         initialValue = JsValue.Undefined;
@@ -623,7 +630,8 @@ Start:
 
                 if (childType == NodeType.CallExpression)
                 {
-                    if (((CallExpression) childNode).Callee is Identifier identifier && identifier.Name.Equals("eval", StringComparison.Ordinal))
+                    if (((CallExpression) childNode).Callee is Identifier identifier &&
+                        identifier.Name.Equals("eval", StringComparison.Ordinal))
                     {
                         return true;
                     }

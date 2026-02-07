@@ -15,7 +15,7 @@ namespace Jint.Native.Array;
 
 public sealed class ArrayConstructor : Constructor
 {
-    private static readonly JsString _functionName = new JsString("Array");
+    private const string _functionName = ("Array");
 
     internal ArrayConstructor(
         Engine engine,
@@ -36,16 +36,27 @@ public sealed class ArrayConstructor : Constructor
     {
         var properties = new PropertyDictionary(4, checkExistingKeys: false)
         {
-            ["from"] = new PropertyDescriptor(new PropertyDescriptor(new ClrFunction(Engine, "from", From, 1, PropertyFlag.Configurable), PropertyFlag.NonEnumerable)),
-            ["fromAsync"] = new PropertyDescriptor(new PropertyDescriptor(new ClrFunction(Engine, "fromAsync", FromAsync, 1, PropertyFlag.Configurable), PropertyFlag.NonEnumerable)),
-            ["isArray"] = new PropertyDescriptor(new PropertyDescriptor(new ClrFunction(Engine, "isArray", IsArray, 1), PropertyFlag.NonEnumerable)),
-            ["of"] = new PropertyDescriptor(new PropertyDescriptor(new ClrFunction(Engine, "of", Of, 0, PropertyFlag.Configurable), PropertyFlag.NonEnumerable))
+            ["from"] =
+                new PropertyDescriptor(new PropertyDescriptor(
+                    new ClrFunction(Engine, "from", From, 1, PropertyFlag.Configurable),
+                    PropertyFlag.NonEnumerable)),
+            ["fromAsync"] =
+                new PropertyDescriptor(new PropertyDescriptor(
+                    new ClrFunction(Engine, "fromAsync", FromAsync, 1, PropertyFlag.Configurable),
+                    PropertyFlag.NonEnumerable)),
+            ["isArray"] =
+                new PropertyDescriptor(new PropertyDescriptor(new ClrFunction(Engine, "isArray", IsArray, 1),
+                    PropertyFlag.NonEnumerable)),
+            ["of"] = new PropertyDescriptor(new PropertyDescriptor(
+                new ClrFunction(Engine, "of", Of, 0, PropertyFlag.Configurable), PropertyFlag.NonEnumerable))
         };
         SetProperties(properties);
 
         var symbols = new SymbolDictionary(1)
         {
-            [GlobalSymbolRegistry.Species] = new GetSetPropertyDescriptor(get: new ClrFunction(Engine, "get [Symbol.species]", Species, 0, PropertyFlag.Configurable), set: Undefined, PropertyFlag.Configurable),
+            [GlobalSymbolRegistry.Species] = new GetSetPropertyDescriptor(
+                get: new ClrFunction(Engine, "get [Symbol.species]", Species, 0, PropertyFlag.Configurable),
+                set: Undefined, PropertyFlag.Configurable),
         };
         SetSymbols(symbols);
     }
@@ -69,7 +80,7 @@ public sealed class ArrayConstructor : Constructor
         if (usingIterator is not null)
         {
             ObjectInstance instance;
-            if (!ReferenceEquals(this, thisObject) && thisObject is IConstructor constructor)
+            if (!ReferenceEquals(this, thisObject.Obj) && thisObject.Obj is IConstructor constructor)
             {
                 instance = constructor.Construct([], thisObject);
             }
@@ -84,7 +95,7 @@ public sealed class ArrayConstructor : Constructor
             return instance;
         }
 
-        if (items is IObjectWrapper { Target: IEnumerable enumerable })
+        if (items.Obj is IObjectWrapper { Target: IEnumerable enumerable })
         {
             return ConstructArrayFromIEnumerable(enumerable);
         }
@@ -118,7 +129,8 @@ public sealed class ArrayConstructor : Constructor
         return promiseCapability.PromiseInstance;
     }
 
-    private void FromAsyncClosure(JsValue c, JsValue asyncItems, JsValue mapfn, JsValue thisArg, PromiseCapability promiseCapability)
+    private void FromAsyncClosure(JsValue c, JsValue asyncItems, JsValue mapfn, JsValue thisArg,
+        PromiseCapability promiseCapability)
     {
         try
         {
@@ -130,7 +142,8 @@ public sealed class ArrayConstructor : Constructor
         }
     }
 
-    private void FromAsyncClosureImpl(JsValue c, JsValue asyncItems, JsValue mapfn, JsValue thisArg, PromiseCapability promiseCapability)
+    private void FromAsyncClosureImpl(JsValue c, JsValue asyncItems, JsValue mapfn, JsValue thisArg,
+        PromiseCapability promiseCapability)
     {
         // a. If mapfn is undefined, let mapping be false.
         // b. Else,
@@ -139,11 +152,12 @@ public sealed class ArrayConstructor : Constructor
         ICallable? callable = null;
         if (!mapfn.IsUndefined())
         {
-            if (mapfn is not ICallable mapCallable)
+            if (mapfn.Obj is not ICallable mapCallable)
             {
                 Throw.TypeError(_realm, $"{mapfn} is not a function");
                 return;
             }
+
             callable = mapCallable;
         }
 
@@ -167,7 +181,8 @@ public sealed class ArrayConstructor : Constructor
         // e. If usingAsyncIterator is not undefined or usingSyncIterator is not undefined, then
         if (usingAsyncIterator is not null || usingSyncIterator is not null)
         {
-            FromAsyncWithIterator(c, asyncItems, callable, thisArg, promiseCapability, usingAsyncIterator, usingSyncIterator);
+            FromAsyncWithIterator(c, asyncItems, callable, thisArg, promiseCapability, usingAsyncIterator,
+                usingSyncIterator);
         }
         else
         {
@@ -189,7 +204,7 @@ public sealed class ArrayConstructor : Constructor
         // ii. Let iteratorRecord be ? GetIterator(asyncItems, async).
         // We'll handle both async and sync iterators
         ObjectInstance instance;
-        if (!ReferenceEquals(this, c) && c is IConstructor constructor)
+        if (!ReferenceEquals(this, c.Obj) && c.Obj is IConstructor constructor)
         {
             instance = constructor.Construct([], c);
         }
@@ -227,9 +242,10 @@ public sealed class ArrayConstructor : Constructor
         {
             // Get next method and call it
             var nextMethod = iterator.Get(CommonProperties.Next);
-            if (nextMethod is not ICallable nextCallable)
+            if (nextMethod.Obj is not ICallable nextCallable)
             {
-                promiseCapability.Reject.Call(Undefined, _realm.Intrinsics.TypeError.Construct("Iterator next is not a function"));
+                promiseCapability.Reject.Call(Undefined,
+                    _realm.Intrinsics.TypeError.Construct("Iterator next is not a function"));
                 return;
             }
 
@@ -242,9 +258,10 @@ public sealed class ArrayConstructor : Constructor
             var onFulfilled = new ClrFunction(_engine, "", (_, args) =>
             {
                 var iterResult = args.At(0);
-                if (iterResult is not ObjectInstance iterResultObj)
+                if (iterResult.Obj is not ObjectInstance iterResultObj)
                 {
-                    promiseCapability.Reject.Call(Undefined, _realm.Intrinsics.TypeError.Construct("Iterator result is not an object"));
+                    promiseCapability.Reject.Call(Undefined,
+                        _realm.Intrinsics.TypeError.Construct("Iterator result is not an object"));
                     return Undefined;
                 }
 
@@ -261,7 +278,8 @@ public sealed class ArrayConstructor : Constructor
                 ProcessAsyncIteratorValue(value, target, callable, thisArg, promiseCapability, capturedK, () =>
                 {
                     // Queue next iteration to prevent stack overflow
-                    _engine.AddToEventLoop(() => FromAsyncIteratorLoop(iterator, target, callable, thisArg, promiseCapability, capturedK + 1));
+                    _engine.AddToEventLoop(() =>
+                        FromAsyncIteratorLoop(iterator, target, callable, thisArg, promiseCapability, capturedK + 1));
                 });
                 return Undefined;
             }, 1, PropertyFlag.Configurable);
@@ -272,7 +290,8 @@ public sealed class ArrayConstructor : Constructor
                 return Undefined;
             }, 1, PropertyFlag.Configurable);
 
-            PromiseOperations.PerformPromiseThen(_engine, (JsPromise) promiseResolve, onFulfilled, onRejected, null!);
+            PromiseOperations.PerformPromiseThen(_engine, (JsPromise) promiseResolve.Obj!, onFulfilled, onRejected,
+                null!);
         }
         catch (JavaScriptException e)
         {
@@ -305,7 +324,7 @@ public sealed class ArrayConstructor : Constructor
             return Undefined;
         }, 1, PropertyFlag.Configurable);
 
-        PromiseOperations.PerformPromiseThen(_engine, (JsPromise) valuePromise, onFulfilled, onRejected, null!);
+        PromiseOperations.PerformPromiseThen(_engine, (JsPromise) valuePromise.Obj!, onFulfilled, onRejected, null!);
     }
 
     private void ProcessMappedValue(
@@ -342,7 +361,8 @@ public sealed class ArrayConstructor : Constructor
                     return Undefined;
                 }, 1, PropertyFlag.Configurable);
 
-                PromiseOperations.PerformPromiseThen(_engine, (JsPromise) mappedPromise, onFulfilled, onRejected, null!);
+                PromiseOperations.PerformPromiseThen(_engine, (JsPromise) mappedPromise.Obj!, onFulfilled, onRejected,
+                    null!);
             }
             else
             {
@@ -377,7 +397,7 @@ public sealed class ArrayConstructor : Constructor
             // v. Else,
             //     1. Let A be ? ArrayCreate(len).
             ObjectInstance a;
-            if (!ReferenceEquals(c, this) && c is IConstructor constructor)
+            if (!ReferenceEquals(c.Obj, this) && c.Obj is IConstructor constructor)
             {
                 a = constructor.Construct([len], c);
             }
@@ -425,7 +445,8 @@ public sealed class ArrayConstructor : Constructor
             var onFulfilled = new ClrFunction(_engine, "", (_, args) =>
             {
                 var resolvedValue = args.At(0);
-                ProcessArrayLikeMappedValue(arrayLike, resolvedValue, target, callable, thisArg, promiseCapability, capturedK, len);
+                ProcessArrayLikeMappedValue(arrayLike, resolvedValue, target, callable, thisArg, promiseCapability,
+                    capturedK, len);
                 return Undefined;
             }, 1, PropertyFlag.Configurable);
 
@@ -435,7 +456,8 @@ public sealed class ArrayConstructor : Constructor
                 return Undefined;
             }, 1, PropertyFlag.Configurable);
 
-            PromiseOperations.PerformPromiseThen(_engine, (JsPromise) valuePromise, onFulfilled, onRejected, null!);
+            PromiseOperations.PerformPromiseThen(_engine, (JsPromise) valuePromise.Obj!, onFulfilled, onRejected,
+                null!);
         }
         catch (JavaScriptException e)
         {
@@ -469,7 +491,8 @@ public sealed class ArrayConstructor : Constructor
                     var resolvedMapped = args.At(0);
                     target.CreateDataPropertyOrThrow(capturedK, resolvedMapped);
                     // Queue next iteration to prevent stack overflow
-                    _engine.AddToEventLoop(() => FromAsyncArrayLikeLoop(arrayLike, target, callable, thisArg, promiseCapability, capturedK + 1, len));
+                    _engine.AddToEventLoop(() => FromAsyncArrayLikeLoop(arrayLike, target, callable, thisArg,
+                        promiseCapability, capturedK + 1, len));
                     return Undefined;
                 }, 1, PropertyFlag.Configurable);
 
@@ -479,13 +502,15 @@ public sealed class ArrayConstructor : Constructor
                     return Undefined;
                 }, 1, PropertyFlag.Configurable);
 
-                PromiseOperations.PerformPromiseThen(_engine, (JsPromise) mappedPromise, onFulfilled, onRejected, null!);
+                PromiseOperations.PerformPromiseThen(_engine, (JsPromise) mappedPromise.Obj!, onFulfilled, onRejected,
+                    null!);
             }
             else
             {
                 target.CreateDataPropertyOrThrow(k, value);
                 // Queue next iteration to prevent stack overflow
-                _engine.AddToEventLoop(() => FromAsyncArrayLikeLoop(arrayLike, target, callable, thisArg, promiseCapability, k + 1, len));
+                _engine.AddToEventLoop(() =>
+                    FromAsyncArrayLikeLoop(arrayLike, target, callable, thisArg, promiseCapability, k + 1, len));
             }
         }
         catch (JavaScriptException e)
@@ -503,7 +528,7 @@ public sealed class ArrayConstructor : Constructor
         var length = source.GetLength();
 
         ObjectInstance a;
-        if (!ReferenceEquals(thisObj, this) && thisObj is IConstructor constructor)
+        if (!ReferenceEquals(thisObj.Obj!, this) && thisObj.Obj is IConstructor constructor)
         {
             var argumentsList = new JsValue[] { length };
             a = Construct(constructor, argumentsList);
@@ -594,7 +619,7 @@ public sealed class ArrayConstructor : Constructor
         ObjectInstance a;
         if (thisObject.IsConstructor)
         {
-            a = ((IConstructor) thisObject).Construct([len], thisObject);
+            a = ((IConstructor) thisObject.Obj!).Construct([len], thisObject);
         }
         else
         {
@@ -640,9 +665,9 @@ public sealed class ArrayConstructor : Constructor
 
     private static JsValue IsArray(JsValue o)
     {
-        if (!(o is ObjectInstance oi))
+        if (!(o.Obj is ObjectInstance oi))
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         return oi.IsArray();
@@ -673,10 +698,11 @@ public sealed class ArrayConstructor : Constructor
         var capacity = arguments.Length > 0 ? (ulong) arguments.Length : 0;
         if (arguments.Length == 1 && arguments[0].IsNumber())
         {
-            var number = ((JsNumber) arguments[0])._value;
+            var number = arguments[0].GetFloat64Value();
             ValidateLength(number);
             capacity = (ulong) number;
         }
+
         return Construct(arguments, capacity, proto);
     }
 
@@ -700,32 +726,39 @@ public sealed class ArrayConstructor : Constructor
         JsArray instance;
         if (arguments.Length == 1)
         {
-            switch (arguments[0])
+            var firstArg = arguments[0];
+            if (firstArg.IsNumber())
             {
-                case JsNumber number:
-                    ValidateLength(number._value);
-                    instance = ArrayCreate((ulong) number._value, prototypeObject);
-                    break;
-                case IObjectWrapper objectWrapper:
-                    instance = objectWrapper.Target is IEnumerable enumerable
-                        ? ConstructArrayFromIEnumerable(enumerable)
-                        : ArrayCreate(0, prototypeObject);
-                    break;
-                case JsArray array:
-                    // direct copy
-                    instance = (JsArray) ConstructArrayFromArrayLike(Undefined, ArrayOperations.For(array, forWrite: false), callable: null, this);
-                    break;
-                default:
-                    instance = ArrayCreate(capacity, prototypeObject);
-                    instance._length!._value = JsNumber.PositiveZero;
-                    instance.Push(arguments);
-                    break;
+                var number = firstArg.GetFloat64Value();
+                ValidateLength(number);
+                instance = ArrayCreate((ulong) number, prototypeObject);
+            }
+            else
+            {
+                switch (firstArg.Obj)
+                {
+                    case IObjectWrapper objectWrapper:
+                        instance = objectWrapper.Target is IEnumerable enumerable
+                            ? ConstructArrayFromIEnumerable(enumerable)
+                            : ArrayCreate(0, prototypeObject);
+                        break;
+                    case JsArray array:
+                        // direct copy
+                        instance = (JsArray) ConstructArrayFromArrayLike(Undefined,
+                            ArrayOperations.For(array, forWrite: false), callable: null, this);
+                        break;
+                    default:
+                        instance = ArrayCreate(capacity, prototypeObject);
+                        instance._length!._value = JsValue.PositiveZero;
+                        instance.Push(arguments);
+                        break;
+                }
             }
         }
         else
         {
             instance = ArrayCreate((ulong) arguments.Length, prototypeObject);
-            instance._length!._value = JsNumber.PositiveZero;
+            instance._length!._value = JsValue.PositiveZero;
             if (arguments.Length > 0)
             {
                 instance.Push(arguments);
@@ -746,10 +779,7 @@ public sealed class ArrayConstructor : Constructor
         }
 
         proto ??= PrototypeObject;
-        var instance = new JsArray(Engine, (uint) length, (uint) length)
-        {
-            _prototype = proto
-        };
+        var instance = new JsArray(Engine, (uint) length, (uint) length) { _prototype = proto };
         return instance;
     }
 
@@ -759,7 +789,7 @@ public sealed class ArrayConstructor : Constructor
         var tempArray = _engine._jsValueArrayPool.RentArray(1);
         foreach (var item in enumerable)
         {
-            var jsItem = FromObject(Engine, item);
+            var jsItem = JsValue.FromObject(Engine, item);
             tempArray[0] = jsItem;
             _realm.Intrinsics.Array.PrototypeObject.Push(jsArray, tempArray);
         }
@@ -801,7 +831,7 @@ public sealed class ArrayConstructor : Constructor
             var realmC = GetFunctionRealm(c);
             if (!ReferenceEquals(thisRealm, realmC))
             {
-                if (ReferenceEquals(c, realmC.Intrinsics.Array))
+                if (ReferenceEquals(c.Obj, realmC.Intrinsics.Array))
                 {
                     c = Undefined;
                 }
@@ -827,10 +857,10 @@ public sealed class ArrayConstructor : Constructor
             Throw.TypeError(_realm, $"{c} is not a constructor");
         }
 
-        return ((IConstructor) c).Construct([JsNumber.Create(length)], c);
+        return ((IConstructor) c.Obj!).Construct([(length)], c);
     }
 
-    internal JsArray CreateArrayFromList<T>(List<T> values) where T : JsValue
+    internal JsArray CreateArrayFromList(List<JsValue> values)// where T : JsValue
     {
         var jsArray = ArrayCreate((uint) values.Count);
         var index = 0;
@@ -844,7 +874,7 @@ public sealed class ArrayConstructor : Constructor
         return jsArray;
     }
 
-    internal JsArray CreateArrayFromList<T>(T[] values) where T : JsValue
+    internal JsArray CreateArrayFromList(JsValue[] values) //where T : JsValue
     {
         var jsArray = ArrayCreate((uint) values.Length);
         var index = 0;

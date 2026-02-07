@@ -91,16 +91,16 @@ public partial class ObjectInstance
 
         if (entry.Kind is PrivateElementKind.Field or PrivateElementKind.Method)
         {
-            return entry.Value ?? Undefined;
+            return entry.Value;
         }
 
         var getter = entry.Get;
-        if (getter is null)
+        if (getter.Obj is null)
         {
             Throw.TypeError(_engine.Realm, $"'#{property}' was defined without a getter");
         }
 
-        var functionInstance = (Function.Function) getter;
+        var functionInstance = (Function.Function) getter.Obj;
         var privateGet = functionInstance._engine.Call(functionInstance, this);
         return privateGet;
     }
@@ -127,7 +127,7 @@ public partial class ObjectInstance
         else
         {
             var setter = entry.Set;
-            if (setter is null)
+            if (setter.IsUndefined())
             {
                 Throw.TypeError(_engine.Realm, $"'#{property}' was defined without a setter");
             }

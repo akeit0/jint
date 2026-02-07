@@ -46,7 +46,7 @@ internal sealed class PluralRulesPrototype : Prototype
 
     private JsPluralRules ValidatePluralRules(JsValue thisObject)
     {
-        if (thisObject is JsPluralRules pluralRules)
+        if (thisObject.Obj is  JsPluralRules pluralRules)
         {
             return pluralRules;
         }

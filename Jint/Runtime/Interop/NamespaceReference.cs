@@ -69,7 +69,7 @@ public class NamespaceReference : ObjectInstance, ICallable
         catch (Exception e)
         {
             Throw.InvalidOperationException($"Invalid generic type parameter on {_path}, if this is not a generic type / method, are you missing a lookup assembly?", e);
-            return null;
+            return default;
         }
     }
 

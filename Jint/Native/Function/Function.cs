@@ -360,7 +360,7 @@ public abstract partial class Function : ObjectInstance, ICallable
         _prototypeDescriptor = new PropertyDescriptor(prototype, writableProperty, enumerable: false, configurable: false);
     }
 
-    internal void SetFunctionLength(JsNumber length)
+    internal void SetFunctionLength(double length)
     {
         DefinePropertyOrThrow(CommonProperties.Length, new PropertyDescriptor(length, writable: false, enumerable: false, configurable: true));
     }

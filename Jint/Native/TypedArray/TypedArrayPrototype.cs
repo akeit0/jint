@@ -25,7 +25,7 @@ internal sealed class TypedArrayPrototype : Prototype
     {
         var properties = new PropertyDictionary(2, checkExistingKeys: false)
         {
-            ["BYTES_PER_ELEMENT"] = new(JsNumber.Create(_arrayElementType.GetElementSize()), PropertyFlag.AllForbidden),
+            ["BYTES_PER_ELEMENT"] = new((_arrayElementType.GetElementSize()), PropertyFlag.AllForbidden),
             ["constructor"] = new(_constructor, PropertyFlag.NonEnumerable),
         };
         SetProperties(properties);

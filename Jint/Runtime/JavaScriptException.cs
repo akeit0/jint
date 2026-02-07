@@ -8,14 +8,14 @@ namespace Jint.Runtime;
 
 public class JavaScriptException : JintException
 {
-    private static string? GetMessage(JsValue? error)
+    private static string? GetMessage(JsValue error)
     {
         string? ret = null;
-        if (error is ObjectInstance oi)
+        if (error.Obj is ObjectInstance oi)
         {
             ret = oi.Get(CommonProperties.Message).ToString();
         }
-        else if (error is not null)
+        else
         {
             ret = error.IsSymbol() ? error.ToString() : TypeConverter.ToString(error);
         }
@@ -106,7 +106,7 @@ public class JavaScriptException : JintException
             else
             {
                 _callStack = engine.CallStack.BuildCallStackString(engine, location);
-                errObj.FastSetProperty(CommonProperties.Stack._value, new PropertyDescriptor(_callStack, false, false, false));
+                errObj.FastSetProperty(CommonProperties.Stack, new PropertyDescriptor(_callStack, false, false, false));
             }
         }
 
@@ -122,7 +122,7 @@ public class JavaScriptException : JintException
                     return _callStack;
                 }
 
-                if (Error is not ObjectInstance oi)
+                if (Error.Obj is not ObjectInstance oi)
                 {
                     return null;
                 }

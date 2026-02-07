@@ -65,8 +65,8 @@ internal readonly record struct TypedArrayValue(Types Type, double DoubleValue, 
     public JsValue ToJsValue()
     {
         return Type == Types.Number
-            ? JsNumber.Create(DoubleValue)
-            : JsBigInt.Create(BigInteger);
+            ? (DoubleValue)
+            : (BigInteger);
     }
 
     public TypeCode GetTypeCode()

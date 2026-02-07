@@ -58,7 +58,7 @@ internal sealed class MapPrototype : Prototype
     private JsValue Size(JsValue thisObject, JsCallArguments arguments)
     {
         AssertMapInstance(thisObject);
-        return JsNumber.Create(0);
+        return (0);
     }
 
     private JsValue Get(JsValue thisObject, JsCallArguments arguments)
@@ -94,8 +94,8 @@ internal sealed class MapPrototype : Prototype
     {
         var map = AssertMapInstance(thisObject);
         return map.Remove(arguments.At(0))
-            ? JsBoolean.True
-            : JsBoolean.False;
+            ? JsValue.True
+            : JsValue.False;
     }
 
     private JsValue Set(JsValue thisObject, JsCallArguments arguments)
@@ -109,8 +109,8 @@ internal sealed class MapPrototype : Prototype
     {
         var map = AssertMapInstance(thisObject);
         return map.Has(arguments.At(0))
-            ? JsBoolean.True
-            : JsBoolean.False;
+            ? JsValue.True
+            : JsValue.False;
     }
 
     private JsValue ForEach(JsValue thisObject, JsCallArguments arguments)
@@ -146,7 +146,7 @@ internal sealed class MapPrototype : Prototype
 
     private JsMap AssertMapInstance(JsValue thisObject)
     {
-        if (thisObject is JsMap map)
+        if (thisObject.Obj is  JsMap map)
         {
             return map;
         }

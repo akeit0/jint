@@ -6,7 +6,7 @@ namespace Jint.Native;
 
 public readonly struct JsBigInt : IEquatable<JsBigInt>
 {
-    internal readonly BigInteger value => Unsafe.As<JsBigInt, BigInteger>(ref Unsafe.AsRef(this));
+    internal readonly BigInteger value => Unsafe.As<JsBigInt, BigInteger>(ref Unsafe.AsRef(in this));
 
 #pragma warning disable CS0169 // Field is never used
     private readonly int sign;
@@ -33,7 +33,7 @@ public readonly struct JsBigInt : IEquatable<JsBigInt>
 
     public JsValue ToJsValue()
     {
-        return new JsValue(unchecked((((ulong)(uint)Tag.JS_TAG_BIG_INT)<< 32 | (uint)sign)), bits);
+        return new JsValue(unchecked((((ulong) (uint) Tag.JS_TAG_BIG_INT) << 32 | (uint) sign)), bits);
     }
 
     public object ToObject() => value;
@@ -70,7 +70,8 @@ public readonly struct JsBigInt : IEquatable<JsBigInt>
 
         if (value.IsBoolean())
         {
-            return value.GetBoolValue() && this.value == BigInteger.One || !value.GetBoolValue() && this.value == BigInteger.Zero;
+            return value.GetBoolValue() && this.value == BigInteger.One ||
+                   !value.GetBoolValue() && this.value == BigInteger.Zero;
         }
 
         if (value.IsString() && TypeConverter.TryStringToBigInt(value.ToString(), out var temp) && temp == this.value)
@@ -94,7 +95,7 @@ public readonly struct JsBigInt : IEquatable<JsBigInt>
 
     public override int GetHashCode() => value.GetHashCode();
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is JsBigInt && Equals((JsBigInt) obj);
     }

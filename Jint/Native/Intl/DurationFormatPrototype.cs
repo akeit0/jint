@@ -48,7 +48,7 @@ internal sealed class DurationFormatPrototype : Prototype
 
     private JsDurationFormat ValidateDurationFormat(JsValue thisObject)
     {
-        if (thisObject is JsDurationFormat durationFormat)
+        if (thisObject.Obj is  JsDurationFormat durationFormat)
         {
             return durationFormat;
         }

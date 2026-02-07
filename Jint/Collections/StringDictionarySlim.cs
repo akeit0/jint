@@ -20,7 +20,7 @@ namespace Jint.Collections;
 /// 2) It does not store the hash code (assumes it is cheap to equate values).
 /// 3) It does not accept an equality comparer (assumes Object.GetHashCode() and Object.Equals() or overridden implementation are cheap and sufficient).
 /// </summary>
-[DebuggerTypeProxy(typeof(DictionarySlimDebugView<>))]
+//[DebuggerTypeProxy(typeof(DictionarySlimDebugView<>))]
 [DebuggerDisplay("Count = {Count}")]
 internal sealed class StringDictionarySlim<TValue> : DictionaryBase<TValue>, IReadOnlyCollection<KeyValuePair<Key, TValue>>
 {

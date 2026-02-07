@@ -69,9 +69,9 @@ public class RavenApiUsageTests
         obj.FastSetDataProperty("name", "test");
 
         var array1 = new JsArray(engine, [
-            JsNumber.Create(1),
-            JsNumber.Create(2),
-            JsNumber.Create(3)
+            (1),
+            (2),
+            (3)
         ]);
         engine.SetValue("array1", array1);
 

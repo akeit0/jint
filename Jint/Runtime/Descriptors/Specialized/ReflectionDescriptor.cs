@@ -30,7 +30,7 @@ internal sealed class ReflectionDescriptor : PropertyDescriptor
         _propertyName = propertyName;
     }
 
-    public override JsValue? Get
+    public override JsValue Get
     {
         get
         {
@@ -43,7 +43,7 @@ internal sealed class ReflectionDescriptor : PropertyDescriptor
         }
     }
 
-    public override JsValue? Set
+    public override JsValue Set
     {
         get
         {
@@ -56,20 +56,20 @@ internal sealed class ReflectionDescriptor : PropertyDescriptor
         }
     }
 
-    protected internal override JsValue? CustomValue
+    protected internal override JsValue CustomValue
     {
-        get => DoGet(thisObj: null);
-        set => DoSet(thisObj: null, value);
+        get => DoGet(thisObj: default);
+        set => DoSet(thisObj: default, value);
     }
 
-    private JsValue DoGet(JsValue? thisObj)
+    private JsValue DoGet(JsValue thisObj)
     {
         var value = _reflectionAccessor.GetValue(_engine, _target, _propertyName);
         var type = _reflectionAccessor.MemberType ?? value?.GetType();
         return JsValue.FromObjectWithType(_engine, value, type);
     }
 
-    private void DoSet(JsValue? thisObj, JsValue? v)
+    private void DoSet(JsValue thisObj, JsValue v)
     {
         try
         {

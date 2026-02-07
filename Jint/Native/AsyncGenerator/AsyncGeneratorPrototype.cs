@@ -94,7 +94,7 @@ internal sealed class AsyncGeneratorPrototype : ObjectInstance
 
     private static bool TryGetAsyncGeneratorInstance(JsValue thisObj, out AsyncGeneratorInstance instance)
     {
-        instance = (thisObj as AsyncGeneratorInstance)!;
+        instance = (thisObj.Obj as AsyncGeneratorInstance)!;
         return instance is not null;
     }
 
@@ -106,7 +106,7 @@ internal sealed class AsyncGeneratorPrototype : ObjectInstance
     {
         var promiseCapability = PromiseConstructor.NewPromiseCapability(_engine, _engine.Realm.Intrinsics.Promise);
         var error = _engine.Realm.Intrinsics.TypeError.Construct(message);
-        promiseCapability.Reject.Call(Undefined, new[] { error });
+        promiseCapability.Reject.Call(Undefined, error);
         return promiseCapability.PromiseInstance;
     }
 }

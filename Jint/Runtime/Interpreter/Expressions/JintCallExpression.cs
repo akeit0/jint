@@ -51,12 +51,12 @@ internal sealed class JintCallExpression : JintExpression
         // Check for generator suspension after evaluating callee
         if (context.IsSuspended())
         {
-            return reference as JsValue ?? JsValue.Undefined;
+            return reference.UninitializedToUndefined();
         }
 
-        if (ReferenceEquals(reference, JsValue.Undefined))
+        if (reference.IsUndefined())
         {
-            return JsValue.Undefined;
+            return reference;
         }
 
         var engine = context.Engine;
@@ -67,8 +67,8 @@ internal sealed class JintCallExpression : JintExpression
             return JsValue.Undefined;
         }
 
-        var referenceRecord = reference as Reference;
-        if (ReferenceEquals(func, engine.Realm.Intrinsics.Eval)
+        var referenceRecord = reference.Obj! as Reference;
+        if (ReferenceEquals(func.Obj, engine.Realm.Intrinsics.Eval)
             && referenceRecord != null
             && !referenceRecord.IsPropertyReference
             && CommonProperties.Eval.Equals(referenceRecord.ReferencedName))

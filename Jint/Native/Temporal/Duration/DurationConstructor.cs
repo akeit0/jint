@@ -21,7 +21,7 @@ internal sealed class DurationConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new DurationPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(JsValue.PositiveZero, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 
@@ -43,7 +43,7 @@ internal sealed class DurationConstructor : Constructor
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.from
     /// </summary>
-    private JsDuration From(JsValue thisObject, JsCallArguments arguments)
+    private JsValue From(JsValue thisObject, JsCallArguments arguments)
     {
         var item = arguments.At(0);
         return ToTemporalDuration(item);
@@ -52,7 +52,7 @@ internal sealed class DurationConstructor : Constructor
     /// <summary>
     /// https://tc39.es/proposal-temporal/#sec-temporal.duration.compare
     /// </summary>
-    private JsNumber Compare(JsValue thisObject, JsCallArguments arguments)
+    private JsValue Compare(JsValue thisObject, JsCallArguments arguments)
     {
         var one = ToTemporalDuration(arguments.At(0));
         var two = ToTemporalDuration(arguments.At(1));
@@ -80,7 +80,7 @@ internal sealed class DurationConstructor : Constructor
         var ns1 = TemporalHelpers.TotalDurationNanoseconds(d1);
         var ns2 = TemporalHelpers.TotalDurationNanoseconds(d2);
 
-        return JsNumber.Create(ns1.CompareTo(ns2));
+        return (ns1.CompareTo(ns2));
     }
 
     protected internal override JsValue Call(JsValue thisObject, JsCallArguments arguments)
@@ -145,7 +145,7 @@ internal sealed class DurationConstructor : Constructor
     /// </summary>
     internal JsDuration ToTemporalDuration(JsValue item)
     {
-        if (item is JsDuration duration)
+        if (item.Obj is JsDuration duration)
         {
             return duration;
         }

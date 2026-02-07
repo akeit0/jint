@@ -260,7 +260,7 @@ public sealed partial class Engine : IDisposable
     /// </summary>
     public Engine SetValue(string name, double value)
     {
-        return SetValue(name, (JsValue) JsNumber.Create(value));
+        return SetValue(name, (JsValue) (value));
     }
 
     /// <summary>
@@ -268,7 +268,7 @@ public sealed partial class Engine : IDisposable
     /// </summary>
     public Engine SetValue(string name, int value)
     {
-        return SetValue(name, (JsValue) JsNumber.Create(value));
+        return SetValue(name, (JsValue) (value));
     }
 
     /// <summary>
@@ -276,7 +276,7 @@ public sealed partial class Engine : IDisposable
     /// </summary>
     public Engine SetValue(string name, bool value)
     {
-        return SetValue(name, (JsValue) (value ? JsBoolean.True : JsBoolean.False));
+        return SetValue(name, (JsValue) (value ? JsValue.True : JsValue.False));
     }
 
     /// <summary>
@@ -556,7 +556,7 @@ public sealed partial class Engine : IDisposable
         _eventLoop.Enqueue(continuation);
     }
 
-    internal void AddToKeptObjects(JsValue target)
+    internal void AddToKeptObjects(object target)
     {
         _agent.AddToKeptObjects(target);
     }
@@ -660,9 +660,9 @@ public sealed partial class Engine : IDisposable
             // check if we are accessing a string, boxing operation can be costly to do index access
             // we have good chance to have fast path with integer or string indexer
             ObjectInstance? o = null;
-            if ((property._type & (InternalTypes.String | InternalTypes.Integer)) != InternalTypes.Empty
-                && baseValue is JsString s
-                && TryHandleStringValue(property, s, ref o, out var jsValue))
+            if ((property.IsString()||property.IsNumber())
+                && baseValue.IsString()
+                && TryHandleStringValue(property, baseValue.AsString()!, ref o, out var jsValue))
             {
                 return jsValue;
             }
@@ -714,11 +714,11 @@ public sealed partial class Engine : IDisposable
         Throw.TypeError(Realm, $"Cannot read property '{propertyName}' of {baseValue}");
     }
 
-    private bool TryHandleStringValue(JsValue property, JsString s, ref ObjectInstance? o, out JsValue jsValue)
+    private bool TryHandleStringValue(JsValue property, string s, ref ObjectInstance? o, out JsValue jsValue)
     {
         if (CommonProperties.Length.Equals(property))
         {
-            jsValue = JsNumber.Create((uint) s.Length);
+            jsValue = ((uint) s.Length);
             return true;
         }
 
@@ -731,7 +731,7 @@ public sealed partial class Engine : IDisposable
                 return true;
             }
 
-            jsValue = JsString.Create(s[index]);
+            jsValue = (s[index]);
             return true;
         }
 
@@ -827,7 +827,7 @@ public sealed partial class Engine : IDisposable
     /// <returns>The value returned by the function call.</returns>
     public JsValue Invoke(JsValue value, object? thisObj, object?[] arguments)
     {
-        var callable = value as ICallable;
+        var callable = value.Obj as ICallable;
         if (callable is null)
         {
             Throw.JavaScriptException(Realm.Intrinsics.TypeError, "Can only invoke functions");
@@ -1586,7 +1586,7 @@ public sealed partial class Engine : IDisposable
                 Throw.ArgumentException(callable + " is not callable");
             }
 
-            return Call((ICallable) callable, thisObject, arguments, null);
+            return Call((ICallable) callable.Obj!, thisObject, arguments, null);
         }
 
         return ExecuteWithConstraints(Options.Strict, Callback);

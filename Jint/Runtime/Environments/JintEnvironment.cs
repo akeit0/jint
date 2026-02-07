@@ -37,7 +37,7 @@ internal static class JintEnvironment
         Environment.BindingName name,
         bool strict,
         [NotNullWhen(true)] out Environment? record,
-        [NotNullWhen(true)] out JsValue? value)
+        [NotNullWhen(true)] out JsValue value)
     {
         record = env;
         value = default;

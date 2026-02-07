@@ -57,7 +57,7 @@ internal sealed class RegExpPrototype : Prototype
                         return protoValue ?? Undefined;
                     }
 
-                    var r = thisObj as JsRegExp;
+                    var r = thisObj.Obj as JsRegExp;
                     if (r is null)
                     {
                         Throw.TypeError(_realm);
@@ -110,7 +110,7 @@ internal sealed class RegExpPrototype : Prototype
             return DefaultSource;
         }
 
-        var r = thisObject as JsRegExp;
+        var r = thisObject .Obj as JsRegExp;
         if (r is null)
         {
             Throw.TypeError(_realm);
@@ -207,7 +207,7 @@ internal sealed class RegExpPrototype : Prototype
                 result = rei.Value.Replace(s, TypeConverter.ToString(replaceValue), count);
             }
 
-            rx.Set(JsRegExp.PropertyLastIndex, JsNumber.PositiveZero);
+            rx.Set(JsRegExp.PropertyLastIndex, JsValue.PositiveZero);
             return result;
         }
 
@@ -631,17 +631,17 @@ internal sealed class RegExpPrototype : Prototype
             var lastIndex = (int) TypeConverter.ToLength(R.Get(JsRegExp.PropertyLastIndex));
             if (lastIndex >= s.Length && s.Length > 0)
             {
-                return JsBoolean.False;
+                return JsValue.False;
             }
 
             var m = R.Value.Match(s, lastIndex);
             if (!m.Success || (R.Sticky && m.Index != lastIndex))
             {
                 R.Set(JsRegExp.PropertyLastIndex, 0, throwOnError: true);
-                return JsBoolean.False;
+                return JsValue.False;
             }
             R.Set(JsRegExp.PropertyLastIndex, m.Index + m.Length, throwOnError: true);
-            return JsBoolean.True;
+            return JsValue.True;
         }
 
         var match = RegExpExec(r, s);
@@ -693,7 +693,7 @@ internal sealed class RegExpPrototype : Prototype
         }
 
         var fullUnicode = flags.Contains('u');
-        rx.Set(JsRegExp.PropertyLastIndex, JsNumber.PositiveZero, true);
+        rx.Set(JsRegExp.PropertyLastIndex, JsValue.PositiveZero, true);
 
         if (!fullUnicode
             && rx is JsRegExp rei
@@ -892,7 +892,7 @@ internal sealed class RegExpPrototype : Prototype
 
         if (lastIndex > length)
         {
-            R.Set(JsRegExp.PropertyLastIndex, JsNumber.PositiveZero, true);
+            R.Set(JsRegExp.PropertyLastIndex, JsValue.PositiveZero, true);
             return Null;
         }
 
@@ -922,7 +922,7 @@ internal sealed class RegExpPrototype : Prototype
         var success = match.Success && (!sticky || match.Index == (int) lastIndex);
         if (!success)
         {
-            R.Set(JsRegExp.PropertyLastIndex, JsNumber.PositiveZero, true);
+            R.Set(JsRegExp.PropertyLastIndex, JsValue.PositiveZero, true);
             return Null;
         }
 
@@ -967,7 +967,7 @@ internal sealed class RegExpPrototype : Prototype
             {
                 if (capture?.Success == true)
                 {
-                    indices!.Add([JsNumber.Create(capture.Index), JsNumber.Create(capture.Index + capture.Length)]);
+                    indices!.Add([(capture.Index), (capture.Index + capture.Length)]);
                 }
                 else
                 {
@@ -1071,7 +1071,7 @@ internal sealed class RegExpPrototype : Prototype
 
     private JsValue Exec(JsValue thisObject, JsCallArguments arguments)
     {
-        var r = thisObject as JsRegExp;
+        var r = thisObject .Obj as JsRegExp;
         if (r is null)
         {
             Throw.TypeError(_engine.Realm);

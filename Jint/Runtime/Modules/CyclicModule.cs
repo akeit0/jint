@@ -139,7 +139,7 @@ public abstract class CyclicModule : Module
             }
 
             _abnormalCompletionLocation = result.Location;
-            capability.Reject.Call(Undefined, result.Value);
+            capability.Reject.Call(JsValue.Undefined, result.Value);
         }
         else
         {
@@ -160,7 +160,7 @@ public abstract class CyclicModule : Module
                     Throw.InvalidOperationException("Error while evaluating module: Module is in an invalid state");
                 }
 
-                capability.Resolve.Call(Undefined, Array.Empty<JsValue>());
+                capability.Resolve.Call(JsValue.Undefined, Array.Empty<JsValue>());
             }
 
             if (stack.Count > 0)

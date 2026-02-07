@@ -29,7 +29,7 @@ internal sealed class PluralRulesConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new PluralRulesPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(JsValue.PositiveZero, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

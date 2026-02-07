@@ -26,7 +26,7 @@ internal sealed class NumberConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new NumberPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 
@@ -59,7 +59,7 @@ internal sealed class NumberConstructor : Constructor
             return false;
         }
 
-        return double.IsInfinity(num._value) || double.IsNaN(num._value) ? JsBoolean.False : JsBoolean.True;
+        return double.IsInfinity(num._value) || double.IsNaN(num._value) ? JsValue.False : JsValue.True;
     }
 
     private static JsValue IsInteger(JsValue thisObject, JsCallArguments arguments)
@@ -71,7 +71,7 @@ internal sealed class NumberConstructor : Constructor
 
         if (double.IsInfinity(num._value) || double.IsNaN(num._value))
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         var integer = TypeConverter.ToInteger(num);
@@ -98,7 +98,7 @@ internal sealed class NumberConstructor : Constructor
 
         if (double.IsInfinity(num._value) || double.IsNaN(num._value))
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         var integer = TypeConverter.ToInteger(num);
@@ -138,13 +138,13 @@ internal sealed class NumberConstructor : Constructor
 
     private static JsNumber ProcessFirstParameter(JsCallArguments arguments)
     {
-        var n = JsNumber.PositiveZero;
+        var n = JsValue.PositiveZero;
         if (arguments.Length > 0)
         {
             var prim = TypeConverter.ToNumeric(arguments[0]);
             if (prim.IsBigInt())
             {
-                n = JsNumber.Create((long) ((JsBigInt) prim).value);
+                n = ((long) ((JsBigInt) prim).value);
             }
             else
             {

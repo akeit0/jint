@@ -12,8 +12,8 @@ public class JsonSerializerTests
         var serializer = new JsonSerializer(engine);
 
         Assert.Equal("null", serializer.Serialize(JsValue.Null).ToString());
-        Assert.Equal("true", serializer.Serialize(JsBoolean.True).ToString());
-        Assert.Equal("false", serializer.Serialize(JsBoolean.False).ToString());
+        Assert.Equal("true", serializer.Serialize(JsValue.True).ToString());
+        Assert.Equal("false", serializer.Serialize(JsValue.False).ToString());
         Assert.Equal("\"\"", serializer.Serialize(new JsString("")).ToString());
         Assert.Equal("\"abc\"", serializer.Serialize(new JsString("abc")).ToString());
         Assert.Equal("1", serializer.Serialize(new JsNumber(1)).ToString());
@@ -125,7 +125,7 @@ public class JsonSerializerTests
     {
         using var engine = new Engine();
         var serializer = new JsonSerializer(engine);
-        JsArray array = new JsArray(engine, [JsNumber.DoubleNegativeInfinity, JsNumber.DoublePositiveInfinity, JsNumber.DoubleNaN]);
+        JsArray array = new JsArray(engine, [double.NegativeInfinity, double.PositiveInfinity, JsValue.NaN]);
         string actual = serializer.Serialize(array, JsValue.Undefined, JsValue.Undefined).ToString();
         Assert.Equal("[null,null,null]", actual);
     }

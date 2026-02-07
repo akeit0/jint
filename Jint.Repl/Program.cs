@@ -168,7 +168,7 @@ while (true)
     {
         var result = engine.Evaluate(input, parsingOptions);
         JsValue str = result;
-        if (!result.IsPrimitive() && result is not IJsPrimitive)
+        if (!result.IsPrimitive() && result.Obj is not IJsPrimitive)
         {
             str = serializer.Serialize(result, JsValue.Undefined, "  ");
             if (str == JsValue.Undefined)

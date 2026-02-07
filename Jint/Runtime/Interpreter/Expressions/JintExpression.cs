@@ -23,9 +23,9 @@ internal abstract class JintExpression
     public virtual JsValue GetValue(EvaluationContext context)
     {
         var result = Evaluate(context);
-        if (result is not Reference reference)
+        if (result.Obj is not Reference reference)
         {
-            return (JsValue) result;
+            return result;
         }
 
         // Set LastSyntaxElement for proper error location if GetValue throws
@@ -156,7 +156,7 @@ internal abstract class JintExpression
 
             if (rightInteger == 0)
             {
-                result = JsNumber.DoubleNaN;
+                result = JsValue.NaN;
             }
             else
             {
@@ -167,7 +167,7 @@ internal abstract class JintExpression
                 }
                 else
                 {
-                    result = JsNumber.Create(modulo);
+                    result = (modulo);
                 }
             }
         }
@@ -178,7 +178,7 @@ internal abstract class JintExpression
 
             if (double.IsNaN(n) || double.IsNaN(d) || double.IsInfinity(n))
             {
-                result = JsNumber.DoubleNaN;
+                result = JsValue.NaN;
             }
             else if (double.IsInfinity(d))
             {
@@ -186,7 +186,7 @@ internal abstract class JintExpression
             }
             else if (NumberInstance.IsPositiveZero(d) || NumberInstance.IsNegativeZero(d))
             {
-                result = JsNumber.DoubleNaN;
+                result = JsValue.NaN;
             }
             else if (NumberInstance.IsPositiveZero(n) || NumberInstance.IsNegativeZero(n))
             {
@@ -194,7 +194,7 @@ internal abstract class JintExpression
             }
             else
             {
-                result = JsNumber.Create(n % d);
+                result = (n % d);
             }
         }
         else
@@ -257,7 +257,7 @@ internal abstract class JintExpression
 
         if (lN == 0 && rN == 0)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         if (rN == 0)
@@ -267,7 +267,7 @@ internal abstract class JintExpression
 
         if (lN % rN == 0 && (lN != 0 || rN > 0))
         {
-            return JsNumber.Create(lN / rN);
+            return (lN / rN);
         }
 
         return (double) lN / rN;
@@ -286,12 +286,12 @@ internal abstract class JintExpression
 
             if (double.IsNaN(rN) || double.IsNaN(lN))
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
 
             if (double.IsInfinity(lN) && double.IsInfinity(rN))
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
 
             if (double.IsInfinity(lN) && rN == 0)
@@ -306,7 +306,7 @@ internal abstract class JintExpression
 
             if (lN == 0 && rN == 0)
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
 
             if (rN == 0)
@@ -346,12 +346,12 @@ internal abstract class JintExpression
 
         if (x.IsInteger() && y.IsInteger())
         {
-            return (int) nx < (int) ny ? JsBoolean.True : JsBoolean.False;
+            return (int) nx < (int) ny ? JsValue.True : JsValue.False;
         }
 
         if (!double.IsInfinity(nx) && !double.IsInfinity(ny) && !double.IsNaN(nx) && !double.IsNaN(ny))
         {
-            return nx < ny ? JsBoolean.True : JsBoolean.False;
+            return nx < ny ? JsValue.True : JsValue.False;
         }
 
         return CompareComplex(x, y, leftFirst);
@@ -380,7 +380,7 @@ internal abstract class JintExpression
             {
                 if (typea == typeb)
                 {
-                    return TypeConverter.ToBigInt(px) < TypeConverter.ToBigInt(py) ? JsBoolean.True : JsBoolean.False;
+                    return TypeConverter.ToBigInt(px) < TypeConverter.ToBigInt(py) ? JsValue.True : JsValue.False;
                 }
 
                 if (typea == Types.BigInt)
@@ -391,7 +391,7 @@ internal abstract class JintExpression
                         {
                             return JsValue.Undefined;
                         }
-                        return TypeConverter.ToBigInt(px) < temp ? JsBoolean.True : JsBoolean.False;
+                        return TypeConverter.ToBigInt(px) < temp ? JsValue.True : JsValue.False;
                     }
 
                     var numberB = TypeConverter.ToNumber(py);
@@ -402,16 +402,16 @@ internal abstract class JintExpression
 
                     if (double.IsPositiveInfinity(numberB))
                     {
-                        return JsBoolean.True;
+                        return JsValue.True;
                     }
 
                     if (double.IsNegativeInfinity(numberB))
                     {
-                        return JsBoolean.False;
+                        return JsValue.False;
                     }
 
                     var normalized = new BigInteger(Math.Ceiling(numberB));
-                    return TypeConverter.ToBigInt(px) < normalized ? JsBoolean.True : JsBoolean.False;
+                    return TypeConverter.ToBigInt(px) < normalized ? JsValue.True : JsValue.False;
                 }
 
                 if (px is JsString jsStringX)
@@ -420,7 +420,7 @@ internal abstract class JintExpression
                     {
                         return JsValue.Undefined;
                     }
-                    return temp < TypeConverter.ToBigInt(py) ? JsBoolean.True : JsBoolean.False;
+                    return temp < TypeConverter.ToBigInt(py) ? JsValue.True : JsValue.False;
                 }
 
                 var numberA = TypeConverter.ToNumber(px);
@@ -431,12 +431,12 @@ internal abstract class JintExpression
 
                 if (double.IsPositiveInfinity(numberA))
                 {
-                    return JsBoolean.False;
+                    return JsValue.False;
                 }
 
                 if (double.IsNegativeInfinity(numberA))
                 {
-                    return JsBoolean.True;
+                    return JsValue.True;
                 }
 
                 var normalizedA = new BigInteger(Math.Floor(numberA));
@@ -453,33 +453,33 @@ internal abstract class JintExpression
 
             if (nx == ny)
             {
-                return JsBoolean.False;
+                return JsValue.False;
             }
 
             if (double.IsPositiveInfinity(nx))
             {
-                return JsBoolean.False;
+                return JsValue.False;
             }
 
             if (double.IsPositiveInfinity(ny))
             {
-                return JsBoolean.True;
+                return JsValue.True;
             }
 
             if (double.IsNegativeInfinity(ny))
             {
-                return JsBoolean.False;
+                return JsValue.False;
             }
 
             if (double.IsNegativeInfinity(nx))
             {
-                return JsBoolean.True;
+                return JsValue.True;
             }
 
-            return nx < ny ? JsBoolean.True : JsBoolean.False;
+            return nx < ny ? JsValue.True : JsValue.False;
         }
 
-        return string.CompareOrdinal(TypeConverter.ToString(x), TypeConverter.ToString(y)) < 0 ? JsBoolean.True : JsBoolean.False;
+        return string.CompareOrdinal(TypeConverter.ToString(x), TypeConverter.ToString(y)) < 0 ? JsValue.True : JsValue.False;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

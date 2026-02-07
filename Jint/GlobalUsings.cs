@@ -3,3 +3,4 @@ global using SymbolDictionary = Jint.Collections.DictionarySlim<Jint.Native.JsSy
 
 global using JsCallDelegate = System.Func<Jint.Native.JsValue, Jint.Native.JsValue[], Jint.Native.JsValue>;
 global using JsCallArguments = Jint.Native.JsValue[];
+global using JsNumber = double;

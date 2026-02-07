@@ -46,7 +46,7 @@ public sealed partial class GlobalObject : ObjectInstance
         }
         else if (radix < 2 || radix > 36)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         else if (radix != 16)
         {
@@ -56,7 +56,7 @@ public sealed partial class GlobalObject : ObjectInstance
         // check fast case
         if (radix == 10 && int.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
         {
-            return JsNumber.Create(number);
+            return (number);
         }
 
         var sign = 1;
@@ -113,7 +113,7 @@ public sealed partial class GlobalObject : ObjectInstance
             pow *= radix;
         }
 
-        return hasResult ? JsNumber.Create(sign * result) : JsNumber.DoubleNaN;
+        return hasResult ? (sign * result) : JsValue.NaN;
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public sealed partial class GlobalObject : ObjectInstance
 
         if (string.IsNullOrWhiteSpace(trimmedString))
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         // start of string processing
@@ -140,7 +140,7 @@ public sealed partial class GlobalObject : ObjectInstance
                 i++;
                 if (trimmedString.Length > 1 && trimmedString[1] == 'I' && trimmedString.StartsWith("-Infinity", StringComparison.Ordinal))
                 {
-                    return JsNumber.DoubleNegativeInfinity;
+                    return double.NegativeInfinity;
                 }
             }
 
@@ -149,18 +149,18 @@ public sealed partial class GlobalObject : ObjectInstance
                 i++;
                 if (trimmedString.Length > 1 && trimmedString[1] == 'I' && trimmedString.StartsWith("+Infinity", StringComparison.Ordinal))
                 {
-                    return JsNumber.DoublePositiveInfinity;
+                    return double.PositiveInfinity;
                 }
             }
 
             if (trimmedString.StartsWith("Infinity", StringComparison.Ordinal))
             {
-                return JsNumber.DoublePositiveInfinity;
+                return double.PositiveInfinity;
             }
 
             if (trimmedString.StartsWith("NaN", StringComparison.Ordinal))
             {
-                return JsNumber.DoubleNaN;
+                return JsValue.NaN;
             }
         }
 
@@ -234,7 +234,7 @@ public sealed partial class GlobalObject : ObjectInstance
             return d;
         }
 
-        return JsNumber.DoubleNaN;
+        return JsValue.NaN;
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ public sealed partial class GlobalObject : ObjectInstance
     {
         var value = arguments.At(0);
 
-        if (ReferenceEquals(value, JsNumber.DoubleNaN))
+        if (value.IsNaN)
         {
             return true;
         }

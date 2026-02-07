@@ -23,7 +23,7 @@ internal sealed class BigIntConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new BigIntPrototype(engine, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

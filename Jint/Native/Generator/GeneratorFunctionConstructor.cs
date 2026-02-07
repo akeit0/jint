@@ -23,7 +23,7 @@ internal sealed class GeneratorFunctionConstructor : Constructor
         PrototypeObject = new GeneratorFunctionPrototype(engine, this, prototype, iteratorPrototype);
         _prototype = PrototypeObject;
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
     }
 
     public GeneratorFunctionPrototype PrototypeObject { get; }

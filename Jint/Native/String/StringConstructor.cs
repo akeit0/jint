@@ -27,7 +27,7 @@ internal sealed class StringConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new StringPrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 
@@ -47,7 +47,7 @@ internal sealed class StringConstructor : Constructor
     /// <summary>
     /// https://tc39.es/ecma262/#sec-string.fromcharcode
     /// </summary>
-    private static JsValue FromCharCode(JsValue? thisObj, JsCallArguments arguments)
+    private static JsValue FromCharCode(JsValue thisObj, JsCallArguments arguments)
     {
         var length = arguments.Length;
 
@@ -86,9 +86,10 @@ internal sealed class StringConstructor : Constructor
         {
             int point;
             codePoint = TypeConverter.ToNumber(a);
-            if (codePoint.IsInteger())
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (System.Math.Truncate(codePoint) == codePoint)
             {
-                point = (int) codePoint._value;
+                point = (int) codePoint;
                 if (point is < 0 or > 0x10FFFF)
                 {
                     goto rangeError;
@@ -97,7 +98,8 @@ internal sealed class StringConstructor : Constructor
             else
             {
                 var pointTemp = codePoint;
-                if (pointTemp < 0 || pointTemp > 0x10FFFF || double.IsInfinity(pointTemp) || double.IsNaN(pointTemp) || TypeConverter.ToInt32(pointTemp) != pointTemp)
+                if (pointTemp < 0 || pointTemp > 0x10FFFF || double.IsInfinity(pointTemp) || double.IsNaN(pointTemp) ||
+                    TypeConverter.ToInt32(pointTemp) != pointTemp)
                 {
                     goto rangeError;
                 }
@@ -167,8 +169,8 @@ rangeError:
         }
 
         var arg = arguments[0];
-        var str = arg is JsSymbol s
-            ? s.ToString()
+        var str = arg.IsSymbol()
+            ? arg.ToString()
             : TypeConverter.ToString(arg);
 
         return JsString.Create(str);
@@ -189,8 +191,9 @@ rangeError:
             var value = arguments.At(0);
             if (newTarget.IsUndefined() && value.IsSymbol())
             {
-                return StringCreate(JsString.Create(((JsSymbol) value).ToString()), PrototypeObject);
+                return StringCreate(value.AsString()!, PrototypeObject);
             }
+
             s = TypeConverter.ToJsString(arguments[0]);
         }
 
@@ -199,7 +202,8 @@ rangeError:
             return StringCreate(s, PrototypeObject);
         }
 
-        return StringCreate(s, GetPrototypeFromConstructor(newTarget, static intrinsics => intrinsics.String.PrototypeObject));
+        return StringCreate(s,
+            GetPrototypeFromConstructor(newTarget, static intrinsics => intrinsics.String.PrototypeObject));
     }
 
     public StringInstance Construct(JsString value)
@@ -212,10 +216,7 @@ rangeError:
     /// </summary>
     private StringInstance StringCreate(JsString value, ObjectInstance prototype)
     {
-        var instance = new StringInstance(Engine, value)
-        {
-            _prototype = prototype
-        };
+        var instance = new StringInstance(Engine, value) { _prototype = prototype };
 
         return instance;
     }

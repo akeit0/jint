@@ -8,5 +8,5 @@ namespace Jint.Runtime.Interop;
 /// </summary>
 public interface IObjectConverter
 {
-    bool TryConvert(Engine engine, object value, [NotNullWhen(true)] out JsValue? result);
+    bool TryConvert(Engine engine, object value, out JsValue result);
 }

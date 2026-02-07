@@ -142,8 +142,8 @@ public class JsonTests
         var engine = new Engine();
         var parser = new JsonParser(engine);
 
-        Assert.Same(JsBoolean.True, parser.Parse("true"));
-        Assert.Same(JsBoolean.False, parser.Parse("false"));
+        Assert.Same(JsValue.True, parser.Parse("true"));
+        Assert.Same(JsValue.False, parser.Parse("false"));
         Assert.Same(JsValue.Null, parser.Parse("null"));
     }
 

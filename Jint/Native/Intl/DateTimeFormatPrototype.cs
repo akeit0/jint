@@ -57,7 +57,7 @@ internal sealed class DateTimeFormatPrototype : Prototype
 
     private JsDateTimeFormat ValidateDateTimeFormat(JsValue thisObject)
     {
-        if (thisObject is JsDateTimeFormat dateTimeFormat)
+        if (thisObject.Obj is  JsDateTimeFormat dateTimeFormat)
         {
             return dateTimeFormat;
         }

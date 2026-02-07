@@ -105,7 +105,7 @@ internal sealed class DatePrototype : Prototype
     /// </summary>
     private JsValue ToPrimitive(JsValue thisObject, JsCallArguments arguments)
     {
-        var oi = thisObject as ObjectInstance;
+        var oi = thisObject .Obj as ObjectInstance;
         if (oi is null)
         {
             Throw.TypeError(_realm);
@@ -145,7 +145,7 @@ internal sealed class DatePrototype : Prototype
     /// </summary>
     private DatePresentation ThisTimeValue(JsValue thisObject)
     {
-        if (thisObject is JsDate dateInstance)
+        if (thisObject.Obj is  JsDate dateInstance)
         {
             return dateInstance._dateValue;
         }
@@ -399,7 +399,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return t.ToJsValue();
     }
@@ -409,7 +409,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return YearFromTime(LocalTime(t));
     }
@@ -419,7 +419,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return YearFromTime(LocalTime(t)) - 1900;
     }
@@ -429,7 +429,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return YearFromTime(t);
     }
@@ -439,7 +439,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return MonthFromTime(LocalTime(t));
     }
@@ -452,7 +452,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return MonthFromTime(t);
     }
@@ -465,7 +465,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return DateFromTime(LocalTime(t));
     }
@@ -475,7 +475,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return DateFromTime(t);
     }
@@ -485,7 +485,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return WeekDay(LocalTime(t));
     }
@@ -495,7 +495,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return WeekDay(t);
     }
@@ -505,7 +505,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return HourFromTime(LocalTime(t));
     }
@@ -515,7 +515,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return HourFromTime(t);
     }
@@ -525,7 +525,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return MinFromTime(LocalTime(t));
     }
@@ -535,7 +535,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return MinFromTime(t);
     }
@@ -545,7 +545,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return SecFromTime(LocalTime(t));
     }
@@ -555,7 +555,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return SecFromTime(t);
     }
@@ -565,7 +565,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return MsFromTime(LocalTime(t));
     }
@@ -575,7 +575,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return MsFromTime(t);
     }
@@ -585,7 +585,7 @@ internal sealed class DatePrototype : Prototype
         var t = ThisTimeValue(thisObject);
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
         return (int) ((double) t.Value - LocalTime(t).Value) / MsPerMinute;
     }
@@ -613,7 +613,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var time = MakeTime(HourFromTime(t), MinFromTime(t), SecFromTime(t), ms);
@@ -652,7 +652,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var date = MakeDate(Day(t), MakeTime(HourFromTime(t), MinFromTime(t), s, milli));
@@ -672,7 +672,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var date = MakeDate(Day(t), MakeTime(HourFromTime(t), MinFromTime(t), s, milli));
@@ -693,7 +693,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var date = MakeDate(Day(t), MakeTime(HourFromTime(t), m, s, milli));
@@ -714,7 +714,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var date = MakeDate(Day(t), MakeTime(HourFromTime(t), m, s, milli));
@@ -736,7 +736,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var date = MakeDate(Day(t), MakeTime(h, m, s, milli));
@@ -758,7 +758,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var newDate = MakeDate(Day(t), MakeTime(h, m, s, milli));
@@ -777,7 +777,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var (year, month, __) = YearMonthDayFromTime(t);
@@ -797,7 +797,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var newDate = MakeDate(MakeDay(YearFromTime(t), MonthFromTime(t), dt), TimeWithinDay(t));
@@ -817,7 +817,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var newDate = MakeDate(MakeDay(YearFromTime(t), m, dt), TimeWithinDay(t));
@@ -837,7 +837,7 @@ internal sealed class DatePrototype : Prototype
 
         if (t.IsNaN)
         {
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var newDate = MakeDate(MakeDay(YearFromTime(t), m, dt), TimeWithinDay(t));
@@ -874,7 +874,7 @@ internal sealed class DatePrototype : Prototype
         if (double.IsNaN(y))
         {
             ((JsDate) thisObject)._dateValue = double.NaN;
-            return JsNumber.DoubleNaN;
+            return JsValue.NaN;
         }
 
         var fy = TypeConverter.ToInteger(y);

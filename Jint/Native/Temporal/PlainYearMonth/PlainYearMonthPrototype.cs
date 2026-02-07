@@ -57,18 +57,18 @@ internal sealed class PlainYearMonthPrototype : Prototype
 
     private JsPlainYearMonth ValidatePlainYearMonth(JsValue thisObject)
     {
-        if (thisObject is JsPlainYearMonth plainYearMonth)
+        if (thisObject.Obj is JsPlainYearMonth plainYearMonth)
             return plainYearMonth;
         Throw.TypeError(_realm, "Value is not a Temporal.PlainYearMonth");
         return null!;
     }
 
-    private JsString GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidatePlainYearMonth(thisObject).Calendar);
-    private JsNumber GetYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainYearMonth(thisObject).IsoDate.Year);
-    private JsNumber GetMonth(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainYearMonth(thisObject).IsoDate.Month);
-    private JsString GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidatePlainYearMonth(thisObject).IsoDate.Month:D2}");
-    private JsNumber GetDaysInMonth(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainYearMonth(thisObject).IsoDate.DaysInMonth());
-    private JsNumber GetDaysInYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainYearMonth(thisObject).IsoDate.DaysInYear());
-    private JsNumber GetMonthsInYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(12);
-    private JsBoolean GetInLeapYear(JsValue thisObject, JsCallArguments arguments) => IsoDate.IsLeapYear(ValidatePlainYearMonth(thisObject).IsoDate.Year) ? JsBoolean.True : JsBoolean.False;
+    private JsValue GetCalendarId(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainYearMonth(thisObject).Calendar);
+    private JsValue GetYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainYearMonth(thisObject).IsoDate.Year);
+    private JsValue GetMonth(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainYearMonth(thisObject).IsoDate.Month);
+    private JsValue GetMonthCode(JsValue thisObject, JsCallArguments arguments) => ($"M{ValidatePlainYearMonth(thisObject).IsoDate.Month:D2}");
+    private JsValue GetDaysInMonth(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainYearMonth(thisObject).IsoDate.DaysInMonth());
+    private JsValue GetDaysInYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainYearMonth(thisObject).IsoDate.DaysInYear());
+    private JsValue GetMonthsInYear(JsValue thisObject, JsCallArguments arguments) => (12);
+    private JsValue GetInLeapYear(JsValue thisObject, JsCallArguments arguments) => IsoDate.IsLeapYear(ValidatePlainYearMonth(thisObject).IsoDate.Year) ? JsValue.True : JsValue.False;
 }

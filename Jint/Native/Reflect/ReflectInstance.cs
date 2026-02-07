@@ -114,7 +114,7 @@ internal sealed class ReflectInstance : ObjectInstance
         }
 
         var property = TypeConverter.ToPropertyKey(arguments.At(1));
-        return o.Delete(property) ? JsBoolean.True : JsBoolean.False;
+        return o.Delete(property) ? JsValue.True : JsValue.False;
     }
 
     private JsValue Has(JsValue thisObject, JsCallArguments arguments)
@@ -126,7 +126,7 @@ internal sealed class ReflectInstance : ObjectInstance
         }
 
         var property = TypeConverter.ToPropertyKey(arguments.At(1));
-        return o.HasProperty(property) ? JsBoolean.True : JsBoolean.False;
+        return o.HasProperty(property) ? JsValue.True : JsValue.False;
     }
 
     private JsValue Set(JsValue thisObject, JsCallArguments arguments)

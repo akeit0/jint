@@ -51,21 +51,21 @@ internal sealed class InstantPrototype : Prototype
 
     private JsInstant ValidateInstant(JsValue thisObject)
     {
-        if (thisObject is JsInstant instant)
+        if (thisObject.Obj is JsInstant instant)
             return instant;
         Throw.TypeError(_realm, "Value is not a Temporal.Instant");
         return null!;
     }
 
-    private JsNumber GetEpochMilliseconds(JsValue thisObject, JsCallArguments arguments)
+    private JsValue GetEpochMilliseconds(JsValue thisObject, JsCallArguments arguments)
     {
         var instant = ValidateInstant(thisObject);
-        return JsNumber.Create((double) (instant.EpochNanoseconds / 1_000_000));
+        return ((double) (instant.EpochNanoseconds / 1_000_000));
     }
 
-    private JsBigInt GetEpochNanoseconds(JsValue thisObject, JsCallArguments arguments)
+    private JsValue GetEpochNanoseconds(JsValue thisObject, JsCallArguments arguments)
     {
         var instant = ValidateInstant(thisObject);
-        return JsBigInt.Create(instant.EpochNanoseconds);
+        return JsBigInt.Create(instant.EpochNanoseconds).ToJsValue();
     }
 }

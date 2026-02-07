@@ -91,7 +91,7 @@ internal sealed class FinalizationRegistryPrototype : Prototype
 
     private FinalizationRegistryInstance AssertFinalizationRegistryInstance(JsValue thisObject)
     {
-        if (thisObject is FinalizationRegistryInstance finalizationRegistryInstance)
+        if (thisObject.Obj is  FinalizationRegistryInstance finalizationRegistryInstance)
         {
             return finalizationRegistryInstance;
         }

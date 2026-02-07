@@ -21,7 +21,7 @@ internal sealed class PlainTimeConstructor : Constructor
     {
         _prototype = functionPrototype;
         PrototypeObject = new PlainTimePrototype(engine, realm, this, objectPrototype);
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(JsValue.PositiveZero, PropertyFlag.Configurable);
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
     }
 

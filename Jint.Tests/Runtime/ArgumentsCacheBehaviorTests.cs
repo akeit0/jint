@@ -33,9 +33,9 @@ public class ArgumentsCacheBehaviorTests
 
         // Assert
         Assert.Equal([
-            JsNumber.Create(42),
+            (42),
             JsValue.Undefined,
-            JsNumber.Create(10),
+            (10),
             JsValue.Undefined,
         ], logValues);
     }
@@ -69,9 +69,9 @@ public class ArgumentsCacheBehaviorTests
 
         // Assert
         Assert.Equal([
-            JsNumber.Create(42),
+            (42),
             JsValue.Undefined,
-            JsNumber.Create(10),
+            (10),
             JsValue.Undefined,
         ], logValues);
     }
@@ -108,9 +108,9 @@ public class ArgumentsCacheBehaviorTests
 
         // Assert
         Assert.Equal([
-            JsNumber.Create(42),
+            (42),
             JsValue.Undefined,
-            JsNumber.Create(10),
+            (10),
             JsValue.Undefined,
         ], logValues);
     }
@@ -143,9 +143,9 @@ public class ArgumentsCacheBehaviorTests
 
         // Assert
         Assert.Equal([
-            JsNumber.Create(42),
+            (42),
             JsValue.Undefined,
-            JsNumber.Create(10),
+            (10),
             JsValue.Undefined,
         ], logValues);
     }

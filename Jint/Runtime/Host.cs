@@ -143,7 +143,7 @@ public class Host
             promise.Reject(ex.Error);
         }
 
-        FinishLoadingImportedModule(referrer, moduleRequest, payload, (JsPromise) promise.Promise);
+        FinishLoadingImportedModule(referrer, moduleRequest, payload, (JsPromise) promise.Promise.Obj!);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public class Host
 
                 // Evaluate returns a promise for async (TLA) modules
                 var evaluateResult = moduleRecord.Evaluate();
-                if (evaluateResult is not JsPromise evaluatePromise)
+                if (evaluateResult.Obj is not JsPromise evaluatePromise)
                 {
                     // Non-cyclic module - shouldn't happen but handle gracefully
                     var ns = Module.GetModuleNamespace(moduleRecord);

@@ -27,7 +27,7 @@ public readonly struct Completion
 
     public Completion(CompletionType type, JsValue value, Node source)
     {
-        Debug.Assert(value is not null);
+        Debug.Assert(!value.IsEmpty);
 
         Type = type;
         Value = value!;
@@ -51,7 +51,7 @@ public readonly struct Completion
     /// </summary>
     internal Completion UpdateEmpty(JsValue value)
     {
-        if (Value?._type != InternalTypes.Empty)
+        if (!Value.IsEmpty)
         {
             return this;
         }

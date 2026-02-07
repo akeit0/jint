@@ -31,7 +31,7 @@ public sealed class ArrayPrototype : ArrayInstance
         ObjectPrototype objectPrototype) : base(engine, InternalTypes.Object)
     {
         _prototype = objectPrototype;
-        _length = new PropertyDescriptor(JsNumber.PositiveZero, PropertyFlag.Writable);
+        _length = new PropertyDescriptor(JsValue.PositiveZero, PropertyFlag.Writable);
         _realm = realm;
         _constructor = arrayConstructor;
         _joinStack = new(engine);
@@ -96,22 +96,22 @@ public sealed class ArrayPrototype : ArrayInstance
                     _prototype = null
                 };
 
-                unscopables.FastSetDataProperty("at", JsBoolean.True);
-                unscopables.FastSetDataProperty("copyWithin", JsBoolean.True);
-                unscopables.FastSetDataProperty("entries", JsBoolean.True);
-                unscopables.FastSetDataProperty("fill", JsBoolean.True);
-                unscopables.FastSetDataProperty("find", JsBoolean.True);
-                unscopables.FastSetDataProperty("findIndex", JsBoolean.True);
-                unscopables.FastSetDataProperty("findLast", JsBoolean.True);
-                unscopables.FastSetDataProperty("findLastIndex", JsBoolean.True);
-                unscopables.FastSetDataProperty("flat", JsBoolean.True);
-                unscopables.FastSetDataProperty("flatMap", JsBoolean.True);
-                unscopables.FastSetDataProperty("includes", JsBoolean.True);
-                unscopables.FastSetDataProperty("keys", JsBoolean.True);
-                unscopables.FastSetDataProperty("toReversed", JsBoolean.True);
-                unscopables.FastSetDataProperty("toSorted", JsBoolean.True);
-                unscopables.FastSetDataProperty("toSpliced", JsBoolean.True);
-                unscopables.FastSetDataProperty("values", JsBoolean.True);
+                unscopables.FastSetDataProperty("at", JsValue.True);
+                unscopables.FastSetDataProperty("copyWithin", JsValue.True);
+                unscopables.FastSetDataProperty("entries", JsValue.True);
+                unscopables.FastSetDataProperty("fill", JsValue.True);
+                unscopables.FastSetDataProperty("find", JsValue.True);
+                unscopables.FastSetDataProperty("findIndex", JsValue.True);
+                unscopables.FastSetDataProperty("findLast", JsValue.True);
+                unscopables.FastSetDataProperty("findLastIndex", JsValue.True);
+                unscopables.FastSetDataProperty("flat", JsValue.True);
+                unscopables.FastSetDataProperty("flatMap", JsValue.True);
+                unscopables.FastSetDataProperty("includes", JsValue.True);
+                unscopables.FastSetDataProperty("keys", JsValue.True);
+                unscopables.FastSetDataProperty("toReversed", JsValue.True);
+                unscopables.FastSetDataProperty("toSorted", JsValue.True);
+                unscopables.FastSetDataProperty("toSpliced", JsValue.True);
+                unscopables.FastSetDataProperty("values", JsValue.True);
 
                 return unscopables;
             }, PropertyFlag.Configurable)
@@ -121,7 +121,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
     private ObjectInstance Keys(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is ObjectInstance oi && oi.IsArrayLike)
+        if (thisObject.Obj is  ObjectInstance oi && oi.IsArrayLike)
         {
             return _realm.Intrinsics.ArrayIteratorPrototype.Construct(oi, ArrayIteratorType.Key);
         }
@@ -175,7 +175,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
     private ObjectInstance Entries(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is ObjectInstance oi && oi.IsArrayLike)
+        if (thisObject.Obj is  ObjectInstance oi && oi.IsArrayLike)
         {
             return _realm.Intrinsics.ArrayIteratorPrototype.Construct(oi, ArrayIteratorType.KeyAndValue);
         }
@@ -329,7 +329,7 @@ public sealed class ArrayPrototype : ArrayInstance
         var len = o.GetLongLength();
         if (len == 0)
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
 
         var n = arguments.Length > 1
@@ -347,7 +347,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
         if (k < 0 || k > ArrayOperations.MaxArrayLikeLength)
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
 
         var searchElement = arguments.At(0);
@@ -370,7 +370,7 @@ public sealed class ArrayPrototype : ArrayInstance
             }
         }
 
-        return JsNumber.IntegerNegativeOne;
+        return -1;
     }
 
     /// <summary>
@@ -480,7 +480,7 @@ public sealed class ArrayPrototype : ArrayInstance
     /// </summary>
     private JsValue Map(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is JsArray { CanUseFastAccess: true } arrayInstance
+        if (thisObject.Obj is  JsArray { CanUseFastAccess: true } arrayInstance
             && !arrayInstance.HasOwnProperty(CommonProperties.Constructor))
         {
             return arrayInstance.Map(arguments);
@@ -591,7 +591,7 @@ public sealed class ArrayPrototype : ArrayInstance
                 if (mapperFunction is not null)
                 {
                     callArguments[0] = element;
-                    callArguments[1] = JsNumber.Create(sourceIndex);
+                    callArguments[1] = (sourceIndex);
                     element = mapperFunction.Call(thisArg ?? Undefined, callArguments);
                 }
 
@@ -670,7 +670,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
         if (len == 0)
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         var searchElement = arguments.At(0);
@@ -680,7 +680,7 @@ public sealed class ArrayPrototype : ArrayInstance
         var n = TypeConverter.ToIntegerOrInfinity(fromIndex);
         if (double.IsPositiveInfinity(n))
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
         else if (double.IsNegativeInfinity(n))
         {
@@ -727,7 +727,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
         if (len == 0)
         {
-            return JsBoolean.True;
+            return JsValue.True;
         }
 
         var callbackfn = arguments.At(0);
@@ -745,13 +745,13 @@ public sealed class ArrayPrototype : ArrayInstance
                 var testResult = callable.Call(thisArg, args);
                 if (!TypeConverter.ToBoolean(testResult))
                 {
-                    return JsBoolean.False;
+                    return JsValue.False;
                 }
             }
         }
         _engine._jsValueArrayPool.ReturnArray(args);
 
-        return JsBoolean.True;
+        return JsValue.True;
     }
 
     /// <summary>
@@ -772,7 +772,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
         if (startIndex > ArrayOperations.MaxArrayLikeLength)
         {
-            return JsNumber.IntegerNegativeOne;
+            return -1;
         }
 
         ulong k;
@@ -1168,7 +1168,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
         var length = (uint) System.Math.Max(0, (long) final - (long) k);
         var a = _realm.Intrinsics.Array.ArraySpeciesCreate(TypeConverter.ToObject(_realm, thisObject), length);
-        if (thisObject is JsArray ai && a is JsArray a2)
+        if (thisObject.Obj is  JsArray ai && a is JsArray a2)
         {
             a2.CopyValues(ai, (uint) k, 0, length);
         }
@@ -1646,7 +1646,7 @@ public sealed class ArrayPrototype : ArrayInstance
     /// </summary>
     public JsValue Push(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is JsArray { CanUseFastAccess: true } arrayInstance)
+        if (thisObject.Obj is  JsArray { CanUseFastAccess: true } arrayInstance)
         {
             return arrayInstance.Push(arguments);
         }
@@ -1671,7 +1671,7 @@ public sealed class ArrayPrototype : ArrayInstance
 
     public JsValue Pop(JsValue thisObject, JsCallArguments arguments)
     {
-        if (thisObject is JsArray { CanUseFastAccess: true } array)
+        if (thisObject.Obj is  JsArray { CanUseFastAccess: true } array)
         {
             return array.Pop();
         }

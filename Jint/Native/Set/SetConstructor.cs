@@ -48,7 +48,7 @@ public sealed class SetConstructor : Constructor
         if (arguments.Length > 0 && !arguments[0].IsNullOrUndefined())
         {
             var adderValue = set.Get("add");
-            var adder = adderValue as ICallable;
+            var adder = adderValue.Obj as ICallable;
             if (adder is null)
             {
                 Throw.TypeError(_engine.Realm, "add must be callable");

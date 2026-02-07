@@ -9,7 +9,7 @@ namespace Jint.Runtime.Environments;
 /// https://tc39.es/ecma262/#sec-environment-records
 /// </summary>
 [DebuggerTypeProxy(typeof(EnvironmentDebugView))]
-internal abstract class Environment : JsValue
+internal abstract class Environment : JsObjectBase
 {
     protected internal readonly Engine _engine;
     protected internal Environment? _outerEnv;
@@ -28,7 +28,7 @@ internal abstract class Environment : JsValue
 
     internal abstract bool HasBinding(BindingName name);
 
-    internal abstract bool TryGetBinding(BindingName name, bool strict, [NotNullWhen(true)] out JsValue? value);
+    internal abstract bool TryGetBinding(BindingName name, bool strict, out JsValue value);
 
     /// <summary>
     /// Creates a new mutable binding in an environment record.
@@ -97,7 +97,7 @@ internal abstract class Environment : JsValue
         return null;
     }
 
-    public override bool Equals(JsValue? other)
+    public override bool Equals(JsObjectBase? other)
     {
         Throw.NotSupportedException();
         return false;

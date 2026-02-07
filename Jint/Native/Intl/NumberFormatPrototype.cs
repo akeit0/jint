@@ -57,9 +57,9 @@ internal sealed class NumberFormatPrototype : Prototype
         SetProperty(name, descriptor);
     }
 
-    private JsNumberFormat ValidateNumberFormat(JsValue thisObject)
+    private JsValueFormat ValidateNumberFormat(JsValue thisObject)
     {
-        if (thisObject is JsNumberFormat numberFormat)
+        if (thisObject.Obj is  JsNumberFormat numberFormat)
         {
             return numberFormat;
         }

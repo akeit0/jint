@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Jint.Native;
+using Jint.Native.Function;
 using Jint.Native.Object;
 
 namespace Jint.Runtime.Descriptors;
@@ -79,8 +80,8 @@ public class PropertyDescriptor
         WritableSet = descriptor.WritableSet;
     }
 
-    public virtual JsValue Get => JsValue.Undefined;
-    public virtual JsValue Set => JsValue.Undefined;
+    public virtual Function? Get => null;
+    public virtual Function? Set => null;
 
     public bool Enumerable
     {
@@ -253,7 +254,7 @@ public class PropertyDescriptor
             configurable = TypeConverter.ToBoolean(obj.Get(CommonProperties.Configurable));
         }
 
-        JsValue? value = null;
+        JsValue value = default;
         var hasValue = obj.HasProperty(CommonProperties.Value);
         if (hasValue)
         {
@@ -267,14 +268,14 @@ public class PropertyDescriptor
             writable = TypeConverter.ToBoolean(obj.Get(CommonProperties.Writable));
         }
 
-        JsValue? get = null;
+        JsValue get = default;
         var hasGet = obj.HasProperty(CommonProperties.Get);
         if (hasGet)
         {
             get = obj.Get(CommonProperties.Get);
         }
 
-        JsValue? set = null;
+        JsValue set = default;
         var hasSet = obj.HasProperty(CommonProperties.Set);
         if (hasSet)
         {
@@ -287,7 +288,7 @@ public class PropertyDescriptor
         }
 
         var desc = hasGet || hasSet
-            ? new GetSetPropertyDescriptor(null, null, PropertyFlag.None)
+            ? new GetSetPropertyDescriptor(default, default, PropertyFlag.None)
             : new PropertyDescriptor(PropertyFlag.None);
 
         if (hasEnumerable)
@@ -360,7 +361,7 @@ public class PropertyDescriptor
 
         if (desc.IsDataDescriptor())
         {
-            properties["value"] = new PropertyDescriptor(desc.Value ?? JsValue.Undefined, PropertyFlag.ConfigurableEnumerableWritable);
+            properties["value"] = new PropertyDescriptor(desc.Value, PropertyFlag.ConfigurableEnumerableWritable);
             if (desc._flags != PropertyFlag.None || desc.WritableSet)
             {
                 properties["writable"] = new PropertyDescriptor(desc.Writable, PropertyFlag.ConfigurableEnumerableWritable);
@@ -400,8 +401,8 @@ public class PropertyDescriptor
             return false;
         }
         return (_flags & (PropertyFlag.WritableSet | PropertyFlag.Writable)) != PropertyFlag.None
-               || (_flags & PropertyFlag.CustomJsValue) != PropertyFlag.None && CustomValue is not null
-               || _value is not null;
+               || (_flags & PropertyFlag.CustomJsValue) != PropertyFlag.None && !CustomValue.IsEmpty
+               || !_value.IsEmpty;
     }
 
     /// <summary>
@@ -420,7 +421,7 @@ public class PropertyDescriptor
         {
         }
 
-        protected internal override JsValue? CustomValue
+        protected internal override JsValue CustomValue
         {
             set => Throw.InvalidOperationException("making changes to undefined property's descriptor is not allowed");
         }
@@ -430,18 +431,18 @@ public class PropertyDescriptor
     {
         private static readonly PropertyDescriptor[] _cache;
 
-        public static readonly AllForbiddenDescriptor NumberZero = new AllForbiddenDescriptor(JsNumber.Create(0));
-        public static readonly AllForbiddenDescriptor NumberOne = new AllForbiddenDescriptor(JsNumber.Create(1));
+        public static readonly AllForbiddenDescriptor NumberZero = new AllForbiddenDescriptor((0));
+        public static readonly AllForbiddenDescriptor NumberOne = new AllForbiddenDescriptor((1));
 
-        public static readonly AllForbiddenDescriptor BooleanFalse = new AllForbiddenDescriptor(JsBoolean.False);
-        public static readonly AllForbiddenDescriptor BooleanTrue = new AllForbiddenDescriptor(JsBoolean.True);
+        public static readonly AllForbiddenDescriptor BooleanFalse = new AllForbiddenDescriptor(JsValue.False);
+        public static readonly AllForbiddenDescriptor BooleanTrue = new AllForbiddenDescriptor(JsValue.True);
 
         static AllForbiddenDescriptor()
         {
             _cache = new PropertyDescriptor[10];
             for (int i = 0; i < _cache.Length; ++i)
             {
-                _cache[i] = new AllForbiddenDescriptor(JsNumber.Create(i));
+                _cache[i] = new AllForbiddenDescriptor((i));
             }
         }
 

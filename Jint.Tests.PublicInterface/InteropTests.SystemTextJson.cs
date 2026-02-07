@@ -196,10 +196,10 @@ file sealed class SystemTextJsonValueConverter : IObjectConverter
                 JsonValueKind.Object or JsonValueKind.Array => JsValue.FromObject(engine, jsonValue),
                 JsonValueKind.String => jsonValue.ToString(),
 #pragma warning disable IL2026, IL3050
-                JsonValueKind.Number => jsonValue.TryGetValue<int>(out var intValue) ? JsNumber.Create(intValue) : JsonSerializer.Deserialize<double>(jsonValue),
+                JsonValueKind.Number => jsonValue.TryGetValue<int>(out var intValue) ? (intValue) : JsonSerializer.Deserialize<double>(jsonValue),
 #pragma warning restore IL2026, IL3050
-                JsonValueKind.True => JsBoolean.True,
-                JsonValueKind.False => JsBoolean.False,
+                JsonValueKind.True => JsValue.True,
+                JsonValueKind.False => JsValue.False,
                 JsonValueKind.Undefined => JsValue.Undefined,
                 JsonValueKind.Null => JsValue.Null,
                 _ => JsValue.Undefined

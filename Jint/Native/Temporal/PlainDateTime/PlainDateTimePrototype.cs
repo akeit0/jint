@@ -62,23 +62,23 @@ internal sealed class PlainDateTimePrototype : Prototype
 
     private JsPlainDateTime ValidatePlainDateTime(JsValue thisObject)
     {
-        if (thisObject is JsPlainDateTime plainDateTime)
+        if (thisObject.Obj is JsPlainDateTime plainDateTime)
             return plainDateTime;
         Throw.TypeError(_realm, "Value is not a Temporal.PlainDateTime");
         return null!;
     }
 
-    private JsString GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidatePlainDateTime(thisObject).Calendar);
-    private JsNumber GetYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Year);
-    private JsNumber GetMonth(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Month);
-    private JsString GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidatePlainDateTime(thisObject).IsoDateTime.Month:D2}");
-    private JsNumber GetDay(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Day);
-    private JsNumber GetHour(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Hour);
-    private JsNumber GetMinute(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Minute);
-    private JsNumber GetSecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Second);
-    private JsNumber GetMillisecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Millisecond);
-    private JsNumber GetMicrosecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Microsecond);
-    private JsNumber GetNanosecond(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Nanosecond);
-    private JsNumber GetDayOfWeek(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Date.DayOfWeek());
-    private JsNumber GetDayOfYear(JsValue thisObject, JsCallArguments arguments) => JsNumber.Create(ValidatePlainDateTime(thisObject).IsoDateTime.Date.DayOfYear());
+    private JsValue GetCalendarId(JsValue thisObject, JsCallArguments arguments) => new JsString(ValidatePlainDateTime(thisObject).Calendar);
+    private JsValue GetYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Year);
+    private JsValue GetMonth(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Month);
+    private JsValue GetMonthCode(JsValue thisObject, JsCallArguments arguments) => new JsString($"M{ValidatePlainDateTime(thisObject).IsoDateTime.Month:D2}");
+    private JsValue GetDay(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Day);
+    private JsValue GetHour(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Hour);
+    private JsValue GetMinute(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Minute);
+    private JsValue GetSecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Second);
+    private JsValue GetMillisecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Millisecond);
+    private JsValue GetMicrosecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Microsecond);
+    private JsValue GetNanosecond(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Nanosecond);
+    private JsValue GetDayOfWeek(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Date.DayOfWeek());
+    private JsValue GetDayOfYear(JsValue thisObject, JsCallArguments arguments) => (ValidatePlainDateTime(thisObject).IsoDateTime.Date.DayOfYear());
 }

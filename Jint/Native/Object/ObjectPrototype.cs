@@ -34,13 +34,13 @@ public sealed class ObjectPrototype : Prototype
             ["__lookupGetter__"] = new LazyPropertyDescriptor<ObjectPrototype>(this, static prototype => new ClrFunction(prototype._engine, "__lookupGetter__", prototype.LookupGetter, 1, LengthFlags), PropertyFlags),
             ["__lookupSetter__"] = new LazyPropertyDescriptor<ObjectPrototype>(this, static prototype => new ClrFunction(prototype._engine, "__lookupSetter__", prototype.LookupSetter, 1, LengthFlags), PropertyFlags),
             ["__proto__"] = new GetSetPropertyDescriptor(
-                new ClrFunction(Engine, "get __proto__", (thisObject, _) => TypeConverter.ToObject(_realm, thisObject).GetPrototypeOf() ?? Null, 0, LengthFlags),
+                new ClrFunction(Engine, "get __proto__", (thisObject, _) => TypeConverter.ToObject(_realm, thisObject).GetPrototypeOf() ?? JsValue.Null, 0, LengthFlags),
                 new ClrFunction(Engine, "set __proto__", (thisObject, arguments) =>
                 {
                     TypeConverter.RequireObjectCoercible(_engine, thisObject);
 
                     var proto = arguments.At(0);
-                    if (!proto.IsObject() && !proto.IsNull() || thisObject is not ObjectInstance objectInstance)
+                    if (!proto.IsObject() && !proto.IsNull() || thisObject.Obj is  not ObjectInstance objectInstance)
                     {
                         return Undefined;
                     }
@@ -198,7 +198,7 @@ public sealed class ObjectPrototype : Prototype
         var desc = o.GetOwnProperty(p);
         if (desc == PropertyDescriptor.Undefined)
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
         return desc.Enumerable;
     }
@@ -214,7 +214,7 @@ public sealed class ObjectPrototype : Prototype
         var arg = arguments[0];
         if (!arg.IsObject())
         {
-            return JsBoolean.False;
+            return JsValue.False;
         }
 
         var v = arg.AsObject();
@@ -226,12 +226,12 @@ public sealed class ObjectPrototype : Prototype
 
             if (v is null)
             {
-                return JsBoolean.False;
+                return JsValue.False;
             }
 
             if (ReferenceEquals(o, v))
             {
-                return JsBoolean.True;
+                return JsValue.True;
             }
         }
     }

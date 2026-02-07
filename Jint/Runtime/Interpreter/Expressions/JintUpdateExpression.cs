@@ -57,7 +57,7 @@ internal sealed class JintUpdateExpression : JintExpression
     private JsValue UpdateNonIdentifier(EvaluationContext context)
     {
         var engine = context.Engine;
-        var reference = _argument.Evaluate(context) as Reference;
+        var reference = _argument.Evaluate(context).Obj as Reference;
         if (reference is null)
         {
             Throw.TypeError(engine.Realm, "Invalid left-hand side expression");
@@ -68,31 +68,31 @@ internal sealed class JintUpdateExpression : JintExpression
         var value = engine.GetValue(reference, false);
         var isInteger = value._type == InternalTypes.Integer;
 
-        JsValue? newValue = null;
+        JsValue newValue = default;
 
         var operatorOverloaded = false;
-        if (context.OperatorOverloadingAllowed)
-        {
-            if (JintUnaryExpression.TryOperatorOverloading(context, _argument.GetValue(context), _change > 0 ? "op_Increment" : "op_Decrement", out var result))
-            {
-                operatorOverloaded = true;
-                newValue = result;
-            }
-        }
+        // if (context.OperatorOverloadingAllowed)
+        // {
+        //     if (JintUnaryExpression.TryOperatorOverloading(context, _argument.GetValue(context), _change > 0 ? "op_Increment" : "op_Decrement", out var result))
+        //     {
+        //         operatorOverloaded = true;
+        //         newValue = result;
+        //     }
+        // }
 
         if (!operatorOverloaded)
         {
             if (isInteger)
             {
-                newValue = JsNumber.Create(value.AsInteger() + _change);
+                newValue = (value.AsInteger() + _change);
             }
             else if (!value.IsBigInt())
             {
-                newValue = JsNumber.Create(TypeConverter.ToNumber(value) + _change);
+                newValue = (TypeConverter.ToNumber(value) + _change);
             }
             else
             {
-                newValue = JsBigInt.Create(TypeConverter.ToBigInt(value) + _change);
+                newValue = (TypeConverter.ToBigInt(value) + _change);
             }
         }
 
@@ -112,10 +112,10 @@ internal sealed class JintUpdateExpression : JintExpression
 
             if (!value.IsBigInt())
             {
-                return JsNumber.Create(TypeConverter.ToNumber(value));
+                return (TypeConverter.ToNumber(value));
             }
 
-            return JsBigInt.Create(value);
+            return (value);
         }
     }
 
@@ -138,27 +138,27 @@ internal sealed class JintUpdateExpression : JintExpression
 
             var isInteger = value._type == InternalTypes.Integer;
 
-            JsValue? newValue = null;
+            JsValue newValue = default;
 
             var operatorOverloaded = false;
-            if (context.OperatorOverloadingAllowed)
-            {
-                if (JintUnaryExpression.TryOperatorOverloading(context, _argument.GetValue(context), _change > 0 ? "op_Increment" : "op_Decrement", out var result))
-                {
-                    operatorOverloaded = true;
-                    newValue = result;
-                }
-            }
+            // if (context.OperatorOverloadingAllowed)
+            // {
+            //     if (JintUnaryExpression.TryOperatorOverloading(context, _argument.GetValue(context), _change > 0 ? "op_Increment" : "op_Decrement", out var result))
+            //     {
+            //         operatorOverloaded = true;
+            //         newValue = result;
+            //     }
+            // }
 
             if (!operatorOverloaded)
             {
                 if (isInteger)
                 {
-                    newValue = JsNumber.Create(value.AsInteger() + _change);
+                    newValue = (value.AsInteger() + _change);
                 }
                 else if (value._type != InternalTypes.BigInt)
                 {
-                    newValue = JsNumber.Create(TypeConverter.ToNumber(value) + _change);
+                    newValue = (TypeConverter.ToNumber(value) + _change);
                 }
                 else
                 {
@@ -174,7 +174,7 @@ internal sealed class JintUpdateExpression : JintExpression
 
             if (!value.IsBigInt() && !value.IsNumber() && !operatorOverloaded)
             {
-                return JsNumber.Create(TypeConverter.ToNumber(value));
+                return (TypeConverter.ToNumber(value));
             }
 
             return value;

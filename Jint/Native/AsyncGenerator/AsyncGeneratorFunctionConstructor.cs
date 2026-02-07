@@ -23,7 +23,7 @@ internal sealed class AsyncGeneratorFunctionConstructor : Constructor
         PrototypeObject = new AsyncGeneratorFunctionPrototype(engine, this, prototype, asyncIteratorPrototype);
         _prototype = PrototypeObject;
         _prototypeDescriptor = new PropertyDescriptor(PrototypeObject, PropertyFlag.AllForbidden);
-        _length = new PropertyDescriptor(JsNumber.PositiveOne, PropertyFlag.Configurable);
+        _length = new PropertyDescriptor(1, PropertyFlag.Configurable);
     }
 
     public AsyncGeneratorFunctionPrototype PrototypeObject { get; }
